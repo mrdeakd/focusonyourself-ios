@@ -1,38 +1,52 @@
 import SwiftUI
 
 struct HomeScreen: View {
-    @Environment(AppState.self) private var appState
-    @State private var viewModel: HomeViewModel
+    @State private var viewModel = HomeViewModel()
 
-    private let dateFont = Font.custom("Inter", size: 13).weight(.regular)
-    private let streakLabelFont = Font.custom("Inter", size: 13).weight(.semibold)
     private let iconSize: CGFloat = 14
-
-    init(appState: AppState) {
-        _viewModel = State(initialValue: HomeViewModel(appState: appState))
-    }
 
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: Spacing.lg) {
-                    headerRow
-                    AffirmationCardView(
-                        quote: viewModel.todayAffirmation.quote,
-                        category: viewModel.todayAffirmation.category
-                    )
-                    MoodPickerView(
-                        selectedMood: viewModel.selectedMood,
-                        onSelect: { viewModel.selectMood($0) },
-                        onCheckIn: { viewModel.completeCheckIn() }
-                    )
+            VStack(spacing: Spacing.lg) {
+                headerRow
+
+                ScrollView {
+                    VStack(spacing: Spacing.lg) {
+                        AffirmationCardView(
+                            quote: viewModel.todayAffirmation.quote,
+                            category: viewModel.todayAffirmation.category,
+                            isLoading: viewModel.isGeneratingAffirmation
+                        )
+                        if viewModel.hasCheckedIn {
+                            CheckedInCardView(
+                                mood: viewModel.todaysMood,
+                                streakCount: viewModel.streakCount
+                            )
+                        } else {
+                            MoodPickerView(
+                                selectedMood: viewModel.selectedMood,
+                                feelingsDescription: Bindable(viewModel).feelingsDescription,
+                                onSelect: { viewModel.selectMood($0) },
+                                onCheckIn: { viewModel.completeCheckIn() }
+                            )
+                        }
+                    }
+                    .padding(.top, Spacing.md)
+                    .padding(.horizontal, Spacing.xl)
+                    .padding(.bottom, Spacing.screenBottom)
                 }
-                .padding(.top, Spacing.md)
-                .padding(.horizontal, Spacing.xl)
-                .padding(.bottom, Spacing.screenBottom)
             }
+        }
+        .simultaneousGesture(TapGesture().onEnded {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder),
+                to: nil, from: nil, for: nil
+            )
+        })
+        .task {
+            await viewModel.generateAffirmationIfNeeded()
         }
     }
 
@@ -43,7 +57,7 @@ struct HomeScreen: View {
                     .font(.foyNavTitle)
                     .foregroundStyle(Color.foyForeground)
                 Text(viewModel.formattedDate)
-                    .font(dateFont)
+                    .font(.foyCaption)
                     .foregroundStyle(Color.foyForegroundSecondary)
             }
             Spacer()
@@ -53,7 +67,7 @@ struct HomeScreen: View {
                     .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(Color.foyOrange)
                 Text("\(viewModel.streakCount) days")
-                    .font(streakLabelFont)
+                    .font(.foyCaptionSemibold)
                     .foregroundStyle(Color.foyOrange)
             }
             .padding(.vertical, Spacing.xxs)

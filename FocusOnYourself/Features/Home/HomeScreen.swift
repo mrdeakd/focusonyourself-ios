@@ -5,7 +5,7 @@ struct HomeScreen: View {
     @State private var viewModel: HomeViewModel
 
     init(appState: AppState) {
-        _viewModel = State(initialValue: HomeViewModel(profile: appState.profile))
+        _viewModel = State(initialValue: HomeViewModel(appState: appState))
     }
 
     var body: some View {

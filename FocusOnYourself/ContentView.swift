@@ -1,24 +1,19 @@
-//
-//  ContentView.swift
-//  FocusOnYourself
-//
-//  Created by Deák Dávid on 2026. 03. 13..
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AppState.self) private var appState
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if appState.profile.onboardingCompleted {
+            Text("Main App — Coming Soon")
+                .foregroundStyle(Color.foyForegroundSecondary)
+        } else {
+            OnboardingFlow()
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .environment(AppState())
 }

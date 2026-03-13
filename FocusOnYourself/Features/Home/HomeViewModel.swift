@@ -8,13 +8,26 @@ final class HomeViewModel {
     var todaysMood: Mood? = nil
     var feelingsDescription: String = ""
     var isGeneratingAffirmation: Bool = false
-    var generatedQuote: String? = nil
+    var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
 
     private let profileService: ProfileServiceProtocol
     private let affirmationService: AffirmationServiceProtocol
 
     private let quoteKey = "affirmation.quote"
     private let datKey  = "affirmation.date"
+
+    private static let fallbackQuotes: [String] = [
+        "I am worthy of love and respect exactly as I am.",
+        "I choose to embrace each day with gratitude and purpose.",
+        "I have the strength to overcome any challenge I face.",
+        "I am growing into the best version of myself.",
+        "I choose peace and let go of what I cannot control.",
+        "I am deserving of good things and I welcome them.",
+        "I have the power to create positive change in my life.",
+        "I am enough, and I do enough.",
+        "I choose kindness — to others and to myself.",
+        "I am capable of achieving everything I set my mind to."
+    ]
 
     init(
         profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
@@ -24,7 +37,7 @@ final class HomeViewModel {
         self.affirmationService = affirmationService
         self.hasCheckedIn = profileService.hasCheckedInToday
         self.todaysMood = profileService.todaysMood
-        loadCachedQuote()
+        loadCachedQuotes()
     }
 
     var greeting: String {
@@ -44,30 +57,19 @@ final class HomeViewModel {
 
     var streakCount: Int { profileService.streakStats().current }
 
-    var todayAffirmation: (quote: String, category: AffirmationCategory) {
-        let category = profileService.profile.selectedCategories.first ?? .confidence
-        let quote = generatedQuote ?? "I am worthy of love and respect exactly as I am."
-        return (quote: quote, category: category)
-    }
-
-    func generateAffirmationIfNeeded() async {
-        guard profileService.profile.appleIntelligenceEnabled else { return }
-        guard generatedQuote == nil else { return }
-
-        isGeneratingAffirmation = true
-        defer { isGeneratingAffirmation = false }
-
+    var todayAffirmations: [(quote: String, category: AffirmationCategory)] {
+        guard generatedQuotes.isEmpty else { return generatedQuotes }
         let categories = profileService.profile.selectedCategories
-        do {
-            let quote = try await affirmationService.generate(for: categories)
-            generatedQuote = quote
-            cacheQuote(quote)
-        } catch {
-            // Silent fallback — static quote remains
+        let fallback: AffirmationCategory = .confidence
+        return Self.fallbackQuotes.enumerated().map { index, quote in
+            let category = categories.isEmpty ? fallback : categories[index % categories.count]
+            return (quote: quote, category: category)
         }
     }
 
-    func selectMood(_ mood: Mood) { selectedMood = mood }
+    func selectMood(_ mood: Mood) {
+        selectedMood = mood
+    }
 
     func completeCheckIn() {
         guard let mood = selectedMood else { return }
@@ -77,19 +79,45 @@ final class HomeViewModel {
         todaysMood = mood
     }
 
-    // MARK: - Private
+    // MARK: - Affirmations
 
-    private func loadCachedQuote() {
+    func generateAffirmationIfNeeded() async {
+        guard profileService.profile.appleIntelligenceEnabled else { return }
+        guard generatedQuotes.isEmpty else { return }
+
+        isGeneratingAffirmation = true
+        defer { isGeneratingAffirmation = false }
+
+        let categories = profileService.profile.selectedCategories
+        do {
+            let pairs = try await affirmationService.generateBatch(count: 10, for: categories)
+            generatedQuotes = pairs
+            cacheQuotes(pairs)
+        } catch {
+            print("[HomeViewModel] Failed to generate affirmations: \(error)")
+        }
+    }
+
+    private struct CachedAffirmation: Codable {
+        let quote: String
+        let category: AffirmationCategory
+    }
+
+    private func loadCachedQuotes() {
         let defaults = UserDefaults.standard
         let today = CheckIn.dateString(for: Date())
         guard defaults.string(forKey: datKey) == today,
-              let cached = defaults.string(forKey: quoteKey) else { return }
-        generatedQuote = cached
+              let data = defaults.data(forKey: quoteKey),
+              let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data) else { return }
+        generatedQuotes = cached.map { (quote: $0.quote, category: $0.category) }
     }
 
-    private func cacheQuote(_ quote: String) {
+    private func cacheQuotes(_ pairs: [(quote: String, category: AffirmationCategory)]) {
         let defaults = UserDefaults.standard
-        defaults.set(quote, forKey: quoteKey)
+        let cached = pairs.map { CachedAffirmation(quote: $0.quote, category: $0.category) }
+        if let data = try? JSONEncoder().encode(cached) {
+            defaults.set(data, forKey: quoteKey)
+        }
         defaults.set(CheckIn.dateString(for: Date()), forKey: datKey)
     }
 }

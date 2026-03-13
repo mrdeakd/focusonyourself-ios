@@ -17,5 +17,9 @@ struct StreakStatCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.foyCard)
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.input))
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.input)
+                .stroke(Color.foyNavy, lineWidth: 1)
+        )
     }
 }

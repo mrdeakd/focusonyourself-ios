@@ -1,5 +1,5 @@
 import Foundation
 
 protocol AffirmationServiceProtocol {
-    func generate(for categories: [AffirmationCategory]) async throws -> String
+    func generateBatch(count: Int, for categories: [AffirmationCategory]) async throws -> [(quote: String, category: AffirmationCategory)]
 }

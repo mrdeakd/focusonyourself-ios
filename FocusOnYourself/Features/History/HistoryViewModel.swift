@@ -21,7 +21,7 @@ final class HistoryViewModel {
         let cal = Calendar.current
         let today = Date()
 
-        let startDate = profileService.streakStartDate ?? today
+        let startDate = profileService.earliestCheckInDate ?? today
 
         var comps = cal.dateComponents([.year, .month], from: startDate)
         comps.day = 1
@@ -39,6 +39,6 @@ final class HistoryViewModel {
             current = next
         }
 
-        return months
+        return months.reversed()
     }
 }

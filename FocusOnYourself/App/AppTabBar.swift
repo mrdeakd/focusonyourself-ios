@@ -24,6 +24,8 @@ struct AppTabBar: View {
     @Binding var selectedTab: AppTab
 
     private let pillHeight: CGFloat = 62
+    private let pillCornerRadius: CGFloat = 36
+    private let innerPadding: CGFloat = 4
     private let tabContainerPadding: CGFloat = 21
     private let tabContainerTop: CGFloat = 12
 
@@ -35,10 +37,14 @@ struct AppTabBar: View {
                 }
             }
         }
+        .padding(innerPadding)
         .frame(height: pillHeight)
-        .padding(Spacing.xxxs)
-        .background(Color.foyNavy)
-        .clipShape(Capsule())
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: pillCornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: pillCornerRadius)
+                .stroke(Color.foyBorder, lineWidth: 1)
+        )
         .padding(.horizontal, tabContainerPadding)
         .padding(.top, tabContainerTop)
         .padding(.bottom, tabContainerPadding)
@@ -50,6 +56,8 @@ private struct TabItemView: View {
     let tab: AppTab
     let isSelected: Bool
     let onTap: () -> Void
+
+    private let activeCornerRadius: CGFloat = 26
 
     var body: some View {
         Button(action: onTap) {
@@ -64,8 +72,8 @@ private struct TabItemView: View {
             }
             .foregroundStyle(isSelected ? Color.white : Color.foyPlaceholder)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(isSelected ? Color.white.opacity(0.15) : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.tabItem))
+            .background(isSelected ? Color.foyNavy : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: activeCornerRadius))
         }
         .buttonStyle(.plain)
     }

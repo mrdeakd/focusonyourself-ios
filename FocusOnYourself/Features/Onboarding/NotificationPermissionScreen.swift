@@ -3,8 +3,6 @@ import SwiftUI
 struct NotificationPermissionScreen: View {
     var viewModel: OnboardingViewModel
 
-    private let skipVerticalPadding: CGFloat = 12
-
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
@@ -52,7 +50,7 @@ struct NotificationPermissionScreen: View {
                         Text("Skip for now")
                             .font(.foySkipLabel)
                             .foregroundStyle(Color.foyPlaceholder)
-                            .padding(.vertical, skipVerticalPadding)
+                            .padding(.vertical, Spacing.sm)
                     }
                 }
             }

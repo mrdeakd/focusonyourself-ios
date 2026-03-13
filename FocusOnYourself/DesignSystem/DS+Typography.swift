@@ -1,17 +1,19 @@
 import SwiftUI
 
 extension Font {
-    static func inter(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+    private static func inter(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         .custom("Inter", size: size).weight(weight)
     }
 
     static let foyDisplayTitle = Font.inter(32, weight: .light)
     static let foySectionTitle = Font.inter(28, weight: .light)
+    static let foyNavTitle     = Font.inter(18, weight: .medium)
     static let foyBody         = Font.inter(15)
     static let foyButtonLabel  = Font.inter(16, weight: .medium)
     static let foyInputText    = Font.inter(16)
     static let foyHint         = Font.inter(12)
     static let foySkipLabel    = Font.inter(14)
+    static let foySectionLabel = Font.inter(11, weight: .medium)
 }
 
 extension View {
@@ -28,5 +30,10 @@ extension View {
     /// Inter 15px, lineSpacing 9pt (lineHeight 1.6)
     func foyBodyStyle() -> some View {
         self.font(.foyBody).lineSpacing(9)
+    }
+
+    /// Inter 11px medium, kerning 0.8 (section label style)
+    func foySectionLabelStyle() -> some View {
+        self.font(.foySectionLabel).kerning(0.8)
     }
 }

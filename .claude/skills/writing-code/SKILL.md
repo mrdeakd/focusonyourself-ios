@@ -4,7 +4,7 @@ description: >
   ALWAYS load this skill automatically whenever writing, adding, or modifying any code file in this
   project. Enforces Swift/SwiftUI conventions, design system token usage, MVVM screen structure,
   component organization, dependency injection patterns, and error handling rules specific to
-  the No More X codebase. Do not skip this skill for any code changes.
+  the FocusOnYourself codebase. Do not skip this skill for any code changes.
 ---
 
 # Writing Code
@@ -15,14 +15,46 @@ When writing or modifying any SwiftUI view, **always use the design system const
 
 | What | Use | Never use |
 |------|-----|-----------|
-| Colors | `Color.nxPrimary`, `Color.nxBackground`, `Color.nxForeground`, etc. (`Colors.swift`) | `.blue`, `Color(hex:)`, `UIColor` literals |
+| Colors | `Color.foyBackground`, `Color.foyNavy`, `Color.foyForeground`, etc. (`Colors.swift`) | `.blue`, `Color(hex:)`, `UIColor` literals |
 | Spacing | `Spacing.xs/sm/md/lg/xl/xxl` (`Spacing.swift`) | `8`, `16`, `24` as magic numbers |
 | Corner radius | `CornerRadius.*` (`CornerRadius.swift`) | `10`, `12`, `.cornerRadius(8)` |
-| Typography | `.font(.nxLargeTitle)`, `.font(.nxHeadline)`, etc. (`Typography.swift`) | `.font(.system(size: 40))`, `.font(.title)` |
+| Typography | `.font(.foyNavTitle)`, `.font(.foyBody)`, etc. (`Typography.swift`) | `.font(.system(size: 40))`, `.font(.title)` |
 
 If a value has no matching token (e.g. a one-off icon size), extract it to a `private let` constant at the top of the struct — never leave magic numbers inline in the view body.
 
-> **Text colors:** Use `Color.nxForeground` / `Color.nxForegroundSecondary` for primary and secondary text. `nxTextPrimary` / `nxTextSecondary` are deprecated backward-compat aliases — do not use them in new code.
+### Color tokens
+
+Full token list: `foyBackground`, `foyNavy`, `foyNavyTint`, `foyForeground`, `foyForegroundSecondary`, `foyPlaceholder`, `foyBorder`, `foyButtonDisabled`, `foyCard`, `foyOrange`, `foyOrangeTint`, `foyMoodBackground`, `foyCalendarSkipped`
+
+| What | Correct token |
+|------|--------------|
+| Background | `Color.foyBackground` |
+| Primary/brand | `Color.foyNavy` |
+| Primary text | `Color.foyForeground` |
+| Secondary text | `Color.foyForegroundSecondary` |
+| Card fill | `Color.foyCard` |
+| Orange accent | `Color.foyOrange` |
+| Border | `Color.foyBorder` |
+| Placeholder / disabled text | `Color.foyPlaceholder` |
+
+### Typography tokens
+
+Tokens (use with `.font()`):
+- `.foyDisplayTitle` (Inter 32px light)
+- `.foySectionTitle` (Inter 28px light)
+- `.foyNavTitle` (Inter 18px medium)
+- `.foyBody` (Inter 15px regular)
+- `.foyButtonLabel` (Inter 16px medium)
+- `.foyInputText` (Inter 16px regular)
+- `.foyHint` (Inter 12px regular)
+- `.foySkipLabel` (Inter 14px regular)
+- `.foySectionLabel` (Inter 11px medium)
+
+Style modifiers (add kerning/line-spacing, use instead of `.font()`):
+- `.foyDisplayTitleStyle()` — 32px light, kerning −0.5
+- `.foySectionTitleStyle()` — 28px light, kerning −0.5
+- `.foyBodyStyle()` — 15px, lineSpacing 9pt
+- `.foySectionLabelStyle()` — 11px medium, kerning 0.8
 
 ## Code Organization
 
@@ -252,8 +284,3 @@ enum MyFeatureError: Error {
 - Throw the typed enum from services; catch in ViewModels
 - ViewModels expose `var errorMessage: String?`; populate via `.defaultDescription`
 - Never use `try?` to suppress errors — catch and surface them via the ViewModel
-- Display errors using the `NXErrorNotificationBanner` via the `.nxErrorBanner(message:)` modifier — the `message` parameter is a `Binding<String?>`:
-  ```swift
-  // ✅ correct — message is a Binding<String?>
-  .nxErrorBanner(message: $viewModel.errorMessage)
-  ```

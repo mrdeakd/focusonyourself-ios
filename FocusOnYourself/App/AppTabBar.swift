@@ -67,7 +67,7 @@ private struct TabItemView: View {
                     .scaledToFit()
                     .frame(width: 18, height: 18)
                 Text(tab.label)
-                    .font(.inter(10, weight: .medium))
+                    .font(.foySectionLabel)
                     .kerning(0.5)
             }
             .foregroundStyle(isSelected ? Color.white : Color.foyPlaceholder)

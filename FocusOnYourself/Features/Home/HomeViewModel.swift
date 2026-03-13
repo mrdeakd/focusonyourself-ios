@@ -6,10 +6,10 @@ final class HomeViewModel {
     var selectedMood: Mood? = nil
     var hasCheckedIn: Bool = false
 
-    private let profile: UserProfile
+    private let appState: AppState
 
-    init(profile: UserProfile) {
-        self.profile = profile
+    init(appState: AppState) {
+        self.appState = appState
     }
 
     var greeting: String {
@@ -20,19 +20,18 @@ final class HomeViewModel {
         case 12..<17: timeOfDay = "Good afternoon"
         default:      timeOfDay = "Good evening"
         }
-        return profile.name.isEmpty ? timeOfDay : "\(timeOfDay), \(profile.name)"
+        return appState.profile.name.isEmpty ? timeOfDay : "\(timeOfDay), \(appState.profile.name)"
     }
 
     var formattedDate: String {
         Date().homeScreenFormatted
     }
 
-    // Placeholder — streak tracking not yet implemented
-    var streakCount: Int { 12 }
+    var streakCount: Int { appState.streakStats().current }
 
     var todayAffirmation: (quote: String, category: AffirmationCategory) {
         // Placeholder affirmation — rotated daily in a future iteration
-        let category = profile.selectedCategories.first ?? .confidence
+        let category = appState.profile.selectedCategories.first ?? .confidence
         return (quote: "I am worthy of love and respect exactly as I am.", category: category)
     }
 
@@ -41,7 +40,8 @@ final class HomeViewModel {
     }
 
     func completeCheckIn() {
-        guard selectedMood != nil else { return }
+        guard let mood = selectedMood else { return }
+        appState.recordCheckIn(mood: mood)
         hasCheckedIn = true
     }
 }

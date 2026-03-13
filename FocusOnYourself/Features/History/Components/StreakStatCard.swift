@@ -4,18 +4,20 @@ struct StreakStatCard: View {
     let label: String
     let value: Int   // number of days
 
+    private let valueFont = Font.custom("Inter", size: 24).weight(.medium)
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Spacing.xxxs) {
             Text(label)
-                .font(.inter(11, weight: .medium))
+                .font(.foySectionLabel)
                 .foregroundStyle(Color.foyPlaceholder)
             Text("\(value) days")
-                .font(.inter(24, weight: .medium))
+                .font(valueFont)
                 .foregroundStyle(Color.foyForeground)
         }
-        .padding(16)
+        .padding(Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.foyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.input))
     }
 }

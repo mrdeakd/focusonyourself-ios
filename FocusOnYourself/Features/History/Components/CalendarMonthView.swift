@@ -12,21 +12,25 @@ private struct CalendarDayCell: View {
     let day: Int      // 1-31, or 0 for empty
     let state: DayState
 
+    private let cellSize: CGFloat = 32
+    private let borderWidth: CGFloat = 1.5
+    private let dayNumberFont = Font.custom("Inter", size: 12).weight(.medium)
+
     var body: some View {
         ZStack {
             cellBackground
             if day > 0 && state != .future && state != .empty {
                 Text("\(day)")
-                    .font(.inter(12, weight: .medium))
+                    .font(dayNumberFont)
                     .foregroundStyle(textColor)
             }
         }
-        .frame(width: 32, height: 32)
+        .frame(width: cellSize, height: cellSize)
         .clipShape(Circle())
         .overlay(
             Group {
                 if state == .today {
-                    Circle().stroke(Color.foyNavy, lineWidth: 1.5)
+                    Circle().stroke(Color.foyNavy, lineWidth: borderWidth)
                 }
             }
         )
@@ -58,26 +62,27 @@ struct CalendarMonthView: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
     private let dayLabels = ["S", "M", "T", "W", "T", "F", "S"]
+    private let monthHeaderFont = Font.custom("Inter", size: 15).weight(.medium)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
             // Month header: "March 2026"
             Text(monthTitle)
-                .font(.inter(15, weight: .medium))
+                .font(monthHeaderFont)
                 .foregroundStyle(Color.foyForeground)
 
             // Day-of-week row
             HStack(spacing: 0) {
                 ForEach(0..<7, id: \.self) { i in
                     Text(dayLabels[i])
-                        .font(.inter(11, weight: .medium))
+                        .font(.foySectionLabel)
                         .foregroundStyle(Color.foyPlaceholder)
                         .frame(maxWidth: .infinity)
                 }
             }
 
             // Calendar grid
-            LazyVGrid(columns: columns, spacing: 8) {
+            LazyVGrid(columns: columns, spacing: Spacing.xs) {
                 ForEach(cells, id: \.offset) { cell in
                     CalendarDayCell(day: cell.day, state: cell.state)
                 }

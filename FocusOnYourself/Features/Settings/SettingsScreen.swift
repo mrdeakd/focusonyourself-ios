@@ -1,12 +1,15 @@
 import SwiftUI
 
 struct SettingsScreen: View {
-    @Environment(AppState.self) private var appState
+    @State private var viewModel: SettingsViewModel
 
-    @State private var draftName: String = ""
-    @State private var draftCategories: Set<AffirmationCategory> = []
-    @State private var draftNotifications: Bool = true
-    @State private var draftAppleIntelligence: Bool = false
+    private let inputFieldHeight: CGFloat = 52
+    private let iconSize: CGFloat = 18
+    private let saveFontMedium15 = Font.custom("Inter", size: 15).weight(.medium)
+
+    init(appState: AppState) {
+        _viewModel = State(initialValue: SettingsViewModel(appState: appState))
+    }
 
     var body: some View {
         ZStack {
@@ -16,56 +19,55 @@ struct SettingsScreen: View {
                 // Fixed header
                 HStack {
                     Text("Settings")
-                        .font(.inter(18, weight: .medium))
+                        .font(.foyNavTitle)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
                     Button("Save") {
-                        save()
+                        viewModel.save()
                     }
-                    .font(.inter(15, weight: .medium))
+                    .font(saveFontMedium15)
                     .foregroundStyle(Color.foyNavy)
                 }
-                .padding(.horizontal, 28)
-                .padding(.top, 20)
-                .padding(.bottom, 16)
+                .padding(.horizontal, Spacing.screenHorizontal)
+                .padding(.top, Spacing.lg)
+                .padding(.bottom, Spacing.md)
 
                 // Scrollable content
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: Spacing.lg) {
                         nameSection
                         categoriesSection
                         notificationsSection
                         appleIntelligenceSection
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, Spacing.lg)
+                    .padding(.bottom, Spacing.lg)
                 }
             }
         }
-        .onAppear { loadDrafts() }
     }
 
     // MARK: - Sections
 
     private var nameSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("YOUR NAME")
-            TextField("Your name", text: $draftName)
-                .font(.inter(15))
+            TextField("Your name", text: $viewModel.draftName)
+                .font(.foyBody)
                 .foregroundStyle(Color.foyForeground)
-                .padding(.horizontal, 16)
-                .frame(height: 52)
+                .padding(.horizontal, Spacing.md)
+                .frame(height: inputFieldHeight)
                 .background(Color.foyCard)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: CornerRadius.card)
                         .stroke(Color.foyBorder, lineWidth: 1)
                 )
         }
     }
 
     private var categoriesSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("AFFIRMATION CATEGORIES")
             VStack(spacing: 0) {
                 ForEach(Array(AffirmationCategory.allCases.enumerated()), id: \.element.id) { index, category in
@@ -76,77 +78,77 @@ struct SettingsScreen: View {
                         }
                         HStack {
                             Text(category.displayName)
-                                .font(.inter(15))
+                                .font(.foyBody)
                                 .foregroundStyle(Color.foyForeground)
                             Spacer()
-                            let isSelected = draftCategories.contains(category)
+                            let isSelected = viewModel.draftCategories.contains(category)
                             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                 .resizable()
-                                .frame(width: 18, height: 18)
+                                .frame(width: iconSize, height: iconSize)
                                 .foregroundStyle(isSelected ? Color.foyNavy : Color.foyButtonDisabled)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
+                        .padding(.horizontal, Spacing.md)
+                        .padding(.vertical, Spacing.md)
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            if draftCategories.contains(category) {
-                                draftCategories.remove(category)
+                            if viewModel.draftCategories.contains(category) {
+                                viewModel.draftCategories.remove(category)
                             } else {
-                                draftCategories.insert(category)
+                                viewModel.draftCategories.insert(category)
                             }
                         }
                     }
                 }
             }
             .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
 
     private var notificationsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("NOTIFICATIONS")
             HStack {
                 Text("Daily 9am Reminder")
-                    .font(.inter(15))
+                    .font(.foyBody)
                     .foregroundStyle(Color.foyForeground)
                 Spacer()
-                FOYToggle(isOn: $draftNotifications)
+                FOYToggle(isOn: $viewModel.draftNotifications)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.horizontal, Spacing.md)
+            .padding(.vertical, Spacing.md)
             .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
 
     private var appleIntelligenceSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("APPLE INTELLIGENCE")
             VStack(spacing: 0) {
                 HStack {
                     Text("Apple Intelligence")
-                        .font(.inter(15))
+                        .font(.foyBody)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
-                    FOYToggle(isOn: $draftAppleIntelligence)
+                    FOYToggle(isOn: $viewModel.draftAppleIntelligence)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.md)
 
                 Divider()
                     .background(Color.foyBorder)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, Spacing.md)
 
                 Text("After check-in, generate a personalized affirmation using on-device AI. Requires iPhone 15 Pro or newer.")
-                    .font(.inter(12))
+                    .font(.foyHint)
                     .foregroundStyle(Color.foyPlaceholder)
-                    .lineSpacing(6)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
+                    .lineSpacing(Spacing.xxs)
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.vertical, Spacing.md)
             }
             .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
 
@@ -154,24 +156,7 @@ struct SettingsScreen: View {
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
-            .font(.inter(11, weight: .medium))
+            .foySectionLabelStyle()
             .foregroundStyle(Color.foyPlaceholder)
-            .kerning(0.8)
-    }
-
-    private func loadDrafts() {
-        draftName = appState.profile.name
-        draftCategories = Set(appState.profile.selectedCategories)
-        draftNotifications = appState.profile.notificationsEnabled
-        draftAppleIntelligence = appState.profile.appleIntelligenceEnabled
-    }
-
-    private func save() {
-        var updated = appState.profile
-        updated.name = draftName
-        updated.selectedCategories = AffirmationCategory.allCases.filter { draftCategories.contains($0) }
-        updated.notificationsEnabled = draftNotifications
-        updated.appleIntelligenceEnabled = draftAppleIntelligence
-        appState.updateProfile(updated)
     }
 }

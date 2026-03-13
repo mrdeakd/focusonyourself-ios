@@ -8,13 +8,12 @@ struct CategoryRowView: View {
     private let iconSize: CGFloat = 20
     private let selectedBorderWidth: CGFloat = 1.5
     private let unselectedBorderWidth: CGFloat = 1
-    private let selectedRowFont = Font.custom("Inter", size: 15).weight(.medium)
 
     var body: some View {
         Button(action: onTap) {
             HStack {
                 Text(category.displayName)
-                    .font(isSelected ? selectedRowFont : .foyBody)
+                    .font(isSelected ? .foyBodyMedium : .foyBody)
                     .foregroundStyle(Color.foyForeground)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")

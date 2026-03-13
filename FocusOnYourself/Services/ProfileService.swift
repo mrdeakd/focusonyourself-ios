@@ -2,8 +2,8 @@ import Foundation
 import Observation
 
 @Observable
-final class AppState {
-    var profile: UserProfile
+final class ProfileService: ProfileServiceProtocol {
+    private(set) var profile: UserProfile
 
     init() {
         if let data = UserDefaults.standard.data(forKey: "userProfile"),
@@ -21,13 +21,14 @@ final class AppState {
         }
     }
 
-    func recordCheckIn(mood: Mood) {
+    func recordCheckIn(mood: Mood, feelingsDescription: String?) {
         let ds = CheckIn.dateString(for: Date())
         var updatedProfile = profile
+        let entry = CheckIn(dateString: ds, mood: mood, feelingsDescription: feelingsDescription)
         if let idx = updatedProfile.checkIns.firstIndex(where: { $0.dateString == ds }) {
-            updatedProfile.checkIns[idx] = CheckIn(dateString: ds, mood: mood)
+            updatedProfile.checkIns[idx] = entry
         } else {
-            updatedProfile.checkIns.append(CheckIn(dateString: ds, mood: mood))
+            updatedProfile.checkIns.append(entry)
         }
         updateProfile(updatedProfile)
     }
@@ -64,6 +65,21 @@ final class AppState {
         }
 
         return (current: current, longest: longest)
+    }
+
+    var hasCheckedInToday: Bool {
+        let ds = CheckIn.dateString(for: Date())
+        return profile.checkIns.contains { $0.dateString == ds }
+    }
+
+    var todaysMood: Mood? {
+        let ds = CheckIn.dateString(for: Date())
+        return profile.checkIns.first { $0.dateString == ds }?.mood
+    }
+
+    var todaysFeelingsDescription: String? {
+        let ds = CheckIn.dateString(for: Date())
+        return profile.checkIns.first { $0.dateString == ds }?.feelingsDescription
     }
 
     var streakStartDate: Date? {

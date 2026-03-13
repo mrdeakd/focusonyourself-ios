@@ -3,8 +3,8 @@ import SwiftUI
 struct HistoryScreen: View {
     @State private var viewModel: HistoryViewModel
 
-    init(appState: AppState) {
-        _viewModel = State(initialValue: HistoryViewModel(appState: appState))
+    init() {
+        _viewModel = State(initialValue: HistoryViewModel())
     }
 
     var body: some View {

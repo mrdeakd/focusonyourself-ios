@@ -2,17 +2,17 @@ import SwiftUI
 
 struct MoodPickerView: View {
     let selectedMood: Mood?
+    @Binding var feelingsDescription: String
     let onSelect: (Mood) -> Void
     let onCheckIn: () -> Void
 
+    @FocusState private var isEditorFocused: Bool
     private let checkInHeight: CGFloat = 52
-    private let moodLabelFont = Font.custom("Inter", size: 13).weight(.medium)
-    private let moodTitleFont = Font.custom("Inter", size: 15).weight(.medium)
 
     var body: some View {
         VStack(spacing: Spacing.md) {
             Text("How are you feeling?")
-                .font(moodLabelFont)
+                .font(.foyCaptionMedium)
                 .foregroundStyle(Color.foyForeground)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -24,9 +24,11 @@ struct MoodPickerView: View {
                 }
             }
 
+            inputSection
+
             Button(action: onCheckIn) {
                 Text("Complete Check-In")
-                    .font(moodTitleFont)
+                    .font(.foyBodyMedium)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: checkInHeight)
@@ -39,6 +41,38 @@ struct MoodPickerView: View {
         .background(Color.foyCard)
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.input))
     }
+
+    private var inputSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text("Tell me about your feelings")
+                .font(.foyHintMedium)
+                .foregroundStyle(Color.foyForegroundSecondary)
+
+            ZStack(alignment: .topLeading) {
+                if feelingsDescription.isEmpty {
+                    Text("Express yourself freely…")
+                        .font(.foySkipLabel)
+                        .foregroundStyle(Color.foyPlaceholder)
+                        .padding(.top, 8)
+                        .padding(.leading, 4)
+                        .allowsHitTesting(false)
+                }
+                TextEditor(text: $feelingsDescription)
+                    .font(.foySkipLabel)
+                    .foregroundStyle(Color.foyForeground)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 80)
+                    .focused($isEditorFocused)
+            }
+            .padding(Spacing.sm)
+            .background(Color.foyCard)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+            .overlay(
+                RoundedRectangle(cornerRadius: CornerRadius.card)
+                    .stroke(Color.foyBorder, lineWidth: 1)
+            )
+        }
+    }
 }
 
 private struct MoodButtonView: View {
@@ -47,20 +81,19 @@ private struct MoodButtonView: View {
     let onTap: () -> Void
 
     private let emojiFontSize: CGFloat = 20
-    private let moodSubLabelMedium = Font.custom("Inter", size: 10).weight(.medium)
-    private let moodSubLabelRegular = Font.custom("Inter", size: 10).weight(.regular)
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: Spacing.xxxs) {
                 Text(mood.emoji)
                     .font(.custom("Inter", size: emojiFontSize))
                 Text(mood.displayName)
-                    .font(isSelected ? moodSubLabelMedium : moodSubLabelRegular)
+                    .font(isSelected ? .foyMicroMedium : .foyMicro)
                     .foregroundStyle(isSelected ? Color.foyNavy : Color.foyPlaceholder)
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, Spacing.xs)
-            .padding(.horizontal, Spacing.sm)
+            .padding(.horizontal, Spacing.xxs)
             .background(isSelected ? Color.foyNavyTint : Color.foyMoodBackground)
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
             .overlay(

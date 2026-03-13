@@ -2,7 +2,14 @@ import SwiftUI
 
 extension Font {
     private static func inter(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .custom("Inter", size: size).weight(weight)
+        let name: String
+        switch weight {
+        case .light:    name = "Inter-Light"
+        case .medium:   name = "Inter-Medium"
+        case .semibold: name = "Inter-SemiBold"
+        default:        name = "Inter-Regular"
+        }
+        return .custom(name, size: size)
     }
 
     static let foyDisplayTitle = Font.inter(32, weight: .light)
@@ -14,6 +21,16 @@ extension Font {
     static let foyHint         = Font.inter(12)
     static let foySkipLabel    = Font.inter(14)
     static let foySectionLabel = Font.inter(11, weight: .medium)
+
+    static let foyCaption         = Font.inter(13)
+    static let foyCaptionMedium   = Font.inter(13, weight: .medium)
+    static let foyCaptionSemibold = Font.inter(13, weight: .semibold)
+    static let foyBodyMedium      = Font.inter(15, weight: .medium)
+    static let foyQuote           = Font.inter(18, weight: .light)
+    static let foyMicro           = Font.inter(10)
+    static let foyMicroMedium     = Font.inter(10, weight: .medium)
+    static let foyHintMedium      = Font.inter(12, weight: .medium)
+    static let foyStatValue       = Font.inter(24, weight: .medium)
 }
 
 extension View {

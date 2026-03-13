@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct OnboardingFlow: View {
-    @Environment(AppState.self) private var appState
     @State private var viewModel = OnboardingViewModel()
 
     var body: some View {
@@ -15,11 +14,6 @@ struct OnboardingFlow: View {
                 CategoryPickerScreen(viewModel: viewModel)
             case .notifications:
                 NotificationPermissionScreen(viewModel: viewModel)
-            }
-        }
-        .onChange(of: viewModel.isCompleted) { _, completed in
-            if completed {
-                appState.updateProfile(viewModel.buildProfile())
             }
         }
     }

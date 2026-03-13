@@ -13,10 +13,15 @@ final class OnboardingViewModel {
     private(set) var notificationsEnabled = false
     private(set) var isCompleted = false
 
-    private let notificationService: NotificationService
+    private let notificationService: NotificationServiceProtocol
+    private let profileService: ProfileServiceProtocol
 
-    init(notificationService: NotificationService = NotificationService()) {
+    init(
+        notificationService: NotificationServiceProtocol = ServiceContainer.shared.notificationService,
+        profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService
+    ) {
         self.notificationService = notificationService
+        self.profileService = profileService
     }
 
     var isNameValid: Bool {
@@ -62,6 +67,7 @@ final class OnboardingViewModel {
     }
 
     private func complete() {
+        profileService.updateProfile(buildProfile())
         isCompleted = true
     }
 }

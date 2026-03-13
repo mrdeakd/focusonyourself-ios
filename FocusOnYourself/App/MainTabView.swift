@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @Environment(AppState.self) private var appState
     @State private var selectedTab: AppTab = .home
 
     var body: some View {
@@ -9,7 +8,7 @@ struct MainTabView: View {
             ZStack {
                 switch selectedTab {
                 case .home:
-                    HomeScreen(appState: appState)
+                    HomeScreen()
                 case .history:
                     HistoryScreen()
                 case .settings:
@@ -17,6 +16,7 @@ struct MainTabView: View {
                 }
             }
             .frame(maxHeight: .infinity)
+            .animation(.none, value: selectedTab)
 
             AppTabBar(selectedTab: $selectedTab)
         }

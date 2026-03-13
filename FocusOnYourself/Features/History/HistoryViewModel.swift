@@ -3,25 +3,25 @@ import Observation
 
 @Observable
 final class HistoryViewModel {
-    private let appState: AppState
+    private let profileService: ProfileServiceProtocol
 
-    init(appState: AppState) {
-        self.appState = appState
+    init(profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService) {
+        self.profileService = profileService
     }
 
     var streakStats: (current: Int, longest: Int) {
-        appState.streakStats()
+        profileService.streakStats()
     }
 
     var checkInDateStrings: Set<String> {
-        Set(appState.profile.checkIns.map { $0.dateString })
+        Set(profileService.profile.checkIns.map { $0.dateString })
     }
 
     var calendarMonths: [Date] {
         let cal = Calendar.current
         let today = Date()
 
-        let startDate = appState.streakStartDate ?? today
+        let startDate = profileService.streakStartDate ?? today
 
         var comps = cal.dateComponents([.year, .month], from: startDate)
         comps.day = 1

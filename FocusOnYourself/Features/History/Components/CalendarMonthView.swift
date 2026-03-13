@@ -14,14 +14,12 @@ private struct CalendarDayCell: View {
 
     private let cellSize: CGFloat = 32
     private let borderWidth: CGFloat = 1.5
-    private let dayNumberFont = Font.custom("Inter", size: 12).weight(.medium)
-
     var body: some View {
         ZStack {
             cellBackground
             if day > 0 && state != .future && state != .empty {
                 Text("\(day)")
-                    .font(dayNumberFont)
+                    .font(.foyHintMedium)
                     .foregroundStyle(textColor)
             }
         }
@@ -62,13 +60,11 @@ struct CalendarMonthView: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
     private let dayLabels = ["S", "M", "T", "W", "T", "F", "S"]
-    private let monthHeaderFont = Font.custom("Inter", size: 15).weight(.medium)
-
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             // Month header: "March 2026"
             Text(monthTitle)
-                .font(monthHeaderFont)
+                .font(.foyBodyMedium)
                 .foregroundStyle(Color.foyForeground)
 
             // Day-of-week row

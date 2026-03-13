@@ -4,6 +4,7 @@ struct CheckIn: Codable, Equatable, Identifiable {
     var id: String { dateString }
     let dateString: String   // "yyyy-MM-dd"
     let mood: Mood
+    let feelingsDescription: String?
 
     var date: Date { Self.formatter.date(from: dateString) ?? .distantPast }
 

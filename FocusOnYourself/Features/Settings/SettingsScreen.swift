@@ -2,13 +2,11 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @State private var viewModel: SettingsViewModel
+    @State private var showChangeNameSheet = false
+    @State private var showChangeCategoriesSheet = false
 
-    private let inputFieldHeight: CGFloat = 52
-    private let iconSize: CGFloat = 18
-    private let saveFontMedium15 = Font.custom("Inter", size: 15).weight(.medium)
-
-    init(appState: AppState) {
-        _viewModel = State(initialValue: SettingsViewModel(appState: appState))
+    init() {
+        _viewModel = State(initialValue: SettingsViewModel())
     }
 
     var body: some View {
@@ -22,11 +20,6 @@ struct SettingsScreen: View {
                         .font(.foyNavTitle)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
-                    Button("Save") {
-                        viewModel.save()
-                    }
-                    .font(saveFontMedium15)
-                    .foregroundStyle(Color.foyNavy)
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.top, Spacing.lg)
@@ -45,6 +38,12 @@ struct SettingsScreen: View {
                 }
             }
         }
+        .sheet(isPresented: $showChangeNameSheet) {
+            ChangeNameSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showChangeCategoriesSheet) {
+            ChangeCategoriesSheet(viewModel: viewModel)
+        }
     }
 
     // MARK: - Sections
@@ -52,17 +51,35 @@ struct SettingsScreen: View {
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("YOUR NAME")
-            TextField("Your name", text: $viewModel.draftName)
-                .font(.foyBody)
-                .foregroundStyle(Color.foyForeground)
+            VStack(spacing: 0) {
+                HStack {
+                    Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
+                        .font(.foyBody)
+                        .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
+                    Spacer()
+                }
                 .padding(.horizontal, Spacing.md)
-                .frame(height: inputFieldHeight)
-                .background(Color.foyCard)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.card)
-                        .stroke(Color.foyBorder, lineWidth: 1)
-                )
+                .padding(.vertical, Spacing.md)
+
+                Rectangle()
+                    .fill(Color.foyBorder)
+                    .frame(height: 1)
+
+                Button {
+                    showChangeNameSheet = true
+                } label: {
+                    HStack {
+                        Text("Change name")
+                            .font(.foyCaptionMedium)
+                            .foregroundStyle(Color.foyNavy)
+                        Spacer()
+                    }
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.vertical, Spacing.md)
+                }
+            }
+            .background(Color.foyCard)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
 
@@ -70,34 +87,30 @@ struct SettingsScreen: View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("AFFIRMATION CATEGORIES")
             VStack(spacing: 0) {
-                ForEach(Array(AffirmationCategory.allCases.enumerated()), id: \.element.id) { index, category in
-                    VStack(spacing: 0) {
-                        if index > 0 {
-                            Divider()
-                                .background(Color.foyBorder)
-                        }
-                        HStack {
-                            Text(category.displayName)
-                                .font(.foyBody)
-                                .foregroundStyle(Color.foyForeground)
-                            Spacer()
-                            let isSelected = viewModel.draftCategories.contains(category)
-                            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                .resizable()
-                                .frame(width: iconSize, height: iconSize)
-                                .foregroundStyle(isSelected ? Color.foyNavy : Color.foyButtonDisabled)
-                        }
-                        .padding(.horizontal, Spacing.md)
-                        .padding(.vertical, Spacing.md)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if viewModel.draftCategories.contains(category) {
-                                viewModel.draftCategories.remove(category)
-                            } else {
-                                viewModel.draftCategories.insert(category)
-                            }
-                        }
+                HStack {
+                    Text(viewModel.currentCategories.map(\.displayName).sorted().joined(separator: ", "))
+                        .font(.foyHint)
+                        .foregroundStyle(Color.foyForegroundSecondary)
+                    Spacer()
+                }
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.md)
+
+                Rectangle()
+                    .fill(Color.foyBorder)
+                    .frame(height: 1)
+
+                Button {
+                    showChangeCategoriesSheet = true
+                } label: {
+                    HStack {
+                        Text("Change categories")
+                            .font(.foyCaptionMedium)
+                            .foregroundStyle(Color.foyNavy)
+                        Spacer()
                     }
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.vertical, Spacing.md)
                 }
             }
             .background(Color.foyCard)
@@ -113,7 +126,7 @@ struct SettingsScreen: View {
                     .font(.foyBody)
                     .foregroundStyle(Color.foyForeground)
                 Spacer()
-                FOYToggle(isOn: $viewModel.draftNotifications)
+                FOYToggle(isOn: $viewModel.currentNotifications)
             }
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.md)
@@ -131,7 +144,7 @@ struct SettingsScreen: View {
                         .font(.foyBody)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
-                    FOYToggle(isOn: $viewModel.draftAppleIntelligence)
+                    FOYToggle(isOn: $viewModel.currentAppleIntelligence)
                 }
                 .padding(.horizontal, Spacing.md)
                 .padding(.vertical, Spacing.md)

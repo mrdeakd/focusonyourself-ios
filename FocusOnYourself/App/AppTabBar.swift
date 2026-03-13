@@ -22,6 +22,7 @@ enum AppTab: CaseIterable {
 
 struct AppTabBar: View {
     @Binding var selectedTab: AppTab
+    @Namespace private var tabNamespace
 
     private let pillHeight: CGFloat = 62
     private let pillCornerRadius: CGFloat = 36
@@ -32,8 +33,10 @@ struct AppTabBar: View {
     var body: some View {
         HStack(spacing: 0) {
             ForEach(AppTab.allCases, id: \.self) { tab in
-                TabItemView(tab: tab, isSelected: selectedTab == tab) {
-                    selectedTab = tab
+                TabItemView(tab: tab, isSelected: selectedTab == tab, namespace: tabNamespace) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        selectedTab = tab
+                    }
                 }
             }
         }
@@ -55,6 +58,7 @@ struct AppTabBar: View {
 private struct TabItemView: View {
     let tab: AppTab
     let isSelected: Bool
+    let namespace: Namespace.ID
     let onTap: () -> Void
 
     private let activeCornerRadius: CGFloat = 26
@@ -72,8 +76,13 @@ private struct TabItemView: View {
             }
             .foregroundStyle(isSelected ? Color.white : Color.foyPlaceholder)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(isSelected ? Color.foyNavy : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: activeCornerRadius))
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: activeCornerRadius)
+                        .fill(Color.foyNavy)
+                        .matchedGeometryEffect(id: "activeTab", in: namespace)
+                }
+            }
         }
         .buttonStyle(.plain)
     }

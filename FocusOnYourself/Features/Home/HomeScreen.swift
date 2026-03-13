@@ -14,11 +14,11 @@ struct HomeScreen: View {
 
                 ScrollView {
                     VStack(spacing: Spacing.lg) {
-                        AffirmationCardView(
-                            quote: viewModel.todayAffirmation.quote,
-                            category: viewModel.todayAffirmation.category,
+                        AffirmationsCarouselView(
+                            affirmations: viewModel.todayAffirmations,
                             isLoading: viewModel.isGeneratingAffirmation
                         )
+                        .padding(.horizontal, -Spacing.xl)
                         if viewModel.hasCheckedIn {
                             CheckedInCardView(
                                 mood: viewModel.todaysMood,
@@ -33,11 +33,11 @@ struct HomeScreen: View {
                             )
                         }
                     }
-                    .padding(.top, Spacing.md)
-                    .padding(.horizontal, Spacing.xl)
-                    .padding(.bottom, Spacing.screenBottom)
                 }
             }
+            .padding(.top, Spacing.md)
+            .padding(.horizontal, Spacing.xl)
+            .padding(.bottom, Spacing.screenBottom)
         }
         .simultaneousGesture(TapGesture().onEnded {
             UIApplication.shared.sendAction(

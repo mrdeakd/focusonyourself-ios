@@ -17,7 +17,7 @@ private struct CalendarDayCell: View {
     var body: some View {
         ZStack {
             cellBackground
-            if day > 0 && state != .future && state != .empty {
+            if day > 0 && state != .empty {
                 Text("\(day)")
                     .font(.foyHintMedium)
                     .foregroundStyle(textColor)
@@ -49,6 +49,7 @@ private struct CalendarDayCell: View {
         case .streakDay: return .white
         case .skipped:   return Color.foyPlaceholder
         case .today:     return Color.foyForeground
+        case .future:    return Color.foyPlaceholder
         default:         return Color.clear
         }
     }
@@ -58,7 +59,6 @@ struct CalendarMonthView: View {
     let month: Date          // any date in the target month
     let checkInDates: Set<String>  // set of "yyyy-MM-dd" strings
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
     private let dayLabels = ["S", "M", "T", "W", "T", "F", "S"]
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -78,15 +78,26 @@ struct CalendarMonthView: View {
             }
 
             // Calendar grid
-            LazyVGrid(columns: columns, spacing: Spacing.xs) {
-                ForEach(cells, id: \.offset) { cell in
-                    CalendarDayCell(day: cell.day, state: cell.state)
+            VStack(spacing: Spacing.xs) {
+                ForEach(cellRows, id: \.first!.offset) { row in
+                    HStack(spacing: 0) {
+                        ForEach(row, id: \.offset) { cell in
+                            CalendarDayCell(day: cell.day, state: cell.state)
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
                 }
             }
         }
     }
 
     // MARK: - Computed
+
+    private var cellRows: [[(offset: Int, day: Int, state: DayState)]] {
+        stride(from: 0, to: cells.count, by: 7).map {
+            Array(cells[$0..<min($0 + 7, cells.count)])
+        }
+    }
 
     private var monthTitle: String {
         let formatter = DateFormatter()

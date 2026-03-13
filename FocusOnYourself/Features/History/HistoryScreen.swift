@@ -1,5 +1,7 @@
 import SwiftUI
 
+private let calendarCardRadius: CGFloat = 18
+
 struct HistoryScreen: View {
     @State private var viewModel: HistoryViewModel
 
@@ -39,7 +41,15 @@ struct HistoryScreen: View {
                                 month: monthDate,
                                 checkInDates: viewModel.checkInDateStrings
                             )
+                            .padding(Spacing.lg)
+                            .background(Color.foyCard)
+                            .clipShape(RoundedRectangle(cornerRadius: calendarCardRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: calendarCardRadius)
+                                    .stroke(Color.foyNavy, lineWidth: 1)
+                            )
                             .padding(.horizontal, Spacing.screenHorizontal)
+                            .padding(.vertical, Spacing.xxxs)
                         }
                     }
                 }

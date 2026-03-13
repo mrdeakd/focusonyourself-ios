@@ -82,6 +82,10 @@ final class ProfileService: ProfileServiceProtocol {
         return profile.checkIns.first { $0.dateString == ds }?.feelingsDescription
     }
 
+    var earliestCheckInDate: Date? {
+        profile.checkIns.map { $0.date }.min()
+    }
+
     var streakStartDate: Date? {
         let cal = Calendar.current
         let checkInDates = Set(profile.checkIns.map { cal.startOfDay(for: $0.date) })

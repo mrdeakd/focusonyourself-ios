@@ -5,8 +5,7 @@ struct ContentView: View {
 
     var body: some View {
         if appState.profile.onboardingCompleted {
-            Text("Main App — Coming Soon")
-                .foregroundStyle(Color.foyForegroundSecondary)
+            MainTabView()
         } else {
             OnboardingFlow()
         }

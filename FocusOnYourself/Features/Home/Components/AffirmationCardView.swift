@@ -11,7 +11,7 @@ struct AffirmationCardView: View {
                 .foregroundStyle(Color.foyPlaceholder)
                 .kerning(0.8)
 
-            Text(""\(quote)"")
+            Text("\u{201C}\(quote)\u{201D}")
                 .font(.inter(18, weight: .light))
                 .foregroundStyle(Color.foyForeground)
                 .lineSpacing(9)

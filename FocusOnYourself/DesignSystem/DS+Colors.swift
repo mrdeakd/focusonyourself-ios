@@ -24,4 +24,8 @@ extension Color {
     static let foyPlaceholder         = Color(hex: "9A9A9A")
     static let foyBorder              = Color(hex: "E8E5E0")
     static let foyButtonDisabled      = Color(hex: "D4D0C8")
+    static let foyCard            = Color.white
+    static let foyOrange          = Color(hex: "FF6B2B")
+    static let foyOrangeTint      = Color(hex: "FF6B2B").opacity(0.12)
+    static let foyMoodBackground  = Color(hex: "F5F3F0")
 }

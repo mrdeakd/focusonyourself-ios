@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/deakdavid/Work/ideas/nomorex -name *.swift)",
+      "Bash(sips -g pixelWidth -g pixelHeight /tmp/nomorex_icon/4STzI.png)",
+      "Bash(sips -s format png --setProperty hasAlpha false /tmp/nomorex_icon/4STzI.png --out /tmp/nomorex_icon/4STzI_flat.png)",
+      "Bash(sips -g hasAlpha /tmp/nomorex_icon/4STzI_flat.png)",
+      "Bash(cp /tmp/nomorex_icon/4STzI_flat.png \"/Users/deakdavid/Work/ideas/nomorex/No More X/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png\")",
+      "Bash(sips -g hasAlpha \"/Users/deakdavid/Work/ideas/nomorex/No More X/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png\")"
+    ]
+  }
+}

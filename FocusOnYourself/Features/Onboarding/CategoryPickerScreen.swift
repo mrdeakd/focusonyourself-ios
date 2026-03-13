@@ -37,7 +37,7 @@ struct CategoryPickerScreen: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Spacing.buttonVertical)
-                        .background(Color.foyNavy)
+                        .background(viewModel.selectedCategories.isEmpty ? Color.foyButtonDisabled : Color.foyNavy)
                         .clipShape(Capsule())
                 }
                 .disabled(viewModel.selectedCategories.isEmpty)

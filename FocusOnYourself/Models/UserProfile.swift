@@ -6,4 +6,5 @@ struct UserProfile: Codable, Equatable {
     var notificationsEnabled: Bool = true
     var appleIntelligenceEnabled: Bool = false
     var onboardingCompleted: Bool = false
+    var checkIns: [CheckIn] = []
 }

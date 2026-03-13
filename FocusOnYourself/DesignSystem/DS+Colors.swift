@@ -28,4 +28,5 @@ extension Color {
     static let foyOrange          = Color(hex: "FF6B2B")
     static let foyOrangeTint      = Color(hex: "FF6B2B").opacity(0.12)
     static let foyMoodBackground  = Color(hex: "F5F3F0")
+    static let foyCalendarSkipped = Color(hex: "F5F3F0")
 }

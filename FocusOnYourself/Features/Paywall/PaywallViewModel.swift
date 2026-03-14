@@ -31,6 +31,18 @@ final class PaywallViewModel {
         selectedPlan == .monthly ? monthlyProduct : annualProduct
     }
 
+    var ctaLabel: String {
+        guard let offer = selectedProduct?.subscription?.introductoryOffer,
+              offer.paymentMode == .freeTrial else {
+            return "Subscribe Now"
+        }
+        let p = offer.period
+        if p.unit == .day {
+            return "Start \(p.value)-Day Free Trial"
+        }
+        return "Start Free Trial"
+    }
+
     func purchase() {
         guard let product = selectedProduct else { return }
         isLoading = true

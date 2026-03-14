@@ -11,4 +11,7 @@ enum AffirmationCategory: String, CaseIterable, Codable, Identifiable {
         case .mindfulness:   return "Mindfulness & Calm"
         }
     }
+    var isFree: Bool {
+        self == .confidence || self == .mindfulness
+    }
 }

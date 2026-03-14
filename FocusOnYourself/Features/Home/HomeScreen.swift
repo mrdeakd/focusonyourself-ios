@@ -37,7 +37,7 @@ struct HomeScreen: View {
             }
             .padding(.top, Spacing.md)
             .padding(.horizontal, Spacing.xl)
-            .padding(.bottom, Spacing.screenBottom)
+            .padding(.bottom, Spacing.xxxs)
         }
         .simultaneousGesture(TapGesture().onEnded {
             UIApplication.shared.sendAction(

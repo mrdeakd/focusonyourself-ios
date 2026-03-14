@@ -31,7 +31,9 @@ struct SettingsScreen: View {
                         nameSection
                         categoriesSection
                         notificationsSection
-                        appleIntelligenceSection
+                        if viewModel.isAppleIntelligenceAvailable {
+                            appleIntelligenceSection
+                        }
                     }
                     .padding(.horizontal, Spacing.lg)
                     .padding(.bottom, Spacing.lg)

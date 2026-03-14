@@ -1,4 +1,5 @@
 import Foundation
+import FoundationModels
 import Observation
 
 @Observable
@@ -43,6 +44,10 @@ final class SettingsViewModel {
             profile.appleIntelligenceEnabled = newValue
             profileService.updateProfile(profile)
         }
+    }
+
+    var isAppleIntelligenceAvailable: Bool {
+        SystemLanguageModel.default.isAvailable
     }
 
     func updateName(_ name: String) {

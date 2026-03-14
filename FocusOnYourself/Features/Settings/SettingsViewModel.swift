@@ -6,13 +6,16 @@ import Observation
 final class SettingsViewModel {
     private let profileService: ProfileServiceProtocol
     private let notificationService: NotificationServiceProtocol
+    private let purchaseService: PurchaseServiceProtocol
 
     init(
         profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
-        notificationService: NotificationServiceProtocol = ServiceContainer.shared.notificationService
+        notificationService: NotificationServiceProtocol = ServiceContainer.shared.notificationService,
+        purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService
     ) {
         self.profileService = profileService
         self.notificationService = notificationService
+        self.purchaseService = purchaseService
     }
 
     var currentName: String {
@@ -45,6 +48,8 @@ final class SettingsViewModel {
             profileService.updateProfile(profile)
         }
     }
+
+    var isPro: Bool { purchaseService.isPro }
 
     var isAppleIntelligenceAvailable: Bool {
         SystemLanguageModel.default.isAvailable

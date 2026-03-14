@@ -12,16 +12,19 @@ final class HomeViewModel {
 
     private let profileService: ProfileServiceProtocol
     private let affirmationService: AffirmationServiceProtocol
+    private let purchaseService: PurchaseServiceProtocol
 
     private let quoteKey = "affirmation.quote"
     private let datKey  = "affirmation.date"
 
     init(
         profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
-        affirmationService: AffirmationServiceProtocol = ServiceContainer.shared.affirmationService
+        affirmationService: AffirmationServiceProtocol = ServiceContainer.shared.affirmationService,
+        purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService
     ) {
         self.profileService = profileService
         self.affirmationService = affirmationService
+        self.purchaseService = purchaseService
         self.hasCheckedIn = profileService.hasCheckedInToday
         self.todaysMood = profileService.todaysMood
         loadCachedQuotes()
@@ -73,7 +76,7 @@ final class HomeViewModel {
             let pairs = try await affirmationService.generateBatch(
                 count: 10,
                 for: categories,
-                useAppleIntelligence: profileService.profile.isAppleIntelligenceActive
+                useAppleIntelligence: profileService.profile.isAppleIntelligenceActive && purchaseService.isPro
             )
             generatedQuotes = pairs
             cacheQuotes(pairs)

@@ -140,7 +140,7 @@ struct PaywallScreen: View {
             Button {
                 viewModel.purchase()
             } label: {
-                Text("Start 7-Day Free Trial")
+                Text(viewModel.ctaLabel)
                     .font(.foyButtonLabel)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)

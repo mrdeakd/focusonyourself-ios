@@ -31,7 +31,7 @@ final class PurchaseService: PurchaseServiceProtocol {
     private var updatesTask: Task<Void, Never>?
 
     init() {
-        isPro = UserDefaults.standard.bool(forKey: "com.focusonyourself.isPro")
+        isPro = UserDefaults.standard.bool(forKey: isProUserDefaultsKey)
         Task {
             await loadProducts()
             await refreshEntitlements()

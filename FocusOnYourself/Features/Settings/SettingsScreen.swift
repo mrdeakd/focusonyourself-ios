@@ -4,6 +4,7 @@ struct SettingsScreen: View {
     @State private var viewModel: SettingsViewModel
     @State private var showChangeNameSheet = false
     @State private var showChangeCategoriesSheet = false
+    @State private var showPaywall = false
 
     init() {
         _viewModel = State(initialValue: SettingsViewModel())
@@ -28,6 +29,7 @@ struct SettingsScreen: View {
                 // Scrollable content
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.lg) {
+                        subscriptionSection
                         nameSection
                         categoriesSection
                         notificationsSection
@@ -46,9 +48,49 @@ struct SettingsScreen: View {
         .sheet(isPresented: $showChangeCategoriesSheet) {
             ChangeCategoriesSheet(viewModel: viewModel)
         }
+        .sheet(isPresented: $showPaywall) {
+            PaywallScreen()
+        }
     }
 
     // MARK: - Sections
+
+    private var subscriptionSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            sectionLabel("SUBSCRIPTION")
+            if viewModel.isPro {
+                HStack {
+                    Image(systemName: "crown.fill")
+                        .foregroundStyle(Color.foyNavy)
+                    Text("Pro Member")
+                        .font(.foyBodyMedium)
+                        .foregroundStyle(Color.foyNavy)
+                    Spacer()
+                }
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.md)
+                .background(Color.foyCard)
+                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+            } else {
+                Button {
+                    showPaywall = true
+                } label: {
+                    HStack {
+                        Text("Upgrade to Pro")
+                            .font(.foyCaptionMedium)
+                            .foregroundStyle(Color.foyNavy)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(Color.foyPlaceholder)
+                    }
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.vertical, Spacing.md)
+                }
+                .background(Color.foyCard)
+                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+            }
+        }
+    }
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {

@@ -16,19 +16,6 @@ final class HomeViewModel {
     private let quoteKey = "affirmation.quote"
     private let datKey  = "affirmation.date"
 
-    private static let fallbackQuotes: [String] = [
-        "I am worthy of love and respect exactly as I am.",
-        "I choose to embrace each day with gratitude and purpose.",
-        "I have the strength to overcome any challenge I face.",
-        "I am growing into the best version of myself.",
-        "I choose peace and let go of what I cannot control.",
-        "I am deserving of good things and I welcome them.",
-        "I have the power to create positive change in my life.",
-        "I am enough, and I do enough.",
-        "I choose kindness — to others and to myself.",
-        "I am capable of achieving everything I set my mind to."
-    ]
-
     init(
         profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
         affirmationService: AffirmationServiceProtocol = ServiceContainer.shared.affirmationService
@@ -58,13 +45,7 @@ final class HomeViewModel {
     var streakCount: Int { profileService.streakStats().current }
 
     var todayAffirmations: [(quote: String, category: AffirmationCategory)] {
-        guard generatedQuotes.isEmpty else { return generatedQuotes }
-        let categories = profileService.profile.selectedCategories
-        let fallback: AffirmationCategory = .confidence
-        return Self.fallbackQuotes.enumerated().map { index, quote in
-            let category = categories.isEmpty ? fallback : categories[index % categories.count]
-            return (quote: quote, category: category)
-        }
+        generatedQuotes
     }
 
     func selectMood(_ mood: Mood) {
@@ -82,7 +63,6 @@ final class HomeViewModel {
     // MARK: - Affirmations
 
     func generateAffirmationIfNeeded() async {
-        guard profileService.profile.appleIntelligenceEnabled else { return }
         guard generatedQuotes.isEmpty else { return }
 
         isGeneratingAffirmation = true
@@ -90,7 +70,11 @@ final class HomeViewModel {
 
         let categories = profileService.profile.selectedCategories
         do {
-            let pairs = try await affirmationService.generateBatch(count: 10, for: categories)
+            let pairs = try await affirmationService.generateBatch(
+                count: 10,
+                for: categories,
+                useAppleIntelligence: profileService.profile.isAppleIntelligenceActive
+            )
             generatedQuotes = pairs
             cacheQuotes(pairs)
         } catch {

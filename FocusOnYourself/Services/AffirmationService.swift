@@ -2,9 +2,21 @@ import Foundation
 import FoundationModels
 
 final class AffirmationService: AffirmationServiceProtocol {
-    func generateBatch(count: Int, for categories: [AffirmationCategory]) async throws -> [(quote: String, category: AffirmationCategory)] {
+    private var staticAffirmations: [(quote: String, category: AffirmationCategory)]?
+
+    func generateBatch(count: Int, for categories: [AffirmationCategory], useAppleIntelligence: Bool) async throws -> [(quote: String, category: AffirmationCategory)] {
         guard !categories.isEmpty else { return [] }
 
+        if useAppleIntelligence {
+            return try await generateWithAppleIntelligence(count: count, categories: categories)
+        } else {
+            return try loadStaticBatch(count: count, categories: categories)
+        }
+    }
+
+    // MARK: - Apple Intelligence path
+
+    private func generateWithAppleIntelligence(count: Int, categories: [AffirmationCategory]) async throws -> [(quote: String, category: AffirmationCategory)] {
         let counts = distribute(total: count, across: categories.count)
         var results: [(quote: String, category: AffirmationCategory)] = []
 
@@ -23,6 +35,37 @@ final class AffirmationService: AffirmationServiceProtocol {
 
         return results
     }
+
+    // MARK: - Static dataset path
+
+    private func loadStaticAffirmations() throws -> [(quote: String, category: AffirmationCategory)] {
+        if let cached = staticAffirmations { return cached }
+
+        guard let url = Bundle.main.url(forResource: "affirmations", withExtension: "json") else {
+            throw AffirmationServiceError.datasetNotFound
+        }
+        let data = try Data(contentsOf: url)
+        let decoded = try JSONDecoder().decode([StaticAffirmation].self, from: data)
+        let result = decoded.compactMap { entry -> (quote: String, category: AffirmationCategory)? in
+            guard let category = AffirmationCategory(rawValue: entry.category) else { return nil }
+            return (quote: entry.quote, category: category)
+        }
+        staticAffirmations = result
+        return result
+    }
+
+    private func loadStaticBatch(
+        count: Int, categories: [AffirmationCategory]
+    ) throws -> [(quote: String, category: AffirmationCategory)] {
+        let all = try loadStaticAffirmations()
+        let categorySet = Set(categories)
+        let filtered = all.filter { categorySet.contains($0.category) }
+        guard !filtered.isEmpty else { return [] }
+        let shuffled = filtered.shuffled()
+        return Array(shuffled.prefix(count))
+    }
+
+    // MARK: - Helpers
 
     private func distribute(total: Int, across count: Int) -> [Int] {
         guard count > 0 else { return [] }
@@ -52,4 +95,15 @@ final class AffirmationService: AffirmationServiceProtocol {
         }
         return Array(results.prefix(expected))
     }
+}
+
+// MARK: - Supporting types
+
+private struct StaticAffirmation: Decodable {
+    let quote: String
+    let category: String
+}
+
+enum AffirmationServiceError: Error {
+    case datasetNotFound
 }

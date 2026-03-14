@@ -5,6 +5,7 @@ struct ChangeCategoriesSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var draftCategories: Set<AffirmationCategory> = []
+    @State private var showPaywall = false
 
     private let handleWidth: CGFloat = 36
     private let handleHeight: CGFloat = 4
@@ -30,6 +31,9 @@ struct ChangeCategoriesSheet: View {
         .background(Color.foyBackground)
         .onAppear {
             draftCategories = viewModel.currentCategories
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallScreen()
         }
     }
 
@@ -66,11 +70,15 @@ struct ChangeCategoriesSheet: View {
 
             VStack(spacing: categorySpacing) {
                 ForEach(AffirmationCategory.allCases) { category in
+                    let isLocked = !category.isFree && !ServiceContainer.shared.purchaseService.isPro
                     CategoryRowView(
                         category: category,
-                        isSelected: draftCategories.contains(category)
+                        isSelected: draftCategories.contains(category),
+                        isLocked: isLocked
                     ) {
-                        if draftCategories.contains(category) {
+                        if isLocked {
+                            showPaywall = true
+                        } else if draftCategories.contains(category) {
                             draftCategories.remove(category)
                         } else {
                             draftCategories.insert(category)

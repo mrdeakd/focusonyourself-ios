@@ -3,6 +3,8 @@ import SwiftUI
 struct CategoryPickerScreen: View {
     var viewModel: OnboardingViewModel
 
+    @State private var showPaywall = false
+
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
@@ -20,10 +22,18 @@ struct CategoryPickerScreen: View {
 
                 VStack(spacing: Spacing.sm) {
                     ForEach(AffirmationCategory.allCases) { category in
+                        let isLocked = !category.isFree && !ServiceContainer.shared.purchaseService.isPro
                         CategoryRowView(
                             category: category,
                             isSelected: viewModel.selectedCategories.contains(category),
-                            onTap: { viewModel.toggleCategory(category) }
+                            isLocked: isLocked,
+                            onTap: {
+                                if isLocked {
+                                    showPaywall = true
+                                } else {
+                                    viewModel.toggleCategory(category)
+                                }
+                            }
                         )
                     }
                 }
@@ -45,6 +55,9 @@ struct CategoryPickerScreen: View {
             .padding(.top, Spacing.screenTop)
             .padding(.horizontal, Spacing.screenHorizontal)
             .padding(.bottom, Spacing.screenBottom)
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallScreen()
         }
     }
 }

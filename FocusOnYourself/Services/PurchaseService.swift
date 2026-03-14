@@ -28,7 +28,7 @@ final class PurchaseService: PurchaseServiceProtocol {
     }
     var products: [Product] = []
 
-    private var updatesTask: Task<Void, Never>?
+    nonisolated(unsafe) private var updatesTask: Task<Void, Never>?
 
     init() {
         isPro = UserDefaults.standard.bool(forKey: "com.focusonyourself.isPro")

@@ -5,5 +5,6 @@ final class ServiceContainer {
     let profileService = ProfileService()
     let notificationService = NotificationService()
     let affirmationService: AffirmationServiceProtocol = AffirmationService()
+    let purchaseService: PurchaseServiceProtocol = PurchaseService()
     private init() {}
 }

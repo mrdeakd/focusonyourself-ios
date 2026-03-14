@@ -175,12 +175,15 @@ private struct BenefitRow: View {
     let symbol: String
     let label: String
 
+    private let iconSize: CGFloat = 18
+    private let iconFrameWidth: CGFloat = 24
+
     var body: some View {
         HStack(spacing: Spacing.md) {
             Image(systemName: symbol)
-                .font(.system(size: 18))
+                .font(.system(size: iconSize))
                 .foregroundStyle(Color.foyOrange)
-                .frame(width: 24, alignment: .center)
+                .frame(width: iconFrameWidth, alignment: .center)
 
             Text(label)
                 .font(.foyBody)

@@ -28,7 +28,7 @@ final class PurchaseService: PurchaseServiceProtocol {
     }
     var products: [Product] = []
 
-    nonisolated private var updatesTask: Task<Void, Never>?
+    private var updatesTask: Task<Void, Never>?
 
     init() {
         isPro = UserDefaults.standard.bool(forKey: "com.focusonyourself.isPro")
@@ -41,10 +41,6 @@ final class PurchaseService: PurchaseServiceProtocol {
                 await refreshEntitlements()
             }
         }
-    }
-
-    deinit {
-        updatesTask?.cancel()
     }
 
     func purchase(_ product: Product) async throws {

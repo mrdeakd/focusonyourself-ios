@@ -34,6 +34,7 @@ struct HomeScreen: View {
                         }
                     }
                 }
+                .scrollDismissesKeyboard(.interactively)
             }
             .padding(.top, Spacing.md)
             .padding(.horizontal, Spacing.xl)

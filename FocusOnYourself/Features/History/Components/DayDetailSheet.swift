@@ -48,6 +48,7 @@ struct DayDetailSheet: View {
         .background(Color.foyBackground)
         .presentationDetents([.fraction(0.65)])
         .presentationDragIndicator(.hidden)
+        .presentationBackground(Color.foyBackground)
     }
 
     // MARK: - Subviews

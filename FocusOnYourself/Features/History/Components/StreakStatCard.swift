@@ -2,7 +2,7 @@ import SwiftUI
 
 struct StreakStatCard: View {
     let label: String
-    let value: Int   // number of days
+    let value: Int
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xxxs) {

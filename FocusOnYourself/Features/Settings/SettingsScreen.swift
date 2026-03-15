@@ -1,39 +1,42 @@
 import SwiftUI
 
 struct SettingsScreen: View {
-    @State private var viewModel: SettingsViewModel
+    @State private var viewModel = SettingsViewModel()
     @State private var showChangeNameSheet = false
     @State private var showChangeCategoriesSheet = false
     @State private var showPaywall = false
-
-    init() {
-        _viewModel = State(initialValue: SettingsViewModel())
-    }
 
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Fixed header
                 HStack {
                     Text("Settings")
                         .font(.foyNavTitle)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
+                    Text(viewModel.isPro ? "PRO" : "FREE")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(viewModel.isPro ? Color.foyOrangeAccent : Color.foyNavy)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(viewModel.isPro ? Color.foyOrangeAccent.opacity(0.15) : Color.foyFreeBadgeBg)
+                        .clipShape(Capsule())
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.top, Spacing.lg)
                 .padding(.bottom, Spacing.md)
 
-                // Scrollable content
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.lg) {
-                        subscriptionSection
+                        if !viewModel.isPro {
+                            subscriptionSection
+                        }
                         nameSection
                         categoriesSection
                         notificationsSection
-                        if viewModel.isAppleIntelligenceAvailable {
+                        if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
                             appleIntelligenceSection
                         }
                     }
@@ -53,42 +56,43 @@ struct SettingsScreen: View {
         }
     }
 
-    // MARK: - Sections
-
     private var subscriptionSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             sectionLabel("SUBSCRIPTION")
-            if viewModel.isPro {
-                HStack {
-                    Image(systemName: "crown.fill")
-                        .foregroundStyle(Color.foyNavy)
-                    Text("Pro Member")
-                        .font(.foyBodyMedium)
-                        .foregroundStyle(Color.foyNavy)
-                    Spacer()
-                }
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-                .background(Color.foyCard)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-            } else {
-                Button {
-                    showPaywall = true
-                } label: {
-                    HStack {
+            Button {
+                showPaywall = true
+            } label: {
+                HStack(spacing: Spacing.sm) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: CornerRadius.categoryTag)
+                            .fill(Color.foyUpgradeIconBg)
+                            .frame(width: 36, height: 36)
+                        Image(systemName: "crown.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 18, height: 18)
+                            .foregroundStyle(Color.foyOrangeAccent)
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
                         Text("Upgrade to Pro")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(Color.foyPlaceholder)
+                        Text("Unlock all categories & features")
+                            .font(.foyHint)
+                            .foregroundStyle(Color.foyForegroundSecondary)
                     }
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.vertical, Spacing.md)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(Color.foyPlaceholder)
                 }
-                .background(Color.foyCard)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+                .padding(Spacing.md)
             }
+            .background(Color.foyUpgradeCardBg)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+            .overlay(
+                RoundedRectangle(cornerRadius: CornerRadius.card)
+                    .strokeBorder(Color.foyUpgradeCardBorder, lineWidth: 1)
+            )
         }
     }
 
@@ -208,8 +212,6 @@ struct SettingsScreen: View {
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
-
-    // MARK: - Helpers
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text)

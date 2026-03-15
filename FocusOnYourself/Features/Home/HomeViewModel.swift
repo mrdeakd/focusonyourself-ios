@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-@Observable
+@Observable @MainActor
 final class HomeViewModel {
     var selectedMood: Mood? = nil
     var hasCheckedIn: Bool = false
@@ -9,13 +9,11 @@ final class HomeViewModel {
     var feelingsDescription: String = ""
     var isGeneratingAffirmation: Bool = false
     var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
+    var errorMessage: String?
 
     private let profileService: ProfileServiceProtocol
     private let affirmationService: AffirmationServiceProtocol
     private let purchaseService: PurchaseServiceProtocol
-
-    private let quoteKey = "affirmation.quote"
-    private let datKey  = "affirmation.date"
 
     init(
         profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
@@ -27,7 +25,7 @@ final class HomeViewModel {
         self.purchaseService = purchaseService
         self.hasCheckedIn = profileService.hasCheckedInToday
         self.todaysMood = profileService.todaysMood
-        loadCachedQuotes()
+        generatedQuotes = affirmationService.cachedBatch() ?? []
     }
 
     var greeting: String {
@@ -47,10 +45,6 @@ final class HomeViewModel {
 
     var streakCount: Int { profileService.streakStats().current }
 
-    var todayAffirmations: [(quote: String, category: AffirmationCategory)] {
-        generatedQuotes
-    }
-
     func selectMood(_ mood: Mood) {
         selectedMood = mood
     }
@@ -63,48 +57,22 @@ final class HomeViewModel {
         todaysMood = mood
     }
 
-    // MARK: - Affirmations
-
     func generateAffirmationIfNeeded() async {
         guard generatedQuotes.isEmpty else { return }
 
         isGeneratingAffirmation = true
         defer { isGeneratingAffirmation = false }
 
-        let categories = profileService.profile.selectedCategories
         do {
             let pairs = try await affirmationService.generateBatch(
                 count: 10,
-                for: categories,
+                for: profileService.profile.selectedCategories,
                 useAppleIntelligence: profileService.profile.isAppleIntelligenceActive && purchaseService.isPro
             )
             generatedQuotes = pairs
-            cacheQuotes(pairs)
+            affirmationService.cacheBatch(pairs)
         } catch {
-            print("[HomeViewModel] Failed to generate affirmations: \(error)")
+            errorMessage = error.localizedDescription
         }
-    }
-
-    private struct CachedAffirmation: Codable {
-        let quote: String
-        let category: AffirmationCategory
-    }
-
-    private func loadCachedQuotes() {
-        let defaults = UserDefaults.standard
-        let today = CheckIn.dateString(for: Date())
-        guard defaults.string(forKey: datKey) == today,
-              let data = defaults.data(forKey: quoteKey),
-              let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data) else { return }
-        generatedQuotes = cached.map { (quote: $0.quote, category: $0.category) }
-    }
-
-    private func cacheQuotes(_ pairs: [(quote: String, category: AffirmationCategory)]) {
-        let defaults = UserDefaults.standard
-        let cached = pairs.map { CachedAffirmation(quote: $0.quote, category: $0.category) }
-        if let data = try? JSONEncoder().encode(cached) {
-            defaults.set(data, forKey: quoteKey)
-        }
-        defaults.set(CheckIn.dateString(for: Date()), forKey: datKey)
     }
 }

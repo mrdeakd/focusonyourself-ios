@@ -29,4 +29,11 @@ extension Color {
     static let foyOrangeTint      = Color(hex: "FF6B2B").opacity(0.12)
     static let foyMoodBackground  = Color(hex: "F5F3F0")
     static let foyCalendarSkipped = Color(hex: "F5F3F0")
+
+    // Upgrade / Pro
+    static let foyOrangeAccent      = Color(hex: "F4845F")
+    static let foyUpgradeCardBg     = Color(hex: "F5F8FF")
+    static let foyUpgradeCardBorder = Color(hex: "DDEAFF")
+    static let foyUpgradeIconBg     = Color(hex: "FFF0EA")
+    static let foyFreeBadgeBg       = Color(hex: "EEF3FF")
 }

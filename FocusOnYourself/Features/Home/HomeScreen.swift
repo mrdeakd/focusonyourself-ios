@@ -15,7 +15,7 @@ struct HomeScreen: View {
                 ScrollView {
                     VStack(spacing: Spacing.lg) {
                         AffirmationsCarouselView(
-                            affirmations: viewModel.todayAffirmations,
+                            affirmations: viewModel.generatedQuotes,
                             isLoading: viewModel.isGeneratingAffirmation
                         )
                         .padding(.horizontal, -Spacing.xl)

@@ -2,7 +2,7 @@ import Foundation
 
 struct CheckIn: Codable, Equatable, Identifiable {
     var id: String { dateString }
-    let dateString: String   // "yyyy-MM-dd"
+    let dateString: String
     let mood: Mood
     let feelingsDescription: String?
 

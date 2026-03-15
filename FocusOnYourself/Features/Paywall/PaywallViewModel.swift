@@ -11,24 +11,26 @@ final class PaywallViewModel {
     var isLoading = false
     var errorMessage: String?
 
-    private let monthlyProductID = "com.focusonyourself.pro.monthly"
-    private let annualProductID  = "com.focusonyourself.pro.annual"
-    private let purchaseService: PurchaseService
+    private let purchaseService: PurchaseServiceProtocol
 
     init(purchaseService: PurchaseService = ServiceContainer.shared.purchaseService) {
         self.purchaseService = purchaseService
     }
 
     var monthlyProduct: Product? {
-        purchaseService.products.first { $0.id == monthlyProductID }
+        purchaseService.products.first { $0.id == purchaseService.productMonthly }
     }
 
     var annualProduct: Product? {
-        purchaseService.products.first { $0.id == annualProductID }
+        purchaseService.products.first { $0.id == purchaseService.productAnnual }
     }
 
     var selectedProduct: Product? {
         selectedPlan == .monthly ? monthlyProduct : annualProduct
+    }
+
+    var isPro: Bool {
+        purchaseService.isPro
     }
 
     var ctaLabel: String {

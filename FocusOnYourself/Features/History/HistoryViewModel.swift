@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-@Observable
+@Observable @MainActor
 final class HistoryViewModel {
     private let profileService: ProfileServiceProtocol
 
@@ -15,6 +15,10 @@ final class HistoryViewModel {
 
     var checkInDateStrings: Set<String> {
         Set(profileService.profile.checkIns.map { $0.dateString })
+    }
+
+    func checkIn(for dateString: String) -> CheckIn? {
+        profileService.profile.checkIns.first { $0.dateString == dateString }
     }
 
     var calendarMonths: [Date] {

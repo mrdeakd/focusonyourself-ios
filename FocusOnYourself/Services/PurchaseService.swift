@@ -19,19 +19,21 @@ enum PurchaseError: Error, Equatable {
 @MainActor
 final class PurchaseService: PurchaseServiceProtocol {
 
-    private let productMonthly = "com.focusonyourself.pro.monthly"
-    private let productAnnual = "com.focusonyourself.pro.annual"
-    private let isProUserDefaultsKey = "com.focusonyourself.isPro"
+    let productMonthly = "com.focusonyourself.pro.monthly.renewal"
+    let productAnnual = "com.focusonyourself.pro.annual.renewal"
+
+    private let userDefaultsService: UserDefaultsServiceProtocol
 
     var isPro: Bool {
-        didSet { UserDefaults.standard.set(isPro, forKey: isProUserDefaultsKey) }
+        didSet { userDefaultsService.setBool(.isPro, value: isPro) }
     }
     var products: [Product] = []
 
     private var updatesTask: Task<Void, Never>?
 
-    init() {
-        isPro = UserDefaults.standard.bool(forKey: isProUserDefaultsKey)
+    init(userDefaultsService: UserDefaultsServiceProtocol = ServiceContainer.shared.userDefaultsService) {
+        self.userDefaultsService = userDefaultsService
+        isPro = userDefaultsService.getBool(.isPro)
         Task {
             await loadProducts()
             await refreshEntitlements()
@@ -80,9 +82,7 @@ final class PurchaseService: PurchaseServiceProtocol {
         let productIDs: Set<String> = [productMonthly, productAnnual]
         do {
             products = try await Product.products(for: productIDs)
-            print("[PurchaseService] Loaded \(products.count) products: \(products.map(\.id))")
         } catch {
-            print("[PurchaseService] Product.products(for:) failed: \(error)")
             products = []
         }
     }

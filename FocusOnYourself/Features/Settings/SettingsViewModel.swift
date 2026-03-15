@@ -2,7 +2,7 @@ import Foundation
 import FoundationModels
 import Observation
 
-@Observable
+@Observable @MainActor
 final class SettingsViewModel {
     private let profileService: ProfileServiceProtocol
     private let notificationService: NotificationServiceProtocol

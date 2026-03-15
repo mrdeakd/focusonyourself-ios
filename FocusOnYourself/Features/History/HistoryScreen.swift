@@ -4,6 +4,7 @@ private let calendarCardRadius: CGFloat = 18
 
 struct HistoryScreen: View {
     @State private var viewModel: HistoryViewModel
+    @State private var selectedCheckIn: CheckIn?
 
     init() {
         _viewModel = State(initialValue: HistoryViewModel())
@@ -14,7 +15,6 @@ struct HistoryScreen: View {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Fixed header
                 HStack {
                     Text("History")
                         .font(.foyNavTitle)
@@ -25,7 +25,6 @@ struct HistoryScreen: View {
                 .padding(.top, Spacing.lg)
                 .padding(.bottom, Spacing.md)
 
-                // Stat cards row
                 HStack(spacing: Spacing.sm) {
                     StreakStatCard(label: "Current Streak", value: viewModel.streakStats.current)
                     StreakStatCard(label: "Longest Streak", value: viewModel.streakStats.longest)
@@ -33,13 +32,15 @@ struct HistoryScreen: View {
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.xxxs)
 
-                // Scrollable content
                 ScrollView {
                     VStack(spacing: Spacing.lg) {
                         ForEach(viewModel.calendarMonths, id: \.self) { monthDate in
                             CalendarMonthView(
                                 month: monthDate,
-                                checkInDates: viewModel.checkInDateStrings
+                                checkInDates: viewModel.checkInDateStrings,
+                                onDayTapped: { dateString in
+                                    selectedCheckIn = viewModel.checkIn(for: dateString)
+                                }
                             )
                             .padding(Spacing.lg)
                             .background(Color.foyCard)
@@ -55,6 +56,9 @@ struct HistoryScreen: View {
                 }
                 .padding(.vertical, Spacing.lg)
             }
+        }
+        .sheet(item: $selectedCheckIn) { checkIn in
+            DayDetailSheet(checkIn: checkIn)
         }
     }
 }

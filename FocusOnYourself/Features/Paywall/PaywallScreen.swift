@@ -5,31 +5,39 @@ struct PaywallScreen: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = PaywallViewModel()
 
-    private let benefits: [(symbol: String, label: String)] = [
-        ("sparkles",           "All Categories"),
-        ("brain.head.profile", "AI Affirmations"),
-        ("clock",              "Custom Reminder Time"),
-        ("gift",               "Future Features")
+    private let benefits: [(symbol: String, title: String, subtitle: String)] = [
+        ("lock.open",  "All Categories",         "Confidence, Health, Relationships & more"),
+        ("sparkles",   "AI Affirmations",         "Personalized with Apple Intelligence"),
+        ("timer",      "Custom Reminder Time",    "Set your perfect daily moment"),
+        ("gift",       "Future Features",         "Get everything we build next"),
     ]
 
     private let defaultMonthlyPrice = "$2.99/mo"
     private let defaultAnnualPrice  = "$19.99/yr"
     private let planToggleHeight: CGFloat = 56
     private let bestValueBadgeCornerRadius: CGFloat = 10
+    private let loadingOverlay = Color.black.opacity(0.4)
+    private let dismissButtonBackground = Color.foyMoodBackground
+    private let dismissButtonSize: CGFloat = 32
+    private let handleBarWidth: CGFloat = 36
+    private let handleBarHeight: CGFloat = 4
 
     var body: some View {
         ZStack {
-            Color.foyNavy.ignoresSafeArea()
+            Color.foyBackground.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 0) {
+                    handleBar
+                        .padding(.top, Spacing.xxs)
+
                     dismissButton
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.horizontal, Spacing.screenHorizontal)
-                        .padding(.top, Spacing.screenTop)
+                        .padding(.top, Spacing.xs)
 
                     titleSection
-                        .padding(.top, Spacing.lg)
+                        .padding(.top, Spacing.sm)
                         .padding(.horizontal, Spacing.screenHorizontal)
 
                     benefitsList
@@ -48,39 +56,59 @@ struct PaywallScreen: View {
             }
 
             if viewModel.isLoading {
-                Color.black.opacity(0.4).ignoresSafeArea()
+                loadingOverlay.ignoresSafeArea()
                 ProgressView()
                     .progressViewStyle(.circular)
                     .tint(.white)
             }
         }
+        .onChange(of: viewModel.isPro) { _, isPro in
+            if isPro { dismiss() }
+        }
     }
 
-    // MARK: - Subviews
+    private var handleBar: some View {
+        RoundedRectangle(cornerRadius: handleBarHeight / 2)
+            .fill(Color.foyButtonDisabled)
+            .frame(width: handleBarWidth, height: handleBarHeight)
+            .frame(maxWidth: .infinity)
+    }
 
     private var dismissButton: some View {
         Button {
             dismiss()
         } label: {
-            Image(systemName: "xmark")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.white.opacity(0.7))
-                .padding(Spacing.xs)
+            ZStack {
+                Circle()
+                    .fill(dismissButtonBackground)
+                    .frame(width: dismissButtonSize, height: dismissButtonSize)
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Color.foyForegroundSecondary)
+            }
         }
     }
 
     private var titleSection: some View {
-        Text("Unlock FocusOnYourself Pro")
-            .foySectionTitleStyle()
-            .foregroundStyle(.white)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
+        VStack(spacing: Spacing.xxs) {
+            Text("Unlock FocusOnYourself Pro")
+                .font(.foyHeadline)
+                .kerning(-0.3)
+                .foregroundStyle(Color.foyForeground)
+                .multilineTextAlignment(.center)
+
+            Text("Everything you need for daily growth")
+                .font(.foyCaption)
+                .foregroundStyle(Color.foyForegroundSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var benefitsList: some View {
-        VStack(spacing: Spacing.md) {
+        VStack(spacing: Spacing.xxxs) {
             ForEach(benefits, id: \.symbol) { benefit in
-                BenefitRow(symbol: benefit.symbol, label: benefit.label)
+                BenefitRow(symbol: benefit.symbol, title: benefit.title, subtitle: benefit.subtitle)
             }
         }
     }
@@ -110,16 +138,20 @@ struct PaywallScreen: View {
                 VStack(spacing: Spacing.xxs) {
                     Text(plan == .monthly ? "Monthly" : "Annual")
                         .font(.foyBodyMedium)
-                        .foregroundStyle(isSelected ? Color.foyNavy : .white)
+                        .foregroundStyle(isSelected ? .white : Color.foyForeground)
 
                     Text(price)
                         .font(.foyCaption)
-                        .foregroundStyle(isSelected ? Color.foyNavy.opacity(0.7) : .white.opacity(0.7))
+                        .foregroundStyle(isSelected ? .white.opacity(0.7) : Color.foyForegroundSecondary)
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: planToggleHeight)
-                .background(isSelected ? .white : .white.opacity(0.1))
+                .background(isSelected ? Color.foyNavy : Color.foyCard)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+                .overlay(
+                    RoundedRectangle(cornerRadius: CornerRadius.card)
+                        .strokeBorder(isSelected ? Color.clear : Color.foyNavy, lineWidth: 1.5)
+                )
 
                 if showBadge {
                     Text("Best Value")
@@ -145,7 +177,7 @@ struct PaywallScreen: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: Spacing.inputHeight)
-                    .background(Color.foyOrange)
+                    .background(Color.foyNavy)
                     .clipShape(RoundedRectangle(cornerRadius: CornerRadius.pill))
             }
             .disabled(viewModel.isLoading)
@@ -155,7 +187,7 @@ struct PaywallScreen: View {
             } label: {
                 Text("Restore Purchase")
                     .font(.foyCaption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(Color.foyPlaceholder)
             }
             .disabled(viewModel.isLoading)
 
@@ -165,31 +197,6 @@ struct PaywallScreen: View {
                     .foregroundStyle(Color.foyOrange)
                     .multilineTextAlignment(.center)
             }
-        }
-    }
-}
-
-// MARK: - BenefitRow
-
-private struct BenefitRow: View {
-    let symbol: String
-    let label: String
-
-    private let iconSize: CGFloat = 18
-    private let iconFrameWidth: CGFloat = 24
-
-    var body: some View {
-        HStack(spacing: Spacing.md) {
-            Image(systemName: symbol)
-                .font(.system(size: iconSize))
-                .foregroundStyle(Color.foyOrange)
-                .frame(width: iconFrameWidth, alignment: .center)
-
-            Text(label)
-                .font(.foyBody)
-                .foregroundStyle(.white)
-
-            Spacer()
         }
     }
 }

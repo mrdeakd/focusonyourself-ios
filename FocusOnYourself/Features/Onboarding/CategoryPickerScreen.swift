@@ -21,7 +21,7 @@ struct CategoryPickerScreen: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 VStack(spacing: Spacing.sm) {
-                    ForEach(AffirmationCategory.allCases) { category in
+                    ForEach(AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }) { category in
                         let isLocked = !category.isFree && !ServiceContainer.shared.purchaseService.isPro
                         CategoryRowView(
                             category: category,

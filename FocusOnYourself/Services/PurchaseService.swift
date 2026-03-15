@@ -1,7 +1,7 @@
 import Foundation
 import StoreKit
 
-enum PurchaseError: Error {
+enum PurchaseError: Error, Equatable {
     case purchaseFailed
     case verificationFailed
     case userCancelled
@@ -78,7 +78,13 @@ final class PurchaseService: PurchaseServiceProtocol {
 
     private func loadProducts() async {
         let productIDs: Set<String> = [productMonthly, productAnnual]
-        products = (try? await Product.products(for: productIDs)) ?? []
+        do {
+            products = try await Product.products(for: productIDs)
+            print("[PurchaseService] Loaded \(products.count) products: \(products.map(\.id))")
+        } catch {
+            print("[PurchaseService] Product.products(for:) failed: \(error)")
+            products = []
+        }
     }
 
     private func refreshEntitlements() async {

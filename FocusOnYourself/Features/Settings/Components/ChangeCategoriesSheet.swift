@@ -69,7 +69,7 @@ struct ChangeCategoriesSheet: View {
                 .lineSpacing(Spacing.xxs)
 
             VStack(spacing: categorySpacing) {
-                ForEach(AffirmationCategory.allCases) { category in
+                ForEach(AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }) { category in
                     let isLocked = !category.isFree && !ServiceContainer.shared.purchaseService.isPro
                     CategoryRowView(
                         category: category,

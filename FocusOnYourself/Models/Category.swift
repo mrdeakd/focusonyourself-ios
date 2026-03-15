@@ -1,7 +1,7 @@
 import Foundation
 
 enum AffirmationCategory: String, CaseIterable, Codable, Identifiable {
-    case confidence, health, relationships, mindfulness
+    case confidence, health, relationships, mindfulness, career, resilience
     var id: String { rawValue }
     var displayName: String {
         switch self {
@@ -9,6 +9,8 @@ enum AffirmationCategory: String, CaseIterable, Codable, Identifiable {
         case .health:        return "Health & Body"
         case .relationships: return "Relationships & Love"
         case .mindfulness:   return "Mindfulness & Calm"
+        case .career:        return "Career & Success"
+        case .resilience:    return "Resilience & Strength"
         }
     }
     var isFree: Bool {

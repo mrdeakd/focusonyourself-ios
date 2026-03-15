@@ -13,9 +13,9 @@ final class PaywallViewModel {
 
     private let monthlyProductID = "com.focusonyourself.pro.monthly"
     private let annualProductID  = "com.focusonyourself.pro.annual"
-    private let purchaseService: PurchaseServiceProtocol
+    private let purchaseService: PurchaseService
 
-    init(purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService) {
+    init(purchaseService: PurchaseService = ServiceContainer.shared.purchaseService) {
         self.purchaseService = purchaseService
     }
 
@@ -51,7 +51,9 @@ final class PaywallViewModel {
             do {
                 try await purchaseService.purchase(product)
             } catch let error as PurchaseError {
-                errorMessage = error.defaultDescription
+                if error != .userCancelled {
+                    errorMessage = error.defaultDescription
+                }
             } catch {}
             isLoading = false
         }
@@ -64,7 +66,9 @@ final class PaywallViewModel {
             do {
                 try await purchaseService.restorePurchases()
             } catch let error as PurchaseError {
-                errorMessage = error.defaultDescription
+                if error != .userCancelled {
+                    errorMessage = error.defaultDescription
+                }
             } catch {}
             isLoading = false
         }

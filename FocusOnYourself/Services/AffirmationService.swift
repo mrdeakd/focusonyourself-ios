@@ -3,6 +3,28 @@ import FoundationModels
 
 final class AffirmationService: AffirmationServiceProtocol {
     private var staticAffirmations: [(quote: String, category: AffirmationCategory)]?
+    private let userDefaultsService: UserDefaultsServiceProtocol
+
+    init(userDefaultsService: UserDefaultsServiceProtocol = ServiceContainer.shared.userDefaultsService) {
+        self.userDefaultsService = userDefaultsService
+    }
+
+    func cachedBatch() -> [(quote: String, category: AffirmationCategory)]? {
+        let today = CheckIn.dateString(for: Date())
+        guard userDefaultsService.getString(.affirmationCacheDate) == today,
+              let data = userDefaultsService.getData(.affirmationCache),
+              let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data)
+        else { return nil }
+        return cached.map { (quote: $0.quote, category: $0.category) }
+    }
+
+    func cacheBatch(_ pairs: [(quote: String, category: AffirmationCategory)]) {
+        let cached = pairs.map { CachedAffirmation(quote: $0.quote, category: $0.category) }
+        if let data = try? JSONEncoder().encode(cached) {
+            userDefaultsService.setData(.affirmationCache, value: data)
+        }
+        userDefaultsService.setString(.affirmationCacheDate, value: CheckIn.dateString(for: Date()))
+    }
 
     func generateBatch(count: Int, for categories: [AffirmationCategory], useAppleIntelligence: Bool) async throws -> [(quote: String, category: AffirmationCategory)] {
         guard !categories.isEmpty else { return [] }
@@ -95,13 +117,6 @@ final class AffirmationService: AffirmationServiceProtocol {
         }
         return Array(results.prefix(expected))
     }
-}
-
-// MARK: - Supporting types
-
-private struct StaticAffirmation: Decodable {
-    let quote: String
-    let category: String
 }
 
 enum AffirmationServiceError: Error {

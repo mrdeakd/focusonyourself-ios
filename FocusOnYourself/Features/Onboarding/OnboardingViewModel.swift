@@ -5,6 +5,7 @@ enum OnboardingStep: Int, CaseIterable {
     case welcome, name, categories, notifications
 }
 
+@MainActor
 @Observable
 final class OnboardingViewModel {
     var currentStep: OnboardingStep = .welcome
@@ -15,14 +16,19 @@ final class OnboardingViewModel {
 
     private let notificationService: NotificationServiceProtocol
     private let profileService: ProfileServiceProtocol
+    private let purchaseService: PurchaseServiceProtocol
 
     init(
         notificationService: NotificationServiceProtocol = ServiceContainer.shared.notificationService,
-        profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService
+        profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
+        purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService
     ) {
         self.notificationService = notificationService
         self.profileService = profileService
+        self.purchaseService = purchaseService
     }
+
+    var isPro: Bool { purchaseService.isPro }
 
     var isNameValid: Bool {
         !nameInput.trimmingCharacters(in: .whitespaces).isEmpty

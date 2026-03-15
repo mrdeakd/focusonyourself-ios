@@ -1,15 +1,15 @@
 import SwiftUI
 
 private enum DayState {
-    case streakDay      // checked in
-    case skipped        // past, no check-in
-    case today          // today (no check-in or not)
-    case future         // future date
-    case empty          // leading/trailing filler cell
+    case streakDay
+    case skipped
+    case today
+    case future
+    case empty
 }
 
 private struct CalendarDayCell: View {
-    let day: Int      // 1-31, or 0 for empty
+    let day: Int
     let state: DayState
 
     private let cellSize: CGFloat = 32
@@ -56,18 +56,17 @@ private struct CalendarDayCell: View {
 }
 
 struct CalendarMonthView: View {
-    let month: Date          // any date in the target month
-    let checkInDates: Set<String>  // set of "yyyy-MM-dd" strings
+    let month: Date
+    let checkInDates: Set<String>
+    var onDayTapped: ((String) -> Void)? = nil
 
     private let dayLabels = ["S", "M", "T", "W", "T", "F", "S"]
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            // Month header: "March 2026"
             Text(monthTitle)
                 .font(.foyBodyMedium)
                 .foregroundStyle(Color.foyForeground)
 
-            // Day-of-week row
             HStack(spacing: 0) {
                 ForEach(0..<7, id: \.self) { i in
                     Text(dayLabels[i])
@@ -77,13 +76,17 @@ struct CalendarMonthView: View {
                 }
             }
 
-            // Calendar grid
             VStack(spacing: Spacing.xs) {
                 ForEach(cellRows, id: \.first!.offset) { row in
                     HStack(spacing: 0) {
                         ForEach(row, id: \.offset) { cell in
                             CalendarDayCell(day: cell.day, state: cell.state)
                                 .frame(maxWidth: .infinity)
+                                .onTapGesture {
+                                    if (cell.state == .streakDay || cell.state == .today), let key = cell.dateKey {
+                                        onDayTapped?(key)
+                                    }
+                                }
                         }
                     }
                 }
@@ -91,43 +94,34 @@ struct CalendarMonthView: View {
         }
     }
 
-    // MARK: - Computed
-
-    private var cellRows: [[(offset: Int, day: Int, state: DayState)]] {
+    private var cellRows: [[(offset: Int, day: Int, state: DayState, dateKey: String?)]] {
         stride(from: 0, to: cells.count, by: 7).map {
             Array(cells[$0..<min($0 + 7, cells.count)])
         }
     }
 
     private var monthTitle: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: month)
+        month.calendarMonthFormatted
     }
 
-    private var cells: [(offset: Int, day: Int, state: DayState)] {
+    private var cells: [(offset: Int, day: Int, state: DayState, dateKey: String?)] {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
 
-        // First day of month
         let comps = cal.dateComponents([.year, .month], from: month)
         guard let firstDay = cal.date(from: comps) else { return [] }
 
-        // Leading empty cells (weekday of first day, 0=Sun)
-        let firstWeekday = cal.component(.weekday, from: firstDay) - 1  // 0-indexed
+        let firstWeekday = cal.component(.weekday, from: firstDay) - 1
 
-        // Days in month
         let range = cal.range(of: .day, in: .month, for: firstDay)!
         let daysInMonth = range.count
 
-        var result: [(offset: Int, day: Int, state: DayState)] = []
+        var result: [(offset: Int, day: Int, state: DayState, dateKey: String?)] = []
 
-        // Leading empties
         for i in 0..<firstWeekday {
-            result.append((offset: i, day: 0, state: .empty))
+            result.append((offset: i, day: 0, state: .empty, dateKey: nil))
         }
 
-        // Day cells
         for d in 1...daysInMonth {
             guard let date = cal.date(byAdding: .day, value: d - 1, to: firstDay) else { continue }
             let dateKey = CheckIn.dateString(for: date)
@@ -144,16 +138,15 @@ struct CalendarMonthView: View {
                 state = .future
             }
 
-            result.append((offset: firstWeekday + d - 1, day: d, state: state))
+            result.append((offset: firstWeekday + d - 1, day: d, state: state, dateKey: dateKey))
         }
 
-        // Trailing empties to complete the grid (must be multiple of 7)
         let totalCells = result.count
         let remainder = totalCells % 7
         if remainder != 0 {
             let trailingCount = 7 - remainder
             for i in 0..<trailingCount {
-                result.append((offset: totalCells + i, day: 0, state: .empty))
+                result.append((offset: totalCells + i, day: 0, state: .empty, dateKey: nil))
             }
         }
 

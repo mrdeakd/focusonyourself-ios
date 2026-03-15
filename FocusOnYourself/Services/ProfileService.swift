@@ -5,8 +5,11 @@ import Observation
 final class ProfileService: ProfileServiceProtocol {
     private(set) var profile: UserProfile
 
-    init() {
-        if let data = UserDefaults.standard.data(forKey: "userProfile"),
+    private let userDefaultsService: UserDefaultsServiceProtocol
+
+    init(userDefaultsService: UserDefaultsServiceProtocol = ServiceContainer.shared.userDefaultsService) {
+        self.userDefaultsService = userDefaultsService
+        if let data = userDefaultsService.getData(.userProfile),
            let saved = try? JSONDecoder().decode(UserProfile.self, from: data) {
             self.profile = saved
         } else {
@@ -17,7 +20,7 @@ final class ProfileService: ProfileServiceProtocol {
     func updateProfile(_ profile: UserProfile) {
         self.profile = profile
         if let data = try? JSONEncoder().encode(profile) {
-            UserDefaults.standard.set(data, forKey: "userProfile")
+            userDefaultsService.setData(.userProfile, value: data)
         }
     }
 

@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B031FB0C2F671B0B0093CA57 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B031FB0B2F671B0B0093CA57 /* StoreKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B006DFAB2F63F8680013416E /* FocusOnYourself.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusOnYourself.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B031FB0B2F671B0B0093CA57 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B031FB0C2F671B0B0093CA57 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +39,7 @@
 			isa = PBXGroup;
 			children = (
 				B006DFAD2F63F8680013416E /* FocusOnYourself */,
+				B031FB0A2F671B0B0093CA57 /* Frameworks */,
 				B006DFAC2F63F8680013416E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +50,14 @@
 				B006DFAB2F63F8680013416E /* FocusOnYourself.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B031FB0A2F671B0B0093CA57 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B031FB0B2F671B0B0093CA57 /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

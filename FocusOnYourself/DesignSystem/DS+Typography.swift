@@ -26,11 +26,13 @@ extension Font {
     static let foyCaptionMedium   = Font.inter(13, weight: .medium)
     static let foyCaptionSemibold = Font.inter(13, weight: .semibold)
     static let foyBodyMedium      = Font.inter(15, weight: .medium)
+    static let foyBodySemibold    = Font.inter(15, weight: .semibold)
     static let foyQuote           = Font.inter(18, weight: .light)
     static let foyMicro           = Font.inter(10)
     static let foyMicroMedium     = Font.inter(10, weight: .medium)
     static let foyHintMedium      = Font.inter(12, weight: .medium)
     static let foyStatValue       = Font.inter(24, weight: .medium)
+    static let foyHeadline        = Font.inter(22, weight: .semibold)
 }
 
 extension View {

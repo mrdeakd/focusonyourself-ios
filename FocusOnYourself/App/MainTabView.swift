@@ -19,7 +19,7 @@ struct MainTabView: View {
             .animation(.none, value: selectedTab)
 
             AppTabBar(selectedTab: $selectedTab)
+                .ignoresSafeArea(edges: .bottom)
         }
-        .ignoresSafeArea(edges: .bottom)
     }
 }

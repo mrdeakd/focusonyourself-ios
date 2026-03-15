@@ -4,15 +4,16 @@
 
 ### What's New
 
-- **Affirmations dataset**: Replaced placeholder with 17,994 curated first-person affirmations (confidence: 4,496 · health: 4,499 · mindfulness: 4,499 · relationships: 4,500). Affirmations are filtered by your selected categories.
-- **Apple Intelligence availability check**: The app now only activates on-device AI generation when both the user toggle is on AND the device supports it (iPhone 15 Pro+). Previously the toggle had no device guard.
-- **Home screen layout**: Removed the large gap (~48pt) between the last content card and the tab bar. The bottom of the Home screen now has minimal breathing room (4pt) matching the rest of the UI.
+- **Pro subscription / Paywall**: In-app purchase flow with a dedicated Paywall screen showing the benefits list, pricing, and a restore-purchases option.
+- **Pro-gated categories**: Two new focus categories — **Career & Success** and **Resilience & Strength** — are exclusive to Pro subscribers. Lock badges appear on these categories in the category picker and in Settings.
+- **AI affirmations require Pro**: The Apple Intelligence affirmations toggle in Settings is now gated behind Pro. Attempting to enable it without a subscription opens the Paywall.
+- **History — Day Detail Sheet**: Tap any checked-in day in the History tab to open a detail sheet showing the mood emoji, mood level dots, and journal notes recorded that day.
 
 ### What to Test
 
-1. **Static affirmations load** — With Apple Intelligence OFF, open Home and confirm 10 affirmations appear. Verify they match your selected categories (Settings → Categories).
-2. **Category filtering** — Deselect all but one category in Settings; return to Home and confirm all 10 affirmations belong to that category only.
-3. **Apple Intelligence guard** — On a non-supported device (pre-iPhone 15 Pro), enable the Apple Intelligence toggle in Settings; confirm the app falls back to the static dataset without crashing.
-4. **Apple Intelligence on supported device** — On iPhone 15 Pro+, enable the toggle; confirm affirmations are dynamically generated and feel distinct from the curated set.
-5. **Dataset variety** — Open Home on multiple days (or clear today's cache); confirm different affirmations appear each day.
-6. **Home screen bottom gap** — Scroll to the bottom of Home; confirm there is no large empty space above the tab bar.
+1. **Paywall flow** — Tap a locked (Pro) category; confirm the Paywall sheet opens with the benefits list and pricing. Test Subscribe, Restore Purchases, and Close/dismiss.
+2. **Locked categories** — In the category picker and Settings, confirm **Career & Success** and **Resilience & Strength** display a Pro lock badge and launch the Paywall when tapped (without an active subscription).
+3. **AI affirmations gate** — With no Pro subscription, go to Settings and attempt to enable the Apple Intelligence toggle; confirm it is blocked and the Paywall appears.
+4. **Free categories** — Confirm Confidence, Health & Wellness, Mindfulness, and Relationships remain freely selectable with no lock badge.
+5. **Day Detail Sheet (checked-in day)** — Open the History tab, tap a day that has a check-in; confirm the detail sheet appears with the correct mood emoji, mood level dots, and journal notes.
+6. **Day Detail Sheet (unchecked day)** — Tap a day with no check-in; confirm no sheet appears (or that any fallback is handled gracefully without a crash).

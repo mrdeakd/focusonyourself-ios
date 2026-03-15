@@ -5,7 +5,6 @@ struct MoodPickerView: View {
     @Binding var feelingsDescription: String
     let onSelect: (Mood) -> Void
     let onCheckIn: () -> Void
-
     @FocusState private var isEditorFocused: Bool
     private let checkInHeight: CGFloat = 52
 

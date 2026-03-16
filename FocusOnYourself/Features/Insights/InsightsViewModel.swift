@@ -1,19 +1,12 @@
+import Factory
 import Foundation
 import Observation
 
 @Observable
 @MainActor
 final class InsightsViewModel {
-    private let profileService: ProfileService
-    private let purchaseService: PurchaseService
-
-    init(
-        profileService: ProfileService = ServiceContainer.shared.profileService,
-        purchaseService: PurchaseService = ServiceContainer.shared.purchaseService
-    ) {
-        self.profileService = profileService
-        self.purchaseService = purchaseService
-    }
+    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var isPro: Bool { purchaseService.isPro }
 

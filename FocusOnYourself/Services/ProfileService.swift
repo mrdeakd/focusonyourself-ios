@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import Observation
 import WidgetKit
@@ -8,7 +9,7 @@ final class ProfileService: ProfileServiceProtocol {
 
     private let userDefaultsService: UserDefaultsServiceProtocol
 
-    init(userDefaultsService: UserDefaultsServiceProtocol = ServiceContainer.shared.userDefaultsService) {
+    init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
         self.userDefaultsService = userDefaultsService
         if let data = userDefaultsService.getData(.userProfile),
            let saved = try? JSONDecoder().decode(UserProfile.self, from: data) {

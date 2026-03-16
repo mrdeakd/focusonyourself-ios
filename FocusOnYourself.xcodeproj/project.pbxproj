@@ -11,6 +11,7 @@
 		B0F0A89E2F68002800C468D1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0F0A89D2F68002800C468D1 /* WidgetKit.framework */; };
 		B0F0A8A02F68002800C468D1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0F0A89F2F68002800C468D1 /* SwiftUI.framework */; };
 		B0F0A8AB2F68002900C468D1 /* FocusOnYourselfWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B0F0A89C2F68002800C468D1 /* FocusOnYourselfWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B0FAC7052F70000000000003 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = B0FAC7042F70000000000002 /* Factory */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B031FB0C2F671B0B0093CA57 /* StoreKit.framework in Frameworks */,
+				B0FAC7052F70000000000003 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +147,7 @@
 			);
 			name = FocusOnYourself;
 			packageProductDependencies = (
+				B0FAC7042F70000000000002 /* Factory */,
 			);
 			productName = FocusOnYourself;
 			productReference = B006DFAB2F63F8680013416E /* FocusOnYourself.app */;
@@ -199,6 +202,9 @@
 			);
 			mainGroup = B006DFA22F63F8680013416E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B0F0AE1D2F686F8100C468D1 /* XCRemoteSwiftPackageReference "Factory" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B006DFAC2F63F8680013416E /* Products */;
 			projectDirPath = "";
@@ -395,7 +401,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = app.ddworks.FocusOnYourself;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -433,7 +439,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = app.ddworks.FocusOnYourself;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -543,6 +549,33 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B0F0AE1D2F686F8100C468D1 /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 2.5.3;
+			};
+		};
+		B0FAC7032F70000000000001 /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B0FAC7042F70000000000002 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B0FAC7032F70000000000001 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B006DFA32F63F8680013416E /* Project object */;
 }

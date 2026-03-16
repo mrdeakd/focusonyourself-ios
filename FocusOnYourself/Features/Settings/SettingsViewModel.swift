@@ -1,22 +1,13 @@
+import Factory
 import Foundation
 import FoundationModels
 import Observation
 
 @Observable @MainActor
 final class SettingsViewModel {
-    private let profileService: ProfileServiceProtocol
-    private let notificationService: NotificationServiceProtocol
-    private let purchaseService: PurchaseServiceProtocol
-
-    init(
-        profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
-        notificationService: NotificationServiceProtocol = ServiceContainer.shared.notificationService,
-        purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService
-    ) {
-        self.profileService = profileService
-        self.notificationService = notificationService
-        self.purchaseService = purchaseService
-    }
+    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.notificationService) private var notificationService
+    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var currentName: String {
         profileService.profile.name

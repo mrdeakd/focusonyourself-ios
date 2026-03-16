@@ -1,5 +1,26 @@
 # TestFlight Release Notes
 
+## Build 1 — 2026-03-16
+
+### What's New
+
+- **Insights tab** — mood distribution, current & longest streaks, trends over time
+- **Home screen widgets** — Mood widget and Streak widget, updates after each check-in
+- **New mood icons** — custom illustrated icons for all 5 moods
+- **Appearance setting** — choose System, Light, or Dark mode in Settings
+- **iCloud sync** — preferences now sync across your Apple devices
+- **History** — calendar day cells polished and extracted as a dedicated component
+- **Dark app icon** — alternate dark variant now available
+
+### What to Test
+
+1. Complete a check-in → verify Mood and Streak widgets update on the Home Screen
+2. Open the Insights tab → confirm mood distribution and streak stats are correct
+3. Settings → Appearance → tap Light/Dark/System → verify the app switches immediately
+4. Settings → Appearance → background-kill the app → verify preference persists on relaunch
+5. Sign in to iCloud on two devices → check in on one → confirm data appears on the other
+6. Check all 5 mood icons render correctly in the check-in picker and history calendar
+
 ## Build 2 — 2026-03-14
 
 ### What's New

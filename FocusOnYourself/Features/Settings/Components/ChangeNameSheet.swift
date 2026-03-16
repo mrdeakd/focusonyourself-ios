@@ -71,7 +71,7 @@ struct ChangeNameSheet: View {
             HStack {
                 Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
                     .font(.foyBody)
-                    .foregroundStyle(Color.foyPlaceholder)
+                    .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
                 Spacer()
                 Image(systemName: "lock")
                     .foregroundStyle(Color.foyPlaceholder)

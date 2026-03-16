@@ -11,6 +11,8 @@ struct MainTabView: View {
                     HomeScreen()
                 case .history:
                     HistoryScreen()
+                case .insights:
+                    InsightsScreen()
                 case .settings:
                     SettingsScreen()
                 }

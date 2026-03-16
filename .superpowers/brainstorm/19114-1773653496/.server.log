@@ -1,0 +1,5 @@
+{"type":"server-started","port":64180,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:64180","screen_dir":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/19114-1773653496"}
+{"type":"screen-added","file":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/19114-1773653496/feature-ideas.html"}
+{"source":"user-event","type":"click","text":"☁️\n    \n      iCloud Sync\n      All data lives in UserDefaults today — no backup, no multi-device. Migrate to CloudKit to sync across iPhone, iPad, and Mac.","choice":"sync","id":null,"timestamp":1773653530662}
+{"type":"screen-added","file":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/19114-1773653496/waiting-1.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -1,12 +1,13 @@
 import SwiftUI
 
 enum AppTab: CaseIterable {
-    case home, history, settings
+    case home, history, insights, settings
 
     var label: String {
         switch self {
         case .home:     return "HOME"
         case .history:  return "HISTORY"
+        case .insights: return "INSIGHTS"
         case .settings: return "SETTINGS"
         }
     }
@@ -15,6 +16,7 @@ enum AppTab: CaseIterable {
         switch self {
         case .home:     return "house.fill"
         case .history:  return "calendar"
+        case .insights: return "chart.bar.fill"
         case .settings: return "gearshape"
         }
     }
@@ -42,7 +44,7 @@ struct AppTabBar: View {
         }
         .padding(innerPadding)
         .frame(height: pillHeight)
-        .background(Color.white)
+        .background(Color.foyCard)
         .clipShape(RoundedRectangle(cornerRadius: pillCornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: pillCornerRadius)
@@ -55,35 +57,3 @@ struct AppTabBar: View {
     }
 }
 
-private struct TabItemView: View {
-    let tab: AppTab
-    let isSelected: Bool
-    let namespace: Namespace.ID
-    let onTap: () -> Void
-
-    private let activeCornerRadius: CGFloat = 26
-
-    var body: some View {
-        Button(action: onTap) {
-            VStack(spacing: Spacing.xxxs) {
-                Image(systemName: tab.icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 18, height: 18)
-                Text(tab.label)
-                    .font(.foySectionLabel)
-                    .kerning(0.5)
-            }
-            .foregroundStyle(isSelected ? Color.white : Color.foyPlaceholder)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: activeCornerRadius)
-                        .fill(Color.foyNavy)
-                        .matchedGeometryEffect(id: "activeTab", in: namespace)
-                }
-            }
-        }
-        .buttonStyle(.plain)
-    }
-}

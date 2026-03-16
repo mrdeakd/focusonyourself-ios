@@ -29,7 +29,8 @@ struct PaywallScreen: View {
             ScrollView {
                 VStack(spacing: 0) {
                     handleBar
-                        .padding(.top, Spacing.xxs)
+                        .padding(.top, Spacing.md)
+                        .padding(.bottom, Spacing.sm)
 
                     dismissButton
                         .frame(maxWidth: .infinity, alignment: .trailing)

@@ -1,0 +1,76 @@
+<h2>Which widget layout feels right?</h2>
+<p class="subtitle">Medium (4×2) widget — showing streak & stats. Pick the layout that fits best.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#1a1f3c;border-radius:20px;padding:18px 22px;display:flex;flex-direction:column;justify-content:space-between;min-height:110px;font-family:-apple-system,sans-serif;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;">Focus on Yourself</div>
+      <div style="display:flex;align-items:flex-end;gap:24px;margin-top:8px;">
+        <div>
+          <div style="font-size:38px;font-weight:300;color:#fff;line-height:1;">🔥 12</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;">day streak</div>
+        </div>
+        <div style="padding-bottom:4px;">
+          <div style="font-size:16px;color:rgba(255,255,255,0.7);">Best: 24</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);">longest streak</div>
+        </div>
+        <div style="padding-bottom:4px;margin-left:auto;">
+          <div style="font-size:22px;">😊</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">today</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Streak hero</h3>
+      <p>Big streak number front and center, longest streak + today's mood alongside</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#1a1f3c;border-radius:20px;padding:18px 22px;display:flex;flex-direction:column;justify-content:space-between;min-height:110px;font-family:-apple-system,sans-serif;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;">Focus on Yourself</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:300;color:#fff;">12</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);">🔥 Streak</div>
+        </div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,0.15);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:300;color:#fff;">24</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);">🏆 Best</div>
+        </div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,0.15);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:28px;">😊</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);">Today</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Three columns</h3>
+      <p>Equal weight to streak, best streak, and today's mood — balanced, scannable</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#1a1f3c;border-radius:20px;padding:18px 22px;display:flex;flex-direction:column;justify-content:space-between;min-height:110px;font-family:-apple-system,sans-serif;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;">Streak</div>
+          <div style="font-size:36px;font-weight:300;color:#fff;line-height:1.1;">🔥 12 days</div>
+        </div>
+        <div style="font-size:22px;margin-top:2px;">😊</div>
+      </div>
+      <div style="margin-top:10px;background:rgba(255,255,255,0.08);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;">
+        <span style="font-size:11px;color:rgba(255,255,255,0.4);">Longest: 24 days</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.4);">Checked in today ✓</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Streak + status bar</h3>
+      <p>Streak prominently on top, a compact detail row at the bottom with best streak and check-in status</p>
+    </div>
+  </div>
+
+</div>

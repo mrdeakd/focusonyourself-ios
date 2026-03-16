@@ -6,10 +6,21 @@
 	<dict>
 		<key>FocusOnYourself.xcscheme_^#shared#^_</key>
 		<dict>
-			<key>isShown</key>
-			<true/>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>B006DFAA2F63F8680013416E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B0F0A89B2F68002800C468D1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

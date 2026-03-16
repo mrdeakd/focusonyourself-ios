@@ -1,0 +1,62 @@
+<h2>Where should Insights live?</h2>
+<p class="subtitle">Choose how users navigate to their mood trends</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="display:flex; justify-content:space-around; border-top: 2px solid #ff6b35; padding-top:10px; margin-top:auto;">
+        <div style="text-align:center; color:#ff6b35; font-size:11px;">
+          <div style="font-size:18px;">🏠</div>Home
+        </div>
+        <div style="text-align:center; color:#ff6b35; font-size:11px;">
+          <div style="font-size:18px;">📅</div>History
+        </div>
+        <div style="text-align:center; color:#ff6b35; font-size:11px; border: 2px solid #ff6b35; border-radius:8px; padding:2px 6px; background: rgba(255,107,53,0.2);">
+          <div style="font-size:18px;">📊</div><strong>Insights</strong>
+        </div>
+        <div style="text-align:center; color:#888; font-size:11px;">
+          <div style="font-size:18px;">⚙️</div>Settings
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — New "Insights" Tab</h3>
+      <p>Add a 4th tab to the main navigation. Insights gets its own dedicated home alongside Home, History, and Settings.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="border-radius:10px; background:#2a2a3e; padding:12px; margin-bottom:8px;">
+        <div style="color:#888; font-size:10px; margin-bottom:4px;">HISTORY</div>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <div style="background:#ff6b35; color:white; border-radius:14px; padding:4px 12px; font-size:11px; font-weight:600;">Calendar</div>
+          <div style="background:#2a2a3e; color:#888; border: 1px solid #444; border-radius:14px; padding:4px 12px; font-size:11px;">Insights</div>
+        </div>
+        <div style="background:#1a1a2e; border-radius:8px; height:60px; display:flex; align-items:center; justify-content:center; color:#555; font-size:11px;">calendar view</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Tab within History</h3>
+      <p>Add a segmented picker inside the History screen: Calendar | Insights. Keeps navigation lean — no new tab bar item.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="border-radius:10px; background:#2a2a3e; padding:12px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="color:#ccc; font-size:12px; font-weight:600;">History</div>
+          <div style="background:#ff6b35; color:white; border-radius:8px; padding:3px 10px; font-size:11px; font-weight:600;">📊 Your Insights</div>
+        </div>
+        <div style="background:#1a1a2e; border-radius:8px; height:60px; display:flex; align-items:center; justify-content:center; color:#555; font-size:11px;">calendar view</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Button → Modal Sheet</h3>
+      <p>An "Insights" button on the History screen opens a full modal sheet. Keeps calendar primary, insights secondary.</p>
+    </div>
+  </div>
+
+</div>

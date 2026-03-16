@@ -5,12 +5,16 @@ struct MoodButtonView: View {
     let isSelected: Bool
     let onTap: () -> Void
 
-    private let emojiFontSize: CGFloat = 20
+    private let emojiSize: CGFloat = 28
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: Spacing.xxxs) {
-                Text(mood.emoji)
-                    .font(.custom("Inter", size: emojiFontSize))
+                Image(mood.imageName)
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: emojiSize, height: emojiSize)
+                    .foregroundStyle(.primary)
                 Text(mood.displayName)
                     .font(isSelected ? .foyMicroMedium : .foyMicro)
                     .foregroundStyle(isSelected ? Color.foyNavy : Color.foyPlaceholder)

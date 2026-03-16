@@ -3,14 +3,8 @@ import Foundation
 enum Mood: String, CaseIterable, Codable, Identifiable {
     case rough, low, okay, good, great
     var id: String { rawValue }
-    var emoji: String {
-        switch self {
-        case .rough: return "😩"
-        case .low:   return "😔"
-        case .okay:  return "😐"
-        case .good:  return "😊"
-        case .great: return "🤩"
-        }
+    var imageName: String {
+        "mood-\(rawValue)"
     }
     var displayName: String {
         switch self {

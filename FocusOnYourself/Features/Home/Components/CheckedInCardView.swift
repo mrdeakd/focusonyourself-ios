@@ -37,8 +37,12 @@ struct CheckedInCardView: View {
             Spacer()
             if let mood {
                 HStack(spacing: Spacing.xxs) {
-                    Text(mood.emoji)
-                        .font(.foySkipLabel)
+                    Image(mood.imageName)
+                        .renderingMode(.template)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(.primary)
                     Text(mood.displayName)
                         .font(.foyHintMedium)
                         .foregroundStyle(Color.foyNavy)

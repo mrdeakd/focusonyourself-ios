@@ -79,8 +79,12 @@ struct DayDetailSheet: View {
 
     private var moodSection: some View {
         VStack(spacing: Spacing.xs) {
-            Text(checkIn.mood.emoji)
-                .font(.system(size: emojiSize))
+            Image(checkIn.mood.imageName)
+                .renderingMode(.template)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: emojiSize, height: emojiSize)
+                .foregroundStyle(.primary)
             Text(checkIn.mood.displayName)
                 .font(.foyHeadline)
                 .foregroundStyle(Color.foyNavy)

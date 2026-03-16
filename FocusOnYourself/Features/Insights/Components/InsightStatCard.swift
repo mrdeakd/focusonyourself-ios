@@ -21,7 +21,7 @@ struct InsightStatCard: View {
         .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: cardCornerRadius)
-                .stroke(Color.foyBorder, lineWidth: 1)
+                .stroke(Color.foyNavy, lineWidth: 1)
         )
     }
 }

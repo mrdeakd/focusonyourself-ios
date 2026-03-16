@@ -66,6 +66,8 @@ struct PaywallScreen: View {
         .onChange(of: viewModel.isPro) { _, isPro in
             if isPro { dismiss() }
         }
+        .presentationDragIndicator(.hidden)
+        .presentationBackground(Color.foyBackground)
     }
 
     private var handleBar: some View {

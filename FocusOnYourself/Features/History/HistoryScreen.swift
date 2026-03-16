@@ -50,11 +50,11 @@ struct HistoryScreen: View {
                                     .stroke(Color.foyNavy, lineWidth: 1)
                             )
                             .padding(.horizontal, Spacing.screenHorizontal)
-                            .padding(.vertical, Spacing.xxxs)
+                            .padding(.top, Spacing.md)
                         }
                     }
                 }
-                .padding(.vertical, Spacing.lg)
+                .padding(.top, Spacing.lg)
             }
         }
         .sheet(item: $selectedCheckIn) { checkIn in

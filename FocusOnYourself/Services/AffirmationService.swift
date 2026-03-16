@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import FoundationModels
 
@@ -5,7 +6,7 @@ final class AffirmationService: AffirmationServiceProtocol {
     private var staticAffirmations: [(quote: String, category: AffirmationCategory)]?
     private let userDefaultsService: UserDefaultsServiceProtocol
 
-    init(userDefaultsService: UserDefaultsServiceProtocol = ServiceContainer.shared.userDefaultsService) {
+    init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
         self.userDefaultsService = userDefaultsService
     }
 

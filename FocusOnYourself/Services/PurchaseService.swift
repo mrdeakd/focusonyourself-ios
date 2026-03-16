@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import StoreKit
 
@@ -34,7 +35,7 @@ final class PurchaseService: PurchaseServiceProtocol {
 
     private var updatesTask: Task<Void, Never>?
 
-    init(userDefaultsService: UserDefaultsServiceProtocol = ServiceContainer.shared.userDefaultsService) {
+    init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
         self.userDefaultsService = userDefaultsService
         isPro = userDefaultsService.getBool(.isPro)
         Task {

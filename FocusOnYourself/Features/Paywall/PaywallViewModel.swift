@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import StoreKit
 import Observation
@@ -11,11 +12,7 @@ final class PaywallViewModel {
     var isLoading = false
     var errorMessage: String?
 
-    private let purchaseService: PurchaseServiceProtocol
-
-    init(purchaseService: PurchaseService = ServiceContainer.shared.purchaseService) {
-        self.purchaseService = purchaseService
-    }
+    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var monthlyProduct: Product? {
         purchaseService.products.first { $0.id == purchaseService.productMonthly }

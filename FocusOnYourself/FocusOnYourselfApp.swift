@@ -1,3 +1,4 @@
+import Factory
 import SwiftUI
 
 @main
@@ -5,7 +6,7 @@ struct FocusOnYourselfApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
-                .environment(ServiceContainer.shared.profileService)
+                .environment(Container.shared.profileService())
         }
     }
 }

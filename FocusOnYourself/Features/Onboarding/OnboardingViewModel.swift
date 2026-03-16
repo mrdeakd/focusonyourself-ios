@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import Observation
 
@@ -14,19 +15,9 @@ final class OnboardingViewModel {
     private(set) var notificationsEnabled = false
     private(set) var isCompleted = false
 
-    private let notificationService: NotificationServiceProtocol
-    private let profileService: ProfileServiceProtocol
-    private let purchaseService: PurchaseServiceProtocol
-
-    init(
-        notificationService: NotificationServiceProtocol = ServiceContainer.shared.notificationService,
-        profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
-        purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService
-    ) {
-        self.notificationService = notificationService
-        self.profileService = profileService
-        self.purchaseService = purchaseService
-    }
+    @ObservationIgnored @Injected(\.notificationService) private var notificationService
+    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var isPro: Bool { purchaseService.isPro }
 

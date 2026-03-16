@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import Observation
 
@@ -11,21 +12,14 @@ final class HomeViewModel {
     var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
     var errorMessage: String?
 
-    private let profileService: ProfileServiceProtocol
-    private let affirmationService: AffirmationServiceProtocol
-    private let purchaseService: PurchaseServiceProtocol
+    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
+    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
-    init(
-        profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService,
-        affirmationService: AffirmationServiceProtocol = ServiceContainer.shared.affirmationService,
-        purchaseService: PurchaseServiceProtocol = ServiceContainer.shared.purchaseService
-    ) {
-        self.profileService = profileService
-        self.affirmationService = affirmationService
-        self.purchaseService = purchaseService
-        self.hasCheckedIn = profileService.hasCheckedInToday
-        self.todaysMood = profileService.todaysMood
-        generatedQuotes = affirmationService.cachedBatch() ?? []
+    init() {
+        hasCheckedIn = _profileService.wrappedValue.hasCheckedInToday
+        todaysMood = _profileService.wrappedValue.todaysMood
+        generatedQuotes = _affirmationService.wrappedValue.cachedBatch() ?? []
     }
 
     var greeting: String {

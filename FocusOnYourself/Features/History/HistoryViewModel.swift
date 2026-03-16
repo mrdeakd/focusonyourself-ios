@@ -1,13 +1,10 @@
+import Factory
 import Foundation
 import Observation
 
 @Observable @MainActor
 final class HistoryViewModel {
-    private let profileService: ProfileServiceProtocol
-
-    init(profileService: ProfileServiceProtocol = ServiceContainer.shared.profileService) {
-        self.profileService = profileService
-    }
+    @ObservationIgnored @Injected(\.profileService) private var profileService
 
     var streakStats: (current: Int, longest: Int) {
         profileService.streakStats()

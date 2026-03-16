@@ -56,7 +56,7 @@ struct CategoryRowView: View {
                 }
             }
             .padding(Spacing.md)
-            .background(isSelected && !isLocked ? Color.foyNavyTint : .white)
+            .background(isSelected && !isLocked ? Color.foyNavyTint : Color.foyCard)
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
             .overlay(
                 RoundedRectangle(cornerRadius: CornerRadius.card)

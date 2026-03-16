@@ -1,60 +1,5 @@
 import SwiftUI
 
-private enum DayState {
-    case streakDay
-    case skipped
-    case today
-    case future
-    case empty
-}
-
-private struct CalendarDayCell: View {
-    let day: Int
-    let state: DayState
-
-    private let cellSize: CGFloat = 32
-    private let borderWidth: CGFloat = 1.5
-    var body: some View {
-        ZStack {
-            cellBackground
-            if day > 0 && state != .empty {
-                Text("\(day)")
-                    .font(.foyHintMedium)
-                    .foregroundStyle(textColor)
-            }
-        }
-        .frame(width: cellSize, height: cellSize)
-        .clipShape(Circle())
-        .overlay(
-            Group {
-                if state == .today {
-                    Circle().stroke(Color.foyNavy, lineWidth: borderWidth)
-                }
-            }
-        )
-    }
-
-    @ViewBuilder
-    private var cellBackground: some View {
-        switch state {
-        case .streakDay: Color.foyNavy
-        case .skipped:   Color.foyCalendarSkipped
-        case .today:     Color.white
-        default:         Color.clear
-        }
-    }
-
-    private var textColor: Color {
-        switch state {
-        case .streakDay: return .white
-        case .skipped:   return Color.foyPlaceholder
-        case .today:     return Color.foyForeground
-        case .future:    return Color.foyPlaceholder
-        default:         return Color.clear
-        }
-    }
-}
-
 struct CalendarMonthView: View {
     let month: Date
     let checkInDates: Set<String>
@@ -77,7 +22,7 @@ struct CalendarMonthView: View {
             }
 
             VStack(spacing: Spacing.xs) {
-                ForEach(cellRows, id: \.first!.offset) { row in
+                ForEach(cellRows, id: \.first?.offset) { row in
                     HStack(spacing: 0) {
                         ForEach(row, id: \.offset) { cell in
                             CalendarDayCell(day: cell.day, state: cell.state)
@@ -113,7 +58,7 @@ struct CalendarMonthView: View {
 
         let firstWeekday = cal.component(.weekday, from: firstDay) - 1
 
-        let range = cal.range(of: .day, in: .month, for: firstDay)!
+        guard let range = cal.range(of: .day, in: .month, for: firstDay) else { return [] }
         let daysInMonth = range.count
 
         var result: [(offset: Int, day: Int, state: DayState, dateKey: String?)] = []

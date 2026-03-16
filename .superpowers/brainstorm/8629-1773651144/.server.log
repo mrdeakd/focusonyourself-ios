@@ -1,0 +1,6 @@
+{"type":"server-started","port":59866,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:59866","screen_dir":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/8629-1773651144"}
+{"type":"screen-added","file":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/8629-1773651144/feature-directions.html"}
+{"source":"user-event","type":"click","text":"D\n    \n      🏠 iOS Widgets & Lock Screen\n      Home screen or lock screen widgets for today's affirmation, streak, or quick mood check-in without opening the app.","choice":"widgets","id":null,"timestamp":1773651232372}
+{"type":"screen-added","file":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/8629-1773651144/waiting-1.html"}
+{"type":"screen-added","file":"/Users/deakdavid/Work/ideas/focusonyourself/.superpowers/brainstorm/8629-1773651144/widget-layouts.html"}
+{"type":"server-stopped","reason":"idle timeout"}

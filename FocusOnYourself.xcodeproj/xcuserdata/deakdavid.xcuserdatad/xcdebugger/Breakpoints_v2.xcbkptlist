@@ -7,22 +7,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "F8294D5B-F6A5-41DE-B6C9-A96E2672199A"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FocusOnYourself/Services/AffirmationService.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13"
-            endingLineNumber = "13"
-            landmarkName = "cachedBatch()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "8A41A7AD-1F41-4999-AC80-8EAD3238AE1F"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -34,6 +18,64 @@
             endingLineNumber = "54"
             landmarkName = "purchase(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "8A41A7AD-1F41-4999-AC80-8EAD3238AE1F - ff3665756cb15eb1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "8A41A7AD-1F41-4999-AC80-8EAD3238AE1F - 91acd2f2a68e94bf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "8A41A7AD-1F41-4999-AC80-8EAD3238AE1F - a27a247bb61a9ab7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "8A41A7AD-1F41-4999-AC80-8EAD3238AE1F - c5d3a245fd45628a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "55"
+                  endingLineNumber = "55">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -50,6 +92,64 @@
             endingLineNumber = "52"
             landmarkName = "purchase(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0A38E4FB-3653-4547-A884-0FA4388D07C3 - ff3665756cb15eb1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "0A38E4FB-3653-4547-A884-0FA4388D07C3 - 91acd2f2a68e94bf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "0A38E4FB-3653-4547-A884-0FA4388D07C3 - a27a247bb61a9ab7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "0A38E4FB-3653-4547-A884-0FA4388D07C3 - c5d3a245fd45628a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "55"
+                  endingLineNumber = "55">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -98,6 +198,50 @@
             endingLineNumber = "65"
             landmarkName = "purchase(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "420D71C5-91E8-465E-AD43-265B86811A9C - 9b0f04586847d1d2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) await resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65">
+               </Location>
+               <Location
+                  uuid = "420D71C5-91E8-465E-AD43-265B86811A9C - e6511eeccf7cbfdd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) await resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65">
+               </Location>
+               <Location
+                  uuid = "420D71C5-91E8-465E-AD43-265B86811A9C - 2f6983c24eb0873d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(6) suspend resume partial function for FocusOnYourself.PurchaseService.purchase(StoreKit.Product) async throws -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Services/PurchaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "73"
+                  endingLineNumber = "73">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -128,8 +272,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "47"
             endingLineNumber = "47"
-            landmarkName = "purchase()"
-            landmarkType = "7">
+            landmarkName = "PaywallViewModel"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -178,6 +322,36 @@
             endingLineNumber = "52"
             landmarkName = "purchase()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "087D77FC-3F91-453A-B26A-593716A2B6DF - 3188f6e9545c205b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FocusOnYourself.PaywallViewModel.purchase() -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Features/Paywall/PaywallViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "52"
+                  endingLineNumber = "52">
+               </Location>
+               <Location
+                  uuid = "087D77FC-3F91-453A-B26A-593716A2B6DF - 795d944cb546f6eb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () async -&gt; () in FocusOnYourself.PaywallViewModel.purchase() -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Features/Paywall/PaywallViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "52"
+                  endingLineNumber = "52">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -194,22 +368,36 @@
             endingLineNumber = "54"
             landmarkName = "purchase()"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7336B960-932C-4916-94C1-1C33180D4BB1"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FocusOnYourself/Features/Paywall/PaywallScreen.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
-            landmarkName = "planButton(plan:price:showBadge:)"
-            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "32C91643-1F4B-4FF2-A620-91E0833B97F0 - 55c47f1761f7f964"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; () in FocusOnYourself.PaywallViewModel.purchase() -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Features/Paywall/PaywallViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+               <Location
+                  uuid = "32C91643-1F4B-4FF2-A620-91E0833B97F0 - b2d368d76695d502"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for closure #1 () async -&gt; () in FocusOnYourself.PaywallViewModel.purchase() -&gt; ()"
+                  moduleName = "FocusOnYourself.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deakdavid/Work/ideas/focusonyourself/FocusOnYourself/Features/Paywall/PaywallViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

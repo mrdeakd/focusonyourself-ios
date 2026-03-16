@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import WidgetKit
 
 @Observable
 final class ProfileService: ProfileServiceProtocol {
@@ -15,6 +16,25 @@ final class ProfileService: ProfileServiceProtocol {
         } else {
             self.profile = UserProfile()
         }
+        observeExternalChanges()
+    }
+
+    private func observeExternalChanges() {
+        NotificationCenter.default.addObserver(
+            forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: NSUbiquitousKeyValueStore.default,
+            queue: .main
+        ) { [weak self] _ in
+            self?.reloadProfile()
+        }
+    }
+
+    private func reloadProfile() {
+        guard
+            let data = userDefaultsService.getData(.userProfile),
+            let saved = try? JSONDecoder().decode(UserProfile.self, from: data)
+        else { return }
+        self.profile = saved
     }
 
     func updateProfile(_ profile: UserProfile) {
@@ -34,6 +54,7 @@ final class ProfileService: ProfileServiceProtocol {
             updatedProfile.checkIns.append(entry)
         }
         updateProfile(updatedProfile)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func streakStats() -> (current: Int, longest: Int) {

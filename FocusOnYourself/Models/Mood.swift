@@ -5,11 +5,11 @@ enum Mood: String, CaseIterable, Codable, Identifiable {
     var id: String { rawValue }
     var emoji: String {
         switch self {
-        case .rough: return "😞"
-        case .low:   return "😕"
+        case .rough: return "😩"
+        case .low:   return "😔"
         case .okay:  return "😐"
-        case .good:  return "🙂"
-        case .great: return "😄"
+        case .good:  return "😊"
+        case .great: return "🤩"
         }
     }
     var displayName: String {
@@ -19,6 +19,16 @@ enum Mood: String, CaseIterable, Codable, Identifiable {
         case .okay:  return "Okay"
         case .good:  return "Good"
         case .great: return "Great"
+        }
+    }
+
+    var numericValue: Int {
+        switch self {
+        case .rough: return 1
+        case .low:   return 2
+        case .okay:  return 3
+        case .good:  return 4
+        case .great: return 5
         }
     }
 }

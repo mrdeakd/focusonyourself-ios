@@ -15,12 +15,15 @@ enum PurchaseError: Error, Equatable {
     }
 }
 
+private let kProductMonthlyID = "com.focusonyourself.pro.monthly.renewal"
+private let kProductAnnualID  = "com.focusonyourself.pro.annual.renewal"
+
 @Observable
 @MainActor
 final class PurchaseService: PurchaseServiceProtocol {
 
-    let productMonthly = "com.focusonyourself.pro.monthly.renewal"
-    let productAnnual = "com.focusonyourself.pro.annual.renewal"
+    let productMonthly = kProductMonthlyID
+    let productAnnual  = kProductAnnualID
 
     private let userDefaultsService: UserDefaultsServiceProtocol
 

@@ -24,7 +24,7 @@
     "_developerTeamID" : "33X274JPQ2",
     "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 795294428.87244904,
+    "_lastSynchronizedDate" : 795351138.75050497,
     "_locale" : "en_US",
     "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
@@ -80,12 +80,7 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "6760620420",
-          "introductoryOffer" : {
-            "internalID" : "3E1CEBEF",
-            "numberOfPeriods" : 1,
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P3D"
-          },
+          "introductoryOffer" : null,
           "localizations" : [
             {
               "description" : "Get acces to premium features for a month!",

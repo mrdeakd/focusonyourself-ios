@@ -121,4 +121,10 @@ final class AffirmationService: AffirmationServiceProtocol {
 
 enum AffirmationServiceError: Error {
     case datasetNotFound
+
+    var defaultDescription: String {
+        switch self {
+        case .datasetNotFound: return "The affirmations dataset could not be found."
+        }
+    }
 }

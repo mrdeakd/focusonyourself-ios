@@ -8,9 +8,9 @@ private let moodCardPadding: CGFloat = 20
 private let dotSize: CGFloat = 10
 private let dotSpacing: CGFloat = 8
 private let pencilIconSize: CGFloat = 14
-private let pencilIconColor = Color(red: 0.722, green: 0.659, blue: 0.541)
-private let emptyDotFill = Color(red: 0.898, green: 0.894, blue: 0.882)
-private let emptyDotStroke = Color(red: 0.784, green: 0.780, blue: 0.769)
+private let pencilIconColor = Color.foyDetailPencil
+private let emptyDotFill = Color.foyDetailDotFill
+private let emptyDotStroke = Color.foyDetailDotStroke
 
 struct DayDetailSheet: View {
     let checkIn: CheckIn

@@ -23,7 +23,7 @@ struct NameEntryScreen: View {
 
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: CornerRadius.input)
-                            .fill(Color.white)
+                            .fill(Color.foyCard)
                             .overlay(
                                 RoundedRectangle(cornerRadius: CornerRadius.input)
                                     .stroke(Color.foyBorder, lineWidth: inputBorderWidth)

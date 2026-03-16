@@ -40,6 +40,15 @@ final class SettingsViewModel {
         }
     }
 
+    var appearanceOverride: String? {
+        get { profileService.profile.appearanceOverride }
+        set {
+            var profile = profileService.profile
+            profile.appearanceOverride = newValue
+            profileService.updateProfile(profile)
+        }
+    }
+
     var currentAppleIntelligence: Bool {
         get { profileService.profile.appleIntelligenceEnabled }
         set {

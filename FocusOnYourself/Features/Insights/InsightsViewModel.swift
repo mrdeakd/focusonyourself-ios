@@ -27,12 +27,20 @@ final class InsightsViewModel {
         recentCheckIns(days: days).count
     }
 
-    func averageMoodEmoji(days: Int) -> String {
+    func averageMood(days: Int) -> Mood? {
+        let checkIns = recentCheckIns(days: days)
+        guard !checkIns.isEmpty else { return nil }
+        let avg = Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
+        let rounded = Int(avg.rounded())
+        return Mood.allCases.first { $0.numericValue == rounded }
+    }
+
+    func averageMoodText(days: Int) -> String {
         let checkIns = recentCheckIns(days: days)
         guard !checkIns.isEmpty else { return "—" }
         let avg = Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
         let rounded = Int(avg.rounded())
-        return Mood.allCases.first { $0.numericValue == rounded }?.emoji ?? "😐"
+        return Mood.allCases.first { $0.numericValue == rounded }?.displayName ?? "—"
     }
 
     // Returns the last `days` calendar days as (label, mood?) pairs
@@ -70,6 +78,34 @@ final class InsightsViewModel {
             formatter.dateFormat = "MMM d"
             let label = formatter.string(from: weekInterval.start)
             return (week: label, avg: avg)
+        }
+    }
+
+    func monthlyAverages() -> [(month: String, avg: Double)] {
+        let cal = Calendar.current
+        let today = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+
+        return (0..<6).reversed().map { offset in
+            guard let monthDate = cal.date(byAdding: .month, value: -offset, to: today),
+                  let monthInterval = cal.dateInterval(of: .month, for: monthDate) else {
+                return (month: "?", avg: 0)
+            }
+            let checkIns = profileService.profile.checkIns.filter {
+                monthInterval.contains($0.date)
+            }
+            let avg = checkIns.isEmpty
+                ? 0.0
+                : Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
+            return (month: formatter.string(from: monthInterval.start), avg: avg)
+        }
+    }
+
+    func moodDistribution(days: Int) -> [(mood: Mood, count: Int)] {
+        let checkIns = recentCheckIns(days: days)
+        return Mood.allCases.reversed().map { mood in
+            (mood: mood, count: checkIns.filter { $0.mood == mood }.count)
         }
     }
 

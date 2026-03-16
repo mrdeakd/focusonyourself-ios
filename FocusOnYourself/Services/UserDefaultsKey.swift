@@ -5,4 +5,5 @@ enum UserDefaultsKey: String {
     case affirmationCache     = "affirmation.quote"
     case affirmationCacheDate = "affirmation.date"
     case isPro                = "com.focusonyourself.isPro"
+    case appearanceOverride   = "appearanceOverride"
 }

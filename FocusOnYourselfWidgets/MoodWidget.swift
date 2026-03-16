@@ -51,10 +51,6 @@ struct MoodWidgetView: View {
     private var secondaryText: Color {
         colorScheme == .dark ? Color(red: 0.388, green: 0.388, blue: 0.400) : Color(red: 0.678, green: 0.678, blue: 0.678)
     }
-    private var moodEmoji: String {
-        entry.mood?.emoji ?? "—"
-    }
-
     private var moodWord: String {
         entry.mood?.displayName ?? "—"
     }
@@ -69,8 +65,14 @@ struct MoodWidgetView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(iconBg)
                     .frame(width: 44, height: 44)
-                Text(moodEmoji)
-                    .font(.system(size: 22))
+                if let mood = entry.mood {
+                    Image(mood.imageName)
+                        .renderingMode(.template)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 26, height: 26)
+                        .foregroundStyle(.primary)
+                }
             }
 
             Text(moodWord)

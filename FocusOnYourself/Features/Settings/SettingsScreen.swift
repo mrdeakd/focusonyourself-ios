@@ -36,11 +36,12 @@ struct SettingsScreen: View {
                         nameSection
                         categoriesSection
                         notificationsSection
+                        appearanceSection
                         if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
                             appleIntelligenceSection
                         }
                     }
-                    .padding(.horizontal, Spacing.lg)
+                    .padding(.horizontal, Spacing.screenHorizontal)
                     .padding(.bottom, Spacing.lg)
                 }
             }
@@ -180,6 +181,39 @@ struct SettingsScreen: View {
             .padding(.vertical, Spacing.md)
             .background(Color.foyCard)
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+        }
+    }
+
+    private var appearanceSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            sectionLabel("APPEARANCE")
+            HStack(spacing: Spacing.xs) {
+                ForEach(["System", "Light", "Dark"], id: \.self) { option in
+                    let isSelected = selectedAppearanceOption == option
+                    Button {
+                        viewModel.appearanceOverride = option == "System" ? nil : option.lowercased()
+                    } label: {
+                        Text(option)
+                            .font(.foyCaptionMedium)
+                            .foregroundStyle(isSelected ? .white : Color.foyPlaceholder)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Spacing.sm)
+                            .background(isSelected ? Color.foyNavy : Color.foyMoodBackground)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+            .padding(Spacing.sm)
+            .background(Color.foyCard)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+        }
+    }
+
+    private var selectedAppearanceOption: String {
+        switch viewModel.appearanceOverride {
+        case "light": return "Light"
+        case "dark": return "Dark"
+        default: return "System"
         }
     }
 

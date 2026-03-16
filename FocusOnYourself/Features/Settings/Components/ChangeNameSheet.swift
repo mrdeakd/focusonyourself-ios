@@ -22,6 +22,9 @@ struct ChangeNameSheet: View {
             content
         }
         .background(Color.foyBackground)
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.hidden)
+        .presentationBackground(Color.foyBackground)
     }
 
     private var handle: some View {

@@ -24,6 +24,10 @@ enum WidgetMood: String, Codable {
         case .great: return "Great"
         }
     }
+
+    var imageName: String {
+        "mood-\(rawValue)"
+    }
 }
 
 private struct WidgetCheckIn: Codable {

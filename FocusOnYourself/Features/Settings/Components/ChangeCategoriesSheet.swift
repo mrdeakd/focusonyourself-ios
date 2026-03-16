@@ -9,8 +9,6 @@ struct ChangeCategoriesSheet: View {
 
     private let handleWidth: CGFloat = 36
     private let handleHeight: CGFloat = 4
-    private let contentHorizontal: CGFloat = 20
-    private let categorySpacing: CGFloat = 10
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,6 +27,9 @@ struct ChangeCategoriesSheet: View {
             saveWrapper
         }
         .background(Color.foyBackground)
+        .presentationDetents([.large])
+        .presentationDragIndicator(.hidden)
+        .presentationBackground(Color.foyBackground)
         .onAppear {
             draftCategories = viewModel.currentCategories
         }
@@ -57,7 +58,7 @@ struct ChangeCategoriesSheet: View {
             .font(.foyBody)
             .foregroundStyle(Color.foyForegroundSecondary)
         }
-        .padding(.horizontal, contentHorizontal)
+        .padding(.horizontal, Spacing.screenHorizontal)
         .padding(.bottom, Spacing.md)
     }
 
@@ -68,7 +69,7 @@ struct ChangeCategoriesSheet: View {
                 .foregroundStyle(Color.foyForegroundSecondary)
                 .lineSpacing(Spacing.xxs)
 
-            VStack(spacing: categorySpacing) {
+            VStack(spacing: Spacing.sm) {
                 ForEach(AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }) { category in
                     let isLocked = !category.isFree && !viewModel.isPro
                     CategoryRowView(
@@ -88,7 +89,7 @@ struct ChangeCategoriesSheet: View {
             }
         }
         .padding(.top, Spacing.lg)
-        .padding(.horizontal, contentHorizontal)
+        .padding(.horizontal, Spacing.screenHorizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -107,7 +108,7 @@ struct ChangeCategoriesSheet: View {
         }
         .disabled(draftCategories.isEmpty)
         .padding(.top, Spacing.sm)
-        .padding(.horizontal, contentHorizontal)
+        .padding(.horizontal, Spacing.screenHorizontal)
         .padding(.bottom, Spacing.xxl)
     }
 }

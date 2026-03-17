@@ -23,4 +23,7 @@ extension Container {
     var meditationService: Factory<MeditationServiceProtocol> {
         self { MeditationService() }.singleton
     }
+    var meditationAudioService: Factory<MeditationAudioService> {
+        self { @MainActor in MeditationAudioService() }.singleton
+    }
 }

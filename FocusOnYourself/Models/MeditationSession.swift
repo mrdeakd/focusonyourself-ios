@@ -26,7 +26,8 @@ enum MeditationCategory: String, CaseIterable, Codable {
 }
 
 struct MeditationStep: Codable {
-    let instruction: String
+    let instruction: String?
+    let silenceDurationSeconds: Int?
 }
 
 struct MeditationSession: Codable, Identifiable {

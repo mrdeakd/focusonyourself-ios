@@ -5,6 +5,8 @@ struct MeditationPlayerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: MeditationPlayerViewModel
 
+    private let timerFontSize: CGFloat = 56
+
     init(session: MeditationSession) {
         self.session = session
         _viewModel = State(initialValue: MeditationPlayerViewModel(session: session))
@@ -21,11 +23,12 @@ struct MeditationPlayerView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear { viewModel.onAppear() }
+        .onDisappear { viewModel.onDisappear() }
     }
 
     private var playerView: some View {
         VStack(spacing: 0) {
-            // Title
             Text(session.title)
                 .font(.foyCaption)
                 .foregroundStyle(.white.opacity(0.5))
@@ -33,17 +36,21 @@ struct MeditationPlayerView: View {
 
             Spacer()
 
-            // Instruction
-            Text(viewModel.currentStep.instruction)
-                .font(.foyBody)
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .lineSpacing(8)
-                .padding(.horizontal, Spacing.xl)
+            if viewModel.phase == .narrating, let instruction = viewModel.currentStep.instruction {
+                Text(instruction)
+                    .font(.foyBody)
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(8)
+                    .padding(.horizontal, Spacing.xl)
+            } else if viewModel.phase == .processingBreak {
+                processingBreakView
+            } else if viewModel.phase == .timerRunning || viewModel.phase == .timerPaused {
+                timerView
+            }
 
             Spacer()
 
-            // Progress bar
             progressBar
                 .padding(.horizontal, Spacing.screenHorizontal)
 
@@ -53,7 +60,6 @@ struct MeditationPlayerView: View {
                 .padding(.top, Spacing.xs)
                 .padding(.bottom, Spacing.lg)
 
-            // Navigation buttons
             HStack(spacing: Spacing.md) {
                 Button {
                     withAnimation {
@@ -90,6 +96,44 @@ struct MeditationPlayerView: View {
             }
             .padding(.horizontal, Spacing.screenHorizontal)
             .padding(.bottom, Spacing.xl)
+        }
+    }
+
+    private var processingBreakView: some View {
+        VStack(spacing: Spacing.lg) {
+            Text(viewModel.timerDisplay)
+                .font(.system(size: timerFontSize, weight: .thin, design: .rounded))
+                .foregroundStyle(.white)
+                .monospacedDigit()
+
+            Text("Take a moment to reflect")
+                .font(.foyCaption)
+                .foregroundStyle(.white.opacity(0.5))
+        }
+    }
+
+    private var timerView: some View {
+        VStack(spacing: Spacing.lg) {
+            Text(viewModel.timerDisplay)
+                .font(.system(size: timerFontSize, weight: .thin, design: .rounded))
+                .foregroundStyle(.white)
+                .monospacedDigit()
+
+            Text("Breathe and rest")
+                .font(.foyCaption)
+                .foregroundStyle(.white.opacity(0.5))
+
+            Button {
+                if viewModel.phase == .timerRunning {
+                    viewModel.pauseTimer()
+                } else {
+                    viewModel.resumeTimer()
+                }
+            } label: {
+                Image(systemName: viewModel.phase == .timerRunning ? "pause.circle" : "play.circle")
+                    .font(.system(size: timerFontSize))
+                    .foregroundStyle(.white.opacity(0.8))
+            }
         }
     }
 

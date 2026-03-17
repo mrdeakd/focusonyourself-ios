@@ -17,7 +17,7 @@ final class HomeViewModel {
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
     @ObservationIgnored @Injected(\.articlesService) private var articlesService
 
-    var articles: [Article] { articlesService.allArticles() }
+    var articles: [Article] { articlesService.dailyArticles() }
 
     init() {
         hasCheckedIn = _profileService.wrappedValue.hasCheckedInToday

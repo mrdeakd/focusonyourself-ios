@@ -3,7 +3,9 @@ import AVFoundation
 @MainActor
 final class MeditationAudioService: NSObject {
     private let synthesizer = AVSpeechSynthesizer()
-    private var audioPlayer: AVAudioPlayer?
+    private var audioPlayer: AVAudioPlayer?       // bell
+    private var narrationPlayer: AVAudioPlayer?   // bundled MP3 narrations
+    private var narrationMap: [String: String] = [:]
     private var onNarrationComplete: (() -> Void)?
     private var currentUtterance: AVSpeechUtterance?
     private var bellEngine: AVAudioEngine?
@@ -11,7 +13,17 @@ final class MeditationAudioService: NSObject {
     override init() {
         super.init()
         synthesizer.delegate = self
+        loadNarrationMap()
         configureAudioSession()
+    }
+
+    private func loadNarrationMap() {
+        guard let url = Bundle.main.url(forResource: "narration_map", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let map = try? JSONDecoder().decode([String: String].self, from: data) else {
+            return
+        }
+        narrationMap = map
     }
 
     private func configureAudioSession() {
@@ -23,20 +35,40 @@ final class MeditationAudioService: NSObject {
 
     func speak(_ text: String, onComplete: @escaping () -> Void) {
         activateAudioSession()
-        onNarrationComplete = nil
-        currentUtterance = nil
-        synthesizer.stopSpeaking(at: .immediate)
+        stopSpeaking()
+
+        if let filename = narrationMap[text],
+           let url = Bundle.main.url(forResource: filename, withExtension: "mp3"),
+           let player = try? AVAudioPlayer(contentsOf: url) {
+            onNarrationComplete = onComplete
+            narrationPlayer = player
+            narrationPlayer?.delegate = self
+            narrationPlayer?.play()
+            return
+        }
+
+        // Fallback: AVSpeechSynthesizer
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
         utterance.pitchMultiplier = 1.0
+        utterance.voice = Self.bestEnglishVoice
         currentUtterance = utterance
         onNarrationComplete = onComplete
         synthesizer.speak(utterance)
     }
 
+    private static let bestEnglishVoice: AVSpeechSynthesisVoice? = {
+        AVSpeechSynthesisVoice.speechVoices()
+            .filter { $0.language.hasPrefix("en") }
+            .sorted { $0.quality.rawValue > $1.quality.rawValue }
+            .first
+    }()
+
     func stopSpeaking() {
         onNarrationComplete = nil
         currentUtterance = nil
+        narrationPlayer?.stop()
+        narrationPlayer = nil
         synthesizer.stopSpeaking(at: .immediate)
     }
 
@@ -92,6 +124,17 @@ extension MeditationAudioService: AVSpeechSynthesizerDelegate {
         Task { @MainActor in
             guard utterance === self.currentUtterance else { return }
             self.currentUtterance = nil
+            self.onNarrationComplete?()
+            self.onNarrationComplete = nil
+        }
+    }
+}
+
+extension MeditationAudioService: AVAudioPlayerDelegate {
+    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        Task { @MainActor in
+            guard player === self.narrationPlayer else { return }
+            self.narrationPlayer = nil
             self.onNarrationComplete?()
             self.onNarrationComplete = nil
         }

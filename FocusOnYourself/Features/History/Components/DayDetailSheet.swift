@@ -1,9 +1,6 @@
 import SwiftUI
 
 private let emojiSize: CGFloat = 52
-private let dragHandleWidth: CGFloat = 36
-private let dragHandleHeight: CGFloat = 4
-private let dragHandleCornerRadius: CGFloat = 2
 private let moodCardPadding: CGFloat = 20
 private let dotSize: CGFloat = 10
 private let dotSpacing: CGFloat = 8
@@ -29,7 +26,7 @@ struct DayDetailSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            handleArea
+            SheetDragHandle()
             headerSection
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
@@ -44,7 +41,6 @@ struct DayDetailSheet: View {
                 .padding(.bottom, Spacing.xl)
         }
         .padding(.horizontal, Spacing.md)
-        .padding(.top, Spacing.xs)
         .background(Color.foyBackground)
         .presentationDetents([.fraction(0.65)])
         .presentationDragIndicator(.hidden)
@@ -52,18 +48,6 @@ struct DayDetailSheet: View {
     }
 
     // MARK: - Subviews
-
-    private var handleArea: some View {
-        HStack {
-            Spacer()
-            RoundedRectangle(cornerRadius: dragHandleCornerRadius)
-                .fill(Color.foyButtonDisabled)
-                .frame(width: dragHandleWidth, height: dragHandleHeight)
-            Spacer()
-        }
-        .padding(.top, 14)
-        .padding(.bottom, 6)
-    }
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -146,17 +130,10 @@ struct DayDetailSheet: View {
     }
 
     private var doneButton: some View {
-        Button {
+        Button("Done") {
             dismiss()
-        } label: {
-            Text("Done")
-                .font(.foyButtonLabel)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.buttonVertical)
-                .background(Color.foyNavy)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.pill))
         }
+        .buttonStyle(FoyPrimaryButtonStyle())
         .padding(.top, Spacing.md)
     }
 }

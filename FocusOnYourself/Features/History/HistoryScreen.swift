@@ -5,8 +5,10 @@ private let calendarCardRadius: CGFloat = 18
 struct HistoryScreen: View {
     @State private var viewModel: HistoryViewModel
     @State private var selectedCheckIn: CheckIn?
+    private let showsHeader: Bool
 
-    init() {
+    init(showsHeader: Bool = true) {
+        self.showsHeader = showsHeader
         _viewModel = State(initialValue: HistoryViewModel())
     }
 
@@ -15,19 +17,21 @@ struct HistoryScreen: View {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
-                    Text("History")
-                        .font(.foyNavTitle)
-                        .foregroundStyle(Color.foyForeground)
-                    Spacer()
+                if showsHeader {
+                    HStack {
+                        Text("History")
+                            .font(.foyNavTitle)
+                            .foregroundStyle(Color.foyForeground)
+                        Spacer()
+                    }
+                    .padding(.horizontal, Spacing.screenHorizontal)
+                    .padding(.top, Spacing.lg)
+                    .padding(.bottom, Spacing.md)
                 }
-                .padding(.horizontal, Spacing.screenHorizontal)
-                .padding(.top, Spacing.lg)
-                .padding(.bottom, Spacing.md)
 
                 HStack(spacing: Spacing.sm) {
-                    StreakStatCard(label: "Current Streak", value: viewModel.streakStats.current)
-                    StreakStatCard(label: "Longest Streak", value: viewModel.streakStats.longest)
+                    StatCard(label: "Current Streak", value: "\(viewModel.streakStats.current) days")
+                    StatCard(label: "Longest Streak", value: "\(viewModel.streakStats.longest) days")
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.xxxs)
@@ -43,18 +47,13 @@ struct HistoryScreen: View {
                                 }
                             )
                             .padding(Spacing.lg)
-                            .background(Color.foyCard)
-                            .clipShape(RoundedRectangle(cornerRadius: calendarCardRadius))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: calendarCardRadius)
-                                    .stroke(Color.foyNavy, lineWidth: 1)
-                            )
+                            .foyCardStyle(borderColor: .foyNavy, cornerRadius: calendarCardRadius)
                             .padding(.horizontal, Spacing.screenHorizontal)
-                            .padding(.top, Spacing.md)
+                            .padding(.top, Spacing.sm)
                         }
                     }
                 }
-                .padding(.top, Spacing.lg)
+                .padding(.top, Spacing.xxs)
             }
         }
         .sheet(item: $selectedCheckIn) { checkIn in

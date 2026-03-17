@@ -12,12 +12,7 @@ struct CheckedInCardView: View {
             moodSummaryRow
         }
         .padding(Spacing.lg)
-        .background(Color.foyCard)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.input))
-        .overlay(
-            RoundedRectangle(cornerRadius: CornerRadius.input)
-                .stroke(Color.foyBorder, lineWidth: 1)
-        )
+        .foyCardStyle()
     }
 
     private var successRow: some View {

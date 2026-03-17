@@ -1,18 +1,18 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @State private var selectedTab: AppTab = .home
+    @State private var selectedTab: AppTab = .checkin
 
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
                 switch selectedTab {
-                case .home:
+                case .checkin:
                     HomeScreen()
-                case .history:
-                    HistoryScreen()
-                case .insights:
-                    InsightsScreen()
+                case .meditate:
+                    MeditateScreen()
+                case .historyInsights:
+                    HistoryInsightsScreen()
                 case .settings:
                     SettingsScreen()
                 }

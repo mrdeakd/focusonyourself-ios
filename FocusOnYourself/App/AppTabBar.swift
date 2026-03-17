@@ -1,23 +1,23 @@
 import SwiftUI
 
 enum AppTab: CaseIterable {
-    case home, history, insights, settings
+    case checkin, meditate, historyInsights, settings
 
     var label: String {
         switch self {
-        case .home:     return "HOME"
-        case .history:  return "HISTORY"
-        case .insights: return "INSIGHTS"
-        case .settings: return "SETTINGS"
+        case .checkin:         return "CHECK-IN"
+        case .meditate:        return "MEDITATE"
+        case .historyInsights: return "PROGRESS"
+        case .settings:        return "SETTINGS"
         }
     }
 
     var icon: String {
         switch self {
-        case .home:     return "house.fill"
-        case .history:  return "calendar"
-        case .insights: return "chart.bar.fill"
-        case .settings: return "gearshape"
+        case .checkin:         return "heart.fill"
+        case .meditate:        return "figure.mind.and.body"
+        case .historyInsights: return "chart.bar.fill"
+        case .settings:        return "gearshape"
         }
     }
 }

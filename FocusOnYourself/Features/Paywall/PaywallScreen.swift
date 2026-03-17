@@ -19,8 +19,6 @@ struct PaywallScreen: View {
     private let loadingOverlay = Color.black.opacity(0.4)
     private let dismissButtonBackground = Color.foyMoodBackground
     private let dismissButtonSize: CGFloat = 32
-    private let handleBarWidth: CGFloat = 36
-    private let handleBarHeight: CGFloat = 4
 
     var body: some View {
         ZStack {
@@ -28,9 +26,7 @@ struct PaywallScreen: View {
 
             ScrollView {
                 VStack(spacing: 0) {
-                    handleBar
-                        .padding(.top, Spacing.md)
-                        .padding(.bottom, Spacing.sm)
+                    SheetDragHandle()
 
                     dismissButton
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -68,13 +64,6 @@ struct PaywallScreen: View {
         }
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color.foyBackground)
-    }
-
-    private var handleBar: some View {
-        RoundedRectangle(cornerRadius: handleBarHeight / 2)
-            .fill(Color.foyButtonDisabled)
-            .frame(width: handleBarWidth, height: handleBarHeight)
-            .frame(maxWidth: .infinity)
     }
 
     private var dismissButton: some View {

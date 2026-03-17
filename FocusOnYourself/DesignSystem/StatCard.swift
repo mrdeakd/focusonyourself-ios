@@ -1,8 +1,6 @@
 import SwiftUI
 
-private let cardCornerRadius: CGFloat = 16
-
-struct InsightStatCard: View {
+struct StatCard: View {
     let label: String
     let value: String
 
@@ -17,11 +15,6 @@ struct InsightStatCard: View {
         }
         .padding(Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.foyCard)
-        .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: cardCornerRadius)
-                .stroke(Color.foyNavy, lineWidth: 1)
-        )
+        .foyCardStyle(borderColor: .foyNavy)
     }
 }

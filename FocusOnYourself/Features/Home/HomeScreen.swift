@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeScreen: View {
     @State private var viewModel = HomeViewModel()
+    @State private var selectedArticle: Article?
 
     private let iconSize: CGFloat = 14
 
@@ -32,6 +33,8 @@ struct HomeScreen: View {
                                 onCheckIn: { viewModel.completeCheckIn() }
                             )
                         }
+
+                        articlesSection
                     }
                 }
                 .scrollIndicators(.hidden)
@@ -46,8 +49,26 @@ struct HomeScreen: View {
                 to: nil, from: nil, for: nil
             )
         })
+        .sheet(item: $selectedArticle) { article in
+            ArticleDetailView(article: article)
+        }
         .task {
             await viewModel.generateAffirmationIfNeeded()
+        }
+    }
+
+    private var articlesSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            SectionLabel("HEALTH & WELLNESS")
+
+            ForEach(viewModel.articles.prefix(4)) { article in
+                Button {
+                    selectedArticle = article
+                } label: {
+                    ArticleCardView(article: article)
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 

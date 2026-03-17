@@ -7,18 +7,11 @@ struct ChangeCategoriesSheet: View {
     @State private var draftCategories: Set<AffirmationCategory> = []
     @State private var showPaywall = false
 
-    private let handleWidth: CGFloat = 36
-    private let handleHeight: CGFloat = 4
-
     var body: some View {
         VStack(spacing: 0) {
-            handle
+            SheetDragHandle()
 
-            header
-
-            Rectangle()
-                .fill(Color.foyBorder)
-                .frame(height: 1)
+            SheetHeader(title: "Change categories") { dismiss() }
 
             content
 
@@ -36,30 +29,6 @@ struct ChangeCategoriesSheet: View {
         .sheet(isPresented: $showPaywall) {
             PaywallScreen()
         }
-    }
-
-    private var handle: some View {
-        RoundedRectangle(cornerRadius: handleHeight / 2)
-            .fill(Color.foyButtonDisabled)
-            .frame(width: handleWidth, height: handleHeight)
-            .padding(.top, Spacing.md)
-            .padding(.bottom, Spacing.sm)
-    }
-
-    private var header: some View {
-        HStack {
-            Text("Change categories")
-                .font(.foyNavTitle)
-                .foregroundStyle(Color.foyForeground)
-            Spacer()
-            Button("Cancel") {
-                dismiss()
-            }
-            .font(.foyBody)
-            .foregroundStyle(Color.foyForegroundSecondary)
-        }
-        .padding(.horizontal, Spacing.screenHorizontal)
-        .padding(.bottom, Spacing.md)
     }
 
     private var content: some View {
@@ -94,18 +63,11 @@ struct ChangeCategoriesSheet: View {
     }
 
     private var saveWrapper: some View {
-        Button {
+        Button("Save Changes") {
             viewModel.updateCategories(draftCategories)
             dismiss()
-        } label: {
-            Text("Save Changes")
-                .font(.foyButtonLabel)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.buttonVertical)
-                .background(draftCategories.isEmpty ? Color.foyButtonDisabled : Color.foyNavy)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.pill))
         }
+        .buttonStyle(FoyPrimaryButtonStyle())
         .disabled(draftCategories.isEmpty)
         .padding(.top, Spacing.sm)
         .padding(.horizontal, Spacing.screenHorizontal)

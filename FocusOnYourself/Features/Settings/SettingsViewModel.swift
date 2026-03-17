@@ -66,4 +66,5 @@ final class SettingsViewModel {
         profile.selectedCategories = Array(categories)
         profileService.updateProfile(profile)
     }
+
 }

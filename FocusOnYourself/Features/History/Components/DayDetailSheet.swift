@@ -4,8 +4,6 @@ private let emojiSize: CGFloat = 52
 private let moodCardPadding: CGFloat = 20
 private let dotSize: CGFloat = 10
 private let dotSpacing: CGFloat = 8
-private let pencilIconSize: CGFloat = 14
-private let pencilIconColor = Color.foyDetailPencil
 private let emptyDotFill = Color.foyDetailDotFill
 private let emptyDotStroke = Color.foyDetailDotStroke
 
@@ -29,12 +27,9 @@ struct DayDetailSheet: View {
             SheetDragHandle()
             headerSection
             ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    sheetDivider
+                VStack(alignment: .leading, spacing: Spacing.lg) {
                     moodSection
-                    sheetDivider
                     journalSection
-                    sheetDivider
                 }
             }
             doneButton
@@ -42,7 +37,7 @@ struct DayDetailSheet: View {
         }
         .padding(.horizontal, Spacing.md)
         .background(Color.foyBackground)
-        .presentationDetents([.fraction(0.65)])
+        .presentationDetents([.fraction(0.55)])
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color.foyBackground)
     }
@@ -76,10 +71,8 @@ struct DayDetailSheet: View {
         }
         .frame(maxWidth: .infinity)
         .padding(moodCardPadding)
-        .background(Color.foyMoodBackground)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.input))
-        .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 2)
-        .padding(.vertical, Spacing.md)
+        .foyCardStyle(borderColor: .foyNavy)
+        .padding(Spacing.xxs)
     }
 
     private var moodDotsRow: some View {
@@ -103,30 +96,12 @@ struct DayDetailSheet: View {
 
     private var journalSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            HStack {
-                Text("JOURNAL")
-                    .font(.foySectionLabel)
-                    .foregroundStyle(Color.foyPlaceholder)
-                Spacer()
-            }
+            SectionLabel("JOURNAL")
             Text(checkIn.feelingsDescription ?? "No notes for this day.")
                 .font(.foyBody)
                 .foregroundStyle(Color.foyForeground)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(Spacing.md)
-                .background(Color.foyBackground)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.categoryTag))
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.categoryTag)
-                        .stroke(Color.foyBorder, lineWidth: 1)
-                )
         }
-        .padding(.vertical, Spacing.md)
-    }
-
-    private var sheetDivider: some View {
-        Divider()
-            .overlay(Color.foyBorder)
     }
 
     private var doneButton: some View {

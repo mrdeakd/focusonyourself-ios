@@ -64,12 +64,7 @@ struct MoodPickerView: View {
                     .focused($isEditorFocused)
             }
             .padding(Spacing.sm)
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-            .overlay(
-                RoundedRectangle(cornerRadius: CornerRadius.card)
-                    .stroke(Color.foyBorder, lineWidth: 1)
-            )
+            .foyCardStyle(cornerRadius: CornerRadius.card)
         }
     }
 }

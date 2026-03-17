@@ -4,18 +4,24 @@ import Charts
 private let cardCornerRadius: CGFloat = 18
 private let chartHeight: CGFloat = 160
 private let moodChartHeight: CGFloat = 140
-private let statCardCornerRadius: CGFloat = 16
 
 struct InsightsScreen: View {
     @State private var viewModel = InsightsViewModel()
     @State private var showingPaywall = false
+    private let showsHeader: Bool
+
+    init(showsHeader: Bool = true) {
+        self.showsHeader = showsHeader
+    }
 
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                header
+                if showsHeader {
+                    header
+                }
 
                 statsRow
                     .padding(.horizontal, Spacing.screenHorizontal)
@@ -25,7 +31,7 @@ struct InsightsScreen: View {
                     VStack(spacing: Spacing.lg) {
                         moodThisWeekSection
                             .padding(.horizontal, Spacing.screenHorizontal)
-                            .padding(.top, Spacing.lg)
+                            .padding(.top, Spacing.sm)
 
                         moodBreakdownSection
                             .padding(.horizontal, Spacing.screenHorizontal)
@@ -44,7 +50,7 @@ struct InsightsScreen: View {
                     .padding(.bottom, Spacing.screenBottom)
                 }
                 .scrollIndicators(.hidden)
-                .padding(.top, Spacing.md)
+                .padding(.top, Spacing.xxs)
             }
         }
         .sheet(isPresented: $showingPaywall) {
@@ -66,16 +72,14 @@ struct InsightsScreen: View {
 
     private var statsRow: some View {
         HStack(spacing: Spacing.sm) {
-            InsightStatCard(label: "Avg Mood", value: viewModel.averageMoodText(days: 7))
-            InsightStatCard(label: "This Week", value: "\(viewModel.checkInCount(days: 7))")
+            StatCard(label: "Avg Mood", value: viewModel.averageMoodText(days: 7))
+            StatCard(label: "This Week", value: "\(viewModel.checkInCount(days: 7))")
         }
     }
 
     private var moodThisWeekSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("MOOD THIS WEEK")
-                .foySectionLabelStyle()
-                .foregroundStyle(Color.foyPlaceholder)
+            SectionLabel("MOOD THIS WEEK")
 
             let data = viewModel.dailyMoodData(days: 7)
 
@@ -103,19 +107,12 @@ struct InsightsScreen: View {
             }
         }
         .padding(Spacing.md)
-        .background(Color.foyCard)
-        .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: cardCornerRadius)
-                .stroke(Color.foyNavy, lineWidth: 1)
-        )
+        .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
     }
 
     private var moodBreakdownSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("MOOD BREAKDOWN")
-                .foySectionLabelStyle()
-                .foregroundStyle(Color.foyPlaceholder)
+            SectionLabel("MOOD BREAKDOWN")
 
             if viewModel.recentCheckIns(days: 30).isEmpty {
                 Text("No check-ins in the last 30 days")
@@ -164,20 +161,13 @@ struct InsightsScreen: View {
             }
         }
         .padding(Spacing.lg)
-        .background(Color.foyCard)
-        .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: cardCornerRadius)
-                .stroke(Color.foyNavy, lineWidth: 1)
-        )
+        .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
     }
 
     private var weeklyAverageSection: some View {
         ZStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
-                Text("WEEKLY AVERAGE")
-                    .foySectionLabelStyle()
-                    .foregroundStyle(Color.foyPlaceholder)
+                SectionLabel("WEEKLY AVERAGE")
 
                 let data = viewModel.weeklyAverages()
 
@@ -205,12 +195,7 @@ struct InsightsScreen: View {
                 }
             }
             .padding(Spacing.lg)
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: cardCornerRadius)
-                    .stroke(Color.foyNavy, lineWidth: 1)
-            )
+            .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
             .blur(radius: viewModel.isPro ? 0 : 6)
             .allowsHitTesting(viewModel.isPro)
 
@@ -223,9 +208,7 @@ struct InsightsScreen: View {
     private var monthlyAverageSection: some View {
         ZStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
-                Text("MONTHLY AVERAGE")
-                    .foySectionLabelStyle()
-                    .foregroundStyle(Color.foyPlaceholder)
+                SectionLabel("MONTHLY AVERAGE")
 
                 let data = viewModel.monthlyAverages()
 
@@ -253,12 +236,7 @@ struct InsightsScreen: View {
                 }
             }
             .padding(Spacing.lg)
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: cardCornerRadius)
-                    .stroke(Color.foyNavy, lineWidth: 1)
-            )
+            .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
             .blur(radius: viewModel.isPro ? 0 : 6)
             .allowsHitTesting(viewModel.isPro)
 
@@ -286,14 +264,11 @@ struct InsightsScreen: View {
             showingPaywall = true
         } label: {
             HStack(spacing: Spacing.md) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: CornerRadius.card)
-                        .fill(Color.foyUpgradeIconBg)
-                        .frame(width: 44, height: 44)
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color.foyOrange)
-                }
+                IconBox(
+                    systemName: "chart.line.uptrend.xyaxis",
+                    tintColor: Color.foyUpgradeIconBg,
+                    iconColor: Color.foyOrange
+                )
                 VStack(alignment: .leading, spacing: Spacing.xxxs) {
                     Text("Unlock Full History")
                         .font(.foyBodyMedium)

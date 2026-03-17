@@ -59,7 +59,7 @@ struct SettingsScreen: View {
 
     private var subscriptionSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("SUBSCRIPTION")
+            SectionLabel("SUBSCRIPTION")
             Button {
                 showPaywall = true
             } label: {
@@ -99,7 +99,7 @@ struct SettingsScreen: View {
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("YOUR NAME")
+            SectionLabel("YOUR NAME")
             VStack(spacing: 0) {
                 HStack {
                     Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
@@ -134,7 +134,7 @@ struct SettingsScreen: View {
 
     private var categoriesSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("AFFIRMATION CATEGORIES")
+            SectionLabel("AFFIRMATION CATEGORIES")
             VStack(spacing: 0) {
                 HStack {
                     Text(viewModel.currentCategories.map(\.displayName).sorted().joined(separator: ", "))
@@ -169,7 +169,7 @@ struct SettingsScreen: View {
 
     private var notificationsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("NOTIFICATIONS")
+            SectionLabel("NOTIFICATIONS")
             HStack {
                 Text("Daily 9am Reminder")
                     .font(.foyBody)
@@ -186,7 +186,7 @@ struct SettingsScreen: View {
 
     private var appearanceSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("APPEARANCE")
+            SectionLabel("APPEARANCE")
             HStack(spacing: Spacing.xs) {
                 ForEach(["System", "Light", "Dark"], id: \.self) { option in
                     let isSelected = selectedAppearanceOption == option
@@ -219,7 +219,7 @@ struct SettingsScreen: View {
 
     private var appleIntelligenceSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("APPLE INTELLIGENCE")
+            SectionLabel("APPLE INTELLIGENCE")
             VStack(spacing: 0) {
                 HStack {
                     Text("Apple Intelligence")
@@ -247,9 +247,4 @@ struct SettingsScreen: View {
         }
     }
 
-    private func sectionLabel(_ text: String) -> some View {
-        Text(text)
-            .foySectionLabelStyle()
-            .foregroundStyle(Color.foyPlaceholder)
-    }
 }

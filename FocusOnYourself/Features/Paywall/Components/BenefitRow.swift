@@ -5,23 +5,19 @@ struct BenefitRow: View {
     let title: String
     let subtitle: String
 
-    private let iconSize: CGFloat = 18
-    private let iconFrameSize: CGFloat = 36
-    private let iconCornerRadius: CGFloat = 10
     private let cardVerticalPadding: CGFloat = 10
     private let cardHorizontalPadding: CGFloat = 14
     private let hstackSpacing: CGFloat = 14
 
     var body: some View {
         HStack(spacing: hstackSpacing) {
-            ZStack {
-                RoundedRectangle(cornerRadius: iconCornerRadius)
-                    .fill(Color.foyNavyTint)
-                    .frame(width: iconFrameSize, height: iconFrameSize)
-                Image(systemName: symbol)
-                    .font(.system(size: iconSize))
-                    .foregroundStyle(Color.foyNavy)
-            }
+            IconBox(
+                systemName: symbol,
+                tintColor: Color.foyNavyTint,
+                iconColor: Color.foyNavy,
+                size: 36,
+                iconSize: 18
+            )
 
             VStack(alignment: .leading, spacing: Spacing.xxxs) {
                 Text(title)
@@ -37,11 +33,6 @@ struct BenefitRow: View {
         }
         .padding(.vertical, cardVerticalPadding)
         .padding(.horizontal, cardHorizontalPadding)
-        .background(Color.foyCard)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-        .overlay(
-            RoundedRectangle(cornerRadius: CornerRadius.card)
-                .strokeBorder(Color.foyBorder, lineWidth: 1)
-        )
+        .foyCardStyle(cornerRadius: CornerRadius.card)
     }
 }

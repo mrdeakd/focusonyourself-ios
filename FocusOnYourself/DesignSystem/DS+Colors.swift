@@ -51,6 +51,14 @@ extension Color {
     static let foyDetailDotFill       = Color(light: Color(hex: "E5E4E1"), dark: Color(hex: "3A3A3C"))
     static let foyDetailDotStroke     = Color(light: Color(hex: "C8C7C4"), dark: Color(hex: "48484A"))
 
+    // Nutrition
+    static let foyGreen     = Color(light: Color(hex: "2E7D5A"), dark: Color(hex: "4CAF82"))
+    static let foyGreenTint = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(Color(hex: "4CAF82")).withAlphaComponent(0.20)
+            : UIColor(Color(hex: "2E7D5A")).withAlphaComponent(0.10)
+    })
+
     // Upgrade / Pro
     static let foyUpgradeCardBg       = Color(light: Color(hex: "F5F8FF"), dark: Color(hex: "1C2C3E"))
     static let foyUpgradeCardBorder   = Color(light: Color(hex: "DDEAFF"), dark: Color(hex: "2C4A6E"))

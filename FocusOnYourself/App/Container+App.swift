@@ -17,4 +17,10 @@ extension Container {
     var purchaseService: Factory<PurchaseServiceProtocol> {
         self { @MainActor in PurchaseService(userDefaultsService: self.userDefaultsService()) }.singleton
     }
+    var articlesService: Factory<ArticlesServiceProtocol> {
+        self { ArticlesService() }.singleton
+    }
+    var meditationService: Factory<MeditationServiceProtocol> {
+        self { MeditationService() }.singleton
+    }
 }

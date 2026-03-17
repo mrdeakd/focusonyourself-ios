@@ -6,18 +6,11 @@ struct ChangeNameSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var newName: String = ""
 
-    private let handleWidth: CGFloat = 36
-    private let handleHeight: CGFloat = 4
-
     var body: some View {
         VStack(spacing: 0) {
-            handle
+            SheetDragHandle()
 
-            header
-
-            Rectangle()
-                .fill(Color.foyBorder)
-                .frame(height: 1)
+            SheetHeader(title: "Change name") { dismiss() }
 
             content
         }
@@ -25,30 +18,6 @@ struct ChangeNameSheet: View {
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color.foyBackground)
-    }
-
-    private var handle: some View {
-        RoundedRectangle(cornerRadius: handleHeight / 2)
-            .fill(Color.foyBorder)
-            .frame(width: handleWidth, height: handleHeight)
-            .padding(.top, Spacing.md)
-            .padding(.bottom, Spacing.sm)
-    }
-
-    private var header: some View {
-        HStack {
-            Text("Change name")
-                .font(.foyNavTitle)
-                .foregroundStyle(Color.foyForeground)
-            Spacer()
-            Button("Cancel") {
-                dismiss()
-            }
-            .font(.foyBodyMedium)
-            .foregroundStyle(Color.foyNavy)
-        }
-        .padding(.horizontal, Spacing.screenHorizontal)
-        .padding(.bottom, Spacing.md)
     }
 
     private var content: some View {
@@ -70,7 +39,7 @@ struct ChangeNameSheet: View {
 
     private var currentNameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("CURRENT NAME")
+            SectionLabel("CURRENT NAME")
             HStack {
                 Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
                     .font(.foyBody)
@@ -88,7 +57,7 @@ struct ChangeNameSheet: View {
 
     private var newNameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            sectionLabel("NEW NAME")
+            SectionLabel("NEW NAME")
             TextField("Enter new name", text: $newName)
                 .font(.foyInputText)
                 .foregroundStyle(Color.foyForeground)
@@ -104,24 +73,12 @@ struct ChangeNameSheet: View {
     }
 
     private var saveButton: some View {
-        Button {
+        Button("Save Changes") {
             viewModel.updateName(newName)
             dismiss()
-        } label: {
-            Text("Save Changes")
-                .font(.foyButtonLabel)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.buttonVertical)
-                .background(Color.foyNavy)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.pill))
         }
+        .buttonStyle(FoyPrimaryButtonStyle())
         .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
     }
 
-    private func sectionLabel(_ text: String) -> some View {
-        Text(text)
-            .foySectionLabelStyle()
-            .foregroundStyle(Color.foyPlaceholder)
-    }
 }

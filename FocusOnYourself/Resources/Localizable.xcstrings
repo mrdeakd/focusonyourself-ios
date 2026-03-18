@@ -46,7 +46,10 @@
     "settings.language.restartAlertTitle"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Language Change"              } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Nyelv módosítása" } } } },
     "settings.language.restartAlertMessage" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The app will restart to apply the language change." } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Az alkalmazás újraindul a nyelvváltás alkalmazásához." } } } },
     "settings.language.ok"                  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "OK"                            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } } },
-    "settings.language.cancel"              : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel"                        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Mégse" } } } }
+    "settings.language.cancel"              : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel"                        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Mégse" } } } },
+
+    "changeName.currentName" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "CURRENT NAME" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "JELENLEGI NÉV" } } } },
+    "changeName.newName"     : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "NEW NAME"     } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "ÚJ NÉV" } } } }
   },
   "version" : "1.0"
 }

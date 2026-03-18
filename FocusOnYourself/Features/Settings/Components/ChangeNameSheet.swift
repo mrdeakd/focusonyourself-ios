@@ -10,7 +10,7 @@ struct ChangeNameSheet: View {
         VStack(spacing: 0) {
             SheetDragHandle()
 
-            SheetHeader(title: "Change name") { dismiss() }
+            SheetHeader(title: String(localized: "settings.changeName")) { dismiss() }
 
             content
         }
@@ -39,9 +39,11 @@ struct ChangeNameSheet: View {
 
     private var currentNameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("CURRENT NAME")
+            SectionLabel(String(localized: "changeName.currentName"))
             HStack {
-                Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
+                Text(viewModel.currentName.isEmpty
+                     ? String(localized: "settings.yourNamePlaceholder")
+                     : viewModel.currentName)
                     .font(.foyBody)
                     .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
                 Spacer()
@@ -57,7 +59,7 @@ struct ChangeNameSheet: View {
 
     private var newNameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("NEW NAME")
+            SectionLabel(String(localized: "changeName.newName"))
             TextField("Enter new name", text: $newName)
                 .font(.foyInputText)
                 .foregroundStyle(Color.foyForeground)

@@ -11,7 +11,7 @@ struct ChangeCategoriesSheet: View {
         VStack(spacing: 0) {
             SheetDragHandle()
 
-            SheetHeader(title: "Change categories") { dismiss() }
+            SheetHeader(title: String(localized: "settings.changeCategories")) { dismiss() }
 
             content
 

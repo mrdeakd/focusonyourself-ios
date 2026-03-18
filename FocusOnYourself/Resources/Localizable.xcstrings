@@ -1,0 +1,52 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "mood.rough" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Rough" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Rossz" } } } },
+    "mood.low"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Low"   } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Levert" } } } },
+    "mood.okay"  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Okay"  } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Oké" } } } },
+    "mood.good"  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Good"  } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Jó" } } } },
+    "mood.great" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Great" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Nagyszerű" } } } },
+
+    "category.confidence"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Confidence & Self-Worth"   } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Magabiztosság" } } } },
+    "category.health"       : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Health & Body"             } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Egészség & Test" } } } },
+    "category.relationships": { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Relationships & Love"       } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Kapcsolatok & Szeretet" } } } },
+    "category.mindfulness"  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Mindfulness & Calm"         } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Tudatosság & Nyugalom" } } } },
+    "category.career"       : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Career & Success"           } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Karrier & Siker" } } } },
+    "category.resilience"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Resilience & Strength"      } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Kitartás & Erő" } } } },
+
+    "topic.sleep"        : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sleep & Recovery"         } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Alvás & Regeneráció" } } } },
+    "topic.mentalHealth" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Mental Health"            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Mentális egészség" } } } },
+    "topic.nutrition"    : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Nutrition & Gut Health"   } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Táplálkozás & Bélflóra" } } } },
+    "topic.movement"     : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Movement & Exercise"      } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Mozgás & Edzés" } } } },
+
+    "meditation.morning" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Morning & Energy"        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Reggel & Energia" } } } },
+    "meditation.focus"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Focus & Productivity"    } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Fókusz & Termelékenység" } } } },
+    "meditation.anxiety" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Anxiety & Stress"        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Szorongás & Stressz" } } } },
+    "meditation.sleep"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Sleep & Rest"            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Alvás & Pihenés" } } } },
+
+    "settings.title"                        : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings"                    } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Beállítások" } } } },
+    "settings.subscription"                 : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "SUBSCRIPTION"                 } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "ELŐFIZETÉS" } } } },
+    "settings.upgradeToPro"                 : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Upgrade to Pro"               } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Váltás Próra" } } } },
+    "settings.unlockFeatures"               : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlock all categories & features" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Összes kategória és funkció feloldása" } } } },
+    "settings.yourName"                     : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "YOUR NAME"                    } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "NEVED" } } } },
+    "settings.yourNamePlaceholder"          : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Your name"                    } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Neved" } } } },
+    "settings.changeName"                   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Change name"                  } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Név módosítása" } } } },
+    "settings.affirmationCategories"        : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "AFFIRMATION CATEGORIES"       } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "MEGERŐSÍTÉSI KATEGÓRIÁK" } } } },
+    "settings.changeCategories"             : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Change categories"             } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Kategóriák módosítása" } } } },
+    "settings.notifications"                : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "NOTIFICATIONS"                 } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "ÉRTESÍTÉSEK" } } } },
+    "settings.dailyReminder"                : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Daily 9am Reminder"            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Napi emlékeztető (9:00)" } } } },
+    "settings.appearance"                   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "APPEARANCE"                    } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "MEGJELENÉS" } } } },
+    "settings.appearance.system"            : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "System"                        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Rendszer" } } } },
+    "settings.appearance.light"             : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Light"                         } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Világos" } } } },
+    "settings.appearance.dark"              : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Dark"                          } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Sötét" } } } },
+    "settings.language"                     : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "LANGUAGE"                      } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "NYELV" } } } },
+    "settings.appleIntelligence"            : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "APPLE INTELLIGENCE"            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "APPLE INTELLIGENCE" } } } },
+    "settings.appleIntelligenceToggle"      : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Apple Intelligence"            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Apple Intelligence" } } } },
+    "settings.appleIntelligenceHint"        : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "After check-in, generate a personalized affirmation using on-device AI. Requires iPhone 15 Pro or newer." } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Bejelentkezés után személyre szabott megerősítést generál az eszközön futó AI-jal. iPhone 15 Pro vagy újabb szükséges." } } } },
+    "settings.language.restartAlertTitle"   : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Language Change"              } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Nyelv módosítása" } } } },
+    "settings.language.restartAlertMessage" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The app will restart to apply the language change." } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Az alkalmazás újraindul a nyelvváltás alkalmazásához." } } } },
+    "settings.language.ok"                  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "OK"                            } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } } },
+    "settings.language.cancel"              : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel"                        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Mégse" } } } }
+  },
+  "version" : "1.0"
+}

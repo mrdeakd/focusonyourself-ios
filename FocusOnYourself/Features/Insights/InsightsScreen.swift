@@ -153,7 +153,7 @@ struct InsightsScreen: View {
     }
 
     private var weeklyAverageSection: some View {
-        ZStack(alignment: .bottom) {
+        ProFeatureOverlayView(isLocked: !viewModel.isPro) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 SectionLabel("WEEKLY AVERAGE")
 
@@ -184,17 +184,11 @@ struct InsightsScreen: View {
             }
             .padding(Spacing.lg)
             .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
-            .blur(radius: viewModel.isPro ? 0 : 6)
-            .allowsHitTesting(viewModel.isPro)
-
-            if !viewModel.isPro {
-                proChartOverlay
-            }
         }
     }
 
     private var monthlyAverageSection: some View {
-        ZStack(alignment: .bottom) {
+        ProFeatureOverlayView(isLocked: !viewModel.isPro) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 SectionLabel("MONTHLY AVERAGE")
 
@@ -225,26 +219,7 @@ struct InsightsScreen: View {
             }
             .padding(Spacing.lg)
             .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
-            .blur(radius: viewModel.isPro ? 0 : 6)
-            .allowsHitTesting(viewModel.isPro)
-
-            if !viewModel.isPro {
-                proChartOverlay
-            }
         }
-    }
-
-    private var proChartOverlay: some View {
-        VStack(spacing: Spacing.xs) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(Color.foyNavy)
-            Text("Unlock trends with Pro")
-                .font(.foyBodyMedium)
-                .foregroundStyle(Color.foyForeground)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Spacing.md)
     }
 
     private var proUpsellCard: some View {

@@ -40,6 +40,20 @@ final class SettingsViewModel {
         }
     }
 
+    var currentLanguage: String {
+        profileService.profile.preferredLanguage
+            ?? Locale.current.language.languageCode?.identifier
+            ?? "en"
+    }
+
+    func changeLanguage(_ code: String) {
+        var profile = profileService.profile
+        profile.preferredLanguage = code
+        profileService.updateProfile(profile)
+        UserDefaults.standard.set([code], forKey: "AppleLanguages")
+        exit(0)
+    }
+
     var currentAppleIntelligence: Bool {
         get { profileService.profile.appleIntelligenceEnabled }
         set {

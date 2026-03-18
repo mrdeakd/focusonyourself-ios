@@ -6,6 +6,8 @@ struct SettingsScreen: View {
     private let badgePaddingH: CGFloat = 10
     @State private var showChangeCategoriesSheet = false
     @State private var showPaywall = false
+    @State private var showLanguageRestartAlert = false
+    @State private var pendingLanguageCode: String = ""
 
     var body: some View {
         ZStack {
@@ -13,7 +15,7 @@ struct SettingsScreen: View {
 
             VStack(spacing: 0) {
                 HStack {
-                    Text("Settings")
+                    Text("settings.title")
                         .font(.foyNavTitle)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
@@ -38,6 +40,7 @@ struct SettingsScreen: View {
                         categoriesSection
                         notificationsSection
                         appearanceSection
+                        languageSection
                         if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
                             appleIntelligenceSection
                         }
@@ -57,11 +60,19 @@ struct SettingsScreen: View {
         .sheet(isPresented: $showPaywall) {
             PaywallScreen()
         }
+        .alert(String(localized: "settings.language.restartAlertTitle"), isPresented: $showLanguageRestartAlert) {
+            Button(String(localized: "settings.language.ok")) {
+                viewModel.changeLanguage(pendingLanguageCode)
+            }
+            Button(String(localized: "settings.language.cancel"), role: .cancel) { }
+        } message: {
+            Text("settings.language.restartAlertMessage")
+        }
     }
 
     private var subscriptionSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("SUBSCRIPTION")
+            SectionLabel(String(localized: "settings.subscription"))
             Button {
                 showPaywall = true
             } label: {
@@ -77,10 +88,10 @@ struct SettingsScreen: View {
                             .foregroundStyle(Color.foyOrangeAccent)
                     }
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Upgrade to Pro")
+                        Text("settings.upgradeToPro")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
-                        Text("Unlock all categories & features")
+                        Text("settings.unlockFeatures")
                             .font(.foyHint)
                             .foregroundStyle(Color.foyForegroundSecondary)
                     }
@@ -101,10 +112,12 @@ struct SettingsScreen: View {
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("YOUR NAME")
+            SectionLabel(String(localized: "settings.yourName"))
             VStack(spacing: 0) {
                 HStack {
-                    Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
+                    Text(viewModel.currentName.isEmpty
+                         ? String(localized: "settings.yourNamePlaceholder")
+                         : viewModel.currentName)
                         .font(.foyBody)
                         .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
                     Spacer()
@@ -120,7 +133,7 @@ struct SettingsScreen: View {
                     showChangeNameSheet = true
                 } label: {
                     HStack {
-                        Text("Change name")
+                        Text("settings.changeName")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
                         Spacer()
@@ -136,7 +149,7 @@ struct SettingsScreen: View {
 
     private var categoriesSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("AFFIRMATION CATEGORIES")
+            SectionLabel(String(localized: "settings.affirmationCategories"))
             VStack(spacing: 0) {
                 HStack {
                     Text(viewModel.currentCategories.map(\.displayName).sorted().joined(separator: ", "))
@@ -155,7 +168,7 @@ struct SettingsScreen: View {
                     showChangeCategoriesSheet = true
                 } label: {
                     HStack {
-                        Text("Change categories")
+                        Text("settings.changeCategories")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
                         Spacer()
@@ -171,9 +184,9 @@ struct SettingsScreen: View {
 
     private var notificationsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("NOTIFICATIONS")
+            SectionLabel(String(localized: "settings.notifications"))
             HStack {
-                Text("Daily 9am Reminder")
+                Text("settings.dailyReminder")
                     .font(.foyBody)
                     .foregroundStyle(Color.foyForeground)
                 Spacer()
@@ -188,14 +201,16 @@ struct SettingsScreen: View {
 
     private var appearanceSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("APPEARANCE")
+            SectionLabel(String(localized: "settings.appearance"))
             HStack(spacing: Spacing.xs) {
-                ForEach(["System", "Light", "Dark"], id: \.self) { option in
-                    let isSelected = selectedAppearanceOption == option
+                ForEach([("System", String(localized: "settings.appearance.system")),
+                         ("Light", String(localized: "settings.appearance.light")),
+                         ("Dark", String(localized: "settings.appearance.dark"))], id: \.0) { id, label in
+                    let isSelected = selectedAppearanceOption == id
                     Button {
-                        viewModel.appearanceOverride = option == "System" ? nil : option.lowercased()
+                        viewModel.appearanceOverride = id == "System" ? nil : id.lowercased()
                     } label: {
-                        Text(option)
+                        Text(label)
                             .font(.foyCaptionMedium)
                             .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyPlaceholder)
                             .frame(maxWidth: .infinity)
@@ -219,12 +234,39 @@ struct SettingsScreen: View {
         }
     }
 
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            SectionLabel(String(localized: "settings.language"))
+            HStack(spacing: Spacing.xs) {
+                ForEach([("en", "English"), ("hu", "Magyar")], id: \.0) { code, label in
+                    let isSelected = viewModel.currentLanguage == code
+                    Button {
+                        guard code != viewModel.currentLanguage else { return }
+                        pendingLanguageCode = code
+                        showLanguageRestartAlert = true
+                    } label: {
+                        Text(label)
+                            .font(.foyCaptionMedium)
+                            .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyPlaceholder)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Spacing.sm)
+                            .background(isSelected ? Color.foyNavy : Color.foyMoodBackground)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+            .padding(Spacing.sm)
+            .background(Color.foyCard)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+        }
+    }
+
     private var appleIntelligenceSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("APPLE INTELLIGENCE")
+            SectionLabel(String(localized: "settings.appleIntelligence"))
             VStack(spacing: 0) {
                 HStack {
-                    Text("Apple Intelligence")
+                    Text("settings.appleIntelligenceToggle")
                         .font(.foyBody)
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
@@ -237,7 +279,7 @@ struct SettingsScreen: View {
                     .background(Color.foyBorder)
                     .padding(.horizontal, Spacing.md)
 
-                Text("After check-in, generate a personalized affirmation using on-device AI. Requires iPhone 15 Pro or newer.")
+                Text("settings.appleIntelligenceHint")
                     .font(.foyHint)
                     .foregroundStyle(Color.foyPlaceholder)
                     .lineSpacing(Spacing.xxs)

@@ -1,5 +1,21 @@
 # TestFlight Release Notes
 
+## Build 2 — 2026-03-18
+
+### What's New
+
+- **Meditation narration** — sessions now read aloud with natural voice narration (Apple TTS fallback when needed)
+- **Countdown timer** — see exactly how much time remains during a meditation session
+- **Performance** — faster date formatting, smarter caching, smoother overall experience
+
+### What to Test
+
+1. Start a meditation session → verify narration plays during the session
+2. Test with a session that has no ElevenLabs audio → confirm Apple TTS fallback activates
+3. During a session, verify the countdown timer counts down correctly
+4. Open the Insights tab → confirm charts and stats load without delay
+5. Check in → verify the Home tab updates correctly
+
 ## Build 1 — 2026-03-16
 
 ### What's New

@@ -129,32 +129,34 @@ final class MeditationPlayerViewModel {
         }
     }
 
-    private func runProcessingBreak() {
+    private func runCountdown(onTick: (() -> Void)? = nil, onComplete: @escaping () -> Void) {
         timerTask = Task {
             while timerSecondsRemaining > 0 {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled else { return }
-                timerSecondsRemaining -= 1
+                onTick?()
             }
             if !Task.isCancelled {
-                advanceStep()
+                onComplete()
             }
         }
     }
 
+    private func runProcessingBreak() {
+        runCountdown(
+            onTick: { [weak self] in self?.timerSecondsRemaining -= 1 },
+            onComplete: { [weak self] in self?.advanceStep() }
+        )
+    }
+
     private func runTimer() {
-        timerTask = Task {
-            while timerSecondsRemaining > 0 {
-                try? await Task.sleep(for: .seconds(1))
-                guard !Task.isCancelled else { return }
-                if phase == .timerRunning {
-                    timerSecondsRemaining -= 1
-                }
-            }
-            if !Task.isCancelled {
-                onTimerFinished()
-            }
-        }
+        runCountdown(
+            onTick: { [weak self] in
+                guard let self, self.phase == .timerRunning else { return }
+                self.timerSecondsRemaining -= 1
+            },
+            onComplete: { [weak self] in self?.onTimerFinished() }
+        )
     }
 
     private func onTimerFinished() {

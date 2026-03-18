@@ -12,6 +12,13 @@ final class MeditateViewModel {
     var isPro: Bool { purchaseService.isPro }
 
     var filteredSessions: [MeditationSession] {
-        meditationService.sessions(for: selectedCategory)
+        let categoryOrder = MeditationCategory.allCases
+        return meditationService.sessions(for: selectedCategory)
+            .sorted {
+                let catA = categoryOrder.firstIndex(of: $0.category) ?? 0
+                let catB = categoryOrder.firstIndex(of: $1.category) ?? 0
+                if catA != catB { return catA < catB }
+                return !$0.isPro && $1.isPro
+            }
     }
 }

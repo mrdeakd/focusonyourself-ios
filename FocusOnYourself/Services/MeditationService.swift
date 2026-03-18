@@ -5,12 +5,9 @@ final class MeditationService: MeditationServiceProtocol {
 
     private func load() -> [MeditationSession] {
         if let cached = loaded { return cached }
-        guard let url = Bundle.main.url(forResource: "meditations", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let decoded = try? JSONDecoder().decode([MeditationSession].self, from: data)
-        else { return [] }
-        loaded = decoded
-        return decoded
+        let result = Bundle.main.decodeJSON([MeditationSession].self, from: "meditations") ?? []
+        loaded = result
+        return result
     }
 
     func allSessions() -> [MeditationSession] {

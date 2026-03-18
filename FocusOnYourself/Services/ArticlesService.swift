@@ -5,12 +5,9 @@ final class ArticlesService: ArticlesServiceProtocol {
 
     private func load() -> [Article] {
         if let cached = loaded { return cached }
-        guard let url = Bundle.main.url(forResource: "articles", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let decoded = try? JSONDecoder().decode([Article].self, from: data)
-        else { return [] }
-        loaded = decoded
-        return decoded
+        let result = Bundle.main.decodeJSON([Article].self, from: "articles") ?? []
+        loaded = result
+        return result
     }
 
     func allArticles() -> [Article] {

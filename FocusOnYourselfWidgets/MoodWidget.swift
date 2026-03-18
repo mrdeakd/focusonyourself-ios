@@ -56,7 +56,9 @@ struct MoodWidgetView: View {
     }
 
     private var statusText: String {
-        entry.hasCheckedInToday ? "logged today ✓" : "not logged yet"
+        entry.hasCheckedInToday
+            ? String(localized: "widget.mood.logged", bundle: .main)
+            : String(localized: "widget.mood.notLogged", bundle: .main)
     }
 
     var body: some View {
@@ -82,7 +84,7 @@ struct MoodWidgetView: View {
                 .minimumScaleFactor(0.6)
                 .lineLimit(1)
 
-            Text("today's mood")
+            Text(String(localized: "widget.mood.label", bundle: .main))
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(labelTint)
 
@@ -102,8 +104,8 @@ struct MoodWidget: Widget {
             MoodWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
         }
-        .configurationDisplayName("Mood")
-        .description("See today's logged mood at a glance.")
+        .configurationDisplayName(Text("widget.mood.displayName"))
+        .description(Text("widget.mood.description"))
         .supportedFamilies([.systemSmall])
     }
 }

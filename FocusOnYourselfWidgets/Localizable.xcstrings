@@ -1,0 +1,20 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "mood.rough"               : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Rough"        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Rossz"      } } } },
+    "mood.low"                 : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Low"          } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Levert"     } } } },
+    "mood.okay"                : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Okay"         } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Oké"        } } } },
+    "mood.good"                : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Good"         } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Jó"         } } } },
+    "mood.great"               : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Great"        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Nagyszerű"  } } } },
+    "widget.mood.label"        : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "today's mood"   } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "mai hangulat" } } } },
+    "widget.mood.logged"       : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "logged today ✓" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "ma rögzítve ✓" } } } },
+    "widget.mood.notLogged"    : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "not logged yet" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "még nincs rögzítve" } } } },
+    "widget.streak.label"      : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "day streak"     } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "napos sorozat" } } } },
+    "widget.streak.motivation" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "keep it up! 💪" } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "csak így tovább! 💪" } } } },
+    "widget.mood.displayName"  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Mood"          } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Hangulat" } } } },
+    "widget.mood.description"  : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "See today's logged mood at a glance." } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Nézd meg a mai hangulatod egy pillantással." } } } },
+    "widget.streak.displayName": { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Streak"        } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Sorozat" } } } },
+    "widget.streak.description": { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "See your current check-in streak at a glance." } }, "hu" : { "stringUnit" : { "state" : "translated", "value" : "Nézd meg az aktuális bejelentkezési sorozatod." } } } }
+  },
+  "version" : "1.0"
+}

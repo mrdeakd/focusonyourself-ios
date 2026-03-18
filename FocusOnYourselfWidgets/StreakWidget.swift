@@ -66,11 +66,11 @@ struct StreakWidgetView: View {
                 .minimumScaleFactor(0.6)
                 .lineLimit(1)
 
-            Text("day streak")
+            Text(String(localized: "widget.streak.label", bundle: .main))
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(labelTint)
 
-            Text("keep it up! 💪")
+            Text(String(localized: "widget.streak.motivation", bundle: .main))
                 .font(.system(size: 10, weight: .regular))
                 .foregroundStyle(secondaryText)
         }
@@ -86,8 +86,8 @@ struct StreakWidget: Widget {
             StreakWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
         }
-        .configurationDisplayName("Streak")
-        .description("See your current check-in streak at a glance.")
+        .configurationDisplayName(Text("widget.streak.displayName"))
+        .description(Text("widget.streak.description"))
         .supportedFamilies([.systemSmall])
     }
 }

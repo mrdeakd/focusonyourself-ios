@@ -17,11 +17,11 @@ enum WidgetMood: String, Codable {
 
     var displayName: String {
         switch self {
-        case .rough: return "Rough"
-        case .low:   return "Low"
-        case .okay:  return "Okay"
-        case .good:  return "Good"
-        case .great: return "Great"
+        case .rough: return String(localized: "mood.rough", bundle: .main)
+        case .low:   return String(localized: "mood.low", bundle: .main)
+        case .okay:  return String(localized: "mood.okay", bundle: .main)
+        case .good:  return String(localized: "mood.good", bundle: .main)
+        case .great: return String(localized: "mood.great", bundle: .main)
         }
     }
 

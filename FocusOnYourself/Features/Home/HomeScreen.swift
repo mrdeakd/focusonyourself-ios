@@ -59,7 +59,7 @@ struct HomeScreen: View {
 
     private var articlesSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionLabel("HEALTH & WELLNESS")
+            SectionLabel(String(localized: "home.healthWellness"))
 
             ForEach(viewModel.articles.prefix(4)) { article in
                 Button {

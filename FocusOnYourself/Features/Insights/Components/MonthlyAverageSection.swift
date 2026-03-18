@@ -10,7 +10,7 @@ struct MonthlyAverageSection: View {
     var body: some View {
         ProFeatureOverlayView(isLocked: !viewModel.isPro) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
-                SectionLabel("MONTHLY AVERAGE")
+                SectionLabel(String(localized: "insights.monthlyAverage"))
 
                 let data = viewModel.monthlyAverages()
 

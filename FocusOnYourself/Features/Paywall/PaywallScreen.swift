@@ -6,10 +6,10 @@ struct PaywallScreen: View {
     @State private var viewModel = PaywallViewModel()
 
     private let benefits: [(symbol: String, title: String, subtitle: String)] = [
-        ("lock.open", "All Categories", "Confidence, Health, Relationships & more"),
-        ("sparkles", "AI Affirmations", "Personalized with Apple Intelligence"),
-        ("timer", "Custom Reminder Time", "Set your perfect daily moment"),
-        ("gift", "Future Features", "Get everything we build next")
+        ("lock.open", String(localized: "paywall.allCategories.title"), String(localized: "paywall.allCategories.subtitle")),
+        ("sparkles", String(localized: "paywall.aiAffirmations.title"), String(localized: "paywall.aiAffirmations.subtitle")),
+        ("timer", String(localized: "paywall.customReminder.title"), String(localized: "paywall.customReminder.subtitle")),
+        ("gift", String(localized: "paywall.futureFeatures.title"), String(localized: "paywall.futureFeatures.subtitle"))
     ]
 
     private let defaultMonthlyPrice = "$2.99/mo"

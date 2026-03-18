@@ -8,7 +8,7 @@ struct MoodBreakdownSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionLabel("MOOD BREAKDOWN")
+            SectionLabel(String(localized: "insights.moodBreakdown"))
 
             if viewModel.recentCheckIns(days: 30).isEmpty {
                 Text("No check-ins in the last 30 days")

@@ -10,7 +10,7 @@ struct WeeklyAverageSection: View {
     var body: some View {
         ProFeatureOverlayView(isLocked: !viewModel.isPro) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
-                SectionLabel("WEEKLY AVERAGE")
+                SectionLabel(String(localized: "insights.weeklyAverage"))
 
                 let data = viewModel.weeklyAverages()
 

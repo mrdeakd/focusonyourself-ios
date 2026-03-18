@@ -97,7 +97,7 @@ struct DayDetailSheet: View {
 
     private var journalSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionLabel("JOURNAL")
+            SectionLabel(String(localized: "history.journal"))
             Text(checkIn.feelingsDescription ?? "No notes for this day.")
                 .font(.foyBody)
                 .foregroundStyle(Color.foyForeground)

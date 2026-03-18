@@ -9,7 +9,7 @@ struct MoodThisWeekSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionLabel("MOOD THIS WEEK")
+            SectionLabel(String(localized: "insights.moodThisWeek"))
 
             let data = viewModel.dailyMoodData(days: 7)
 

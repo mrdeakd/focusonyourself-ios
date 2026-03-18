@@ -15,7 +15,7 @@ struct ProFeatureOverlayView<Content: View>: View {
             if isLocked {
                 VStack(spacing: Spacing.xs) {
                     Image(systemName: "lock.fill")
-                        .font(.system(size: lockIconSize, weight: .medium))
+                        .font(Font.foyMeditationTimer(size: lockIconSize))
                         .foregroundStyle(Color.foyNavy)
                     Text("Unlock trends with Pro")
                         .font(.foyBodyMedium)

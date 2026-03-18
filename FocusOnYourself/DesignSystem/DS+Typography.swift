@@ -32,7 +32,12 @@ extension Font {
     static let foyMicroMedium     = Font.inter(10, weight: .medium)
     static let foyHintMedium      = Font.inter(12, weight: .medium)
     static let foyStatValue       = Font.inter(24, weight: .medium)
-    static let foyHeadline        = Font.inter(22, weight: .semibold)
+    static let foyHeadline              = Font.inter(22, weight: .semibold)
+    static let foySectionLabelSemibold  = Font.inter(11, weight: .semibold)
+
+    static func foyMeditationTimer(size: CGFloat) -> Font {
+        .system(size: size, weight: .thin, design: .rounded)
+    }
 }
 
 extension View {

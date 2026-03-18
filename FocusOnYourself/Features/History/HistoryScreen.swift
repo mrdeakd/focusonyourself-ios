@@ -45,6 +45,7 @@ struct HistoryScreen: View {
                         }
                     }
                 }
+                .scrollIndicators(.hidden)
                 .padding(.top, Spacing.xxs)
             }
         }

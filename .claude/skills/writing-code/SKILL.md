@@ -20,7 +20,43 @@ When writing or modifying any SwiftUI view, **always use the design system const
 | Corner radius | `CornerRadius.*` (`CornerRadius.swift`) | `10`, `12`, `.cornerRadius(8)` |
 | Typography | `.font(.foyNavTitle)`, `.font(.foyBody)`, etc. (`Typography.swift`) | `.font(.system(size: 40))`, `.font(.title)` |
 
-If a value has no matching token (e.g. a one-off icon size), extract it to a `private let` constant at the top of the struct — never leave magic numbers inline in the view body.
+### Spacing tokens — where they apply
+
+`Spacing.*` tokens must be used **everywhere a padding or spacing value appears**:
+
+- `.padding(Spacing.md)`
+- `.padding(.horizontal, Spacing.lg)`
+- `VStack(spacing: Spacing.sm)`
+- `HStack(spacing: Spacing.xs)`
+- `LazyVStack(spacing: Spacing.sm)`
+- `Spacer(minLength: Spacing.md)`
+
+`CornerRadius.*` tokens must be used for all corner radius values:
+
+- `.cornerRadius(CornerRadius.md)`
+- `.clipShape(RoundedRectangle(cornerRadius: CornerRadius.lg))`
+
+**Exception — width and height are excluded.** `.frame(width: 44, height: 44)` and `.frame(maxWidth: .infinity)` do not use tokens; no matching token exists for layout dimensions.
+
+**One-off values:** if a truly unique spacing value exists with no matching token, extract it to a `private let` constant at the top of the struct — never leave the raw number inline in the view body.
+
+**Before (wrong — raw magic numbers):**
+```swift
+VStack(spacing: 12) {           // ❌ raw number
+    Text("Hello")
+        .padding(.horizontal, 16)  // ❌ raw number
+}
+.cornerRadius(8)                // ❌ raw number
+```
+
+**After (correct — design system tokens):**
+```swift
+VStack(spacing: Spacing.sm) {              // ✅ token
+    Text("Hello")
+        .padding(.horizontal, Spacing.md)  // ✅ token
+}
+.cornerRadius(CornerRadius.sm)             // ✅ token
+```
 
 ### ScrollView indicators
 
@@ -97,13 +133,50 @@ struct BlockSetupScreen: View {    // ✅ Screen suffix
 
 The ViewModel owns all state, calls services, and exposes intent methods. The screen only renders and forwards user actions.
 
-## ViewModels — `@Observable`
+## View Conditions
 
-All ViewModels use the `@Observable` macro. `ObservableObject` and `@Published` must **not** be used in new code. Existing ViewModels using `ObservableObject` must be migrated when touched.
+**One ViewModel property inline is fine.** A view may read a single VM property directly in a condition:
 
 ```swift
-// ✅ All ViewModels use @Observable
-@Observable
+if viewModel.isLoading { ProgressView() }
+```
+
+**Two or more ViewModel properties → computed property on the ViewModel.** When a condition combines two or more VM properties, extract it to a `var` on the ViewModel. The view then reads only that single derived property.
+
+**Before (wrong — compound condition in the view):**
+```swift
+// ❌ Inline compound condition — can't be unit-tested
+if !viewModel.isLoading && viewModel.hasError {
+    RetryButton()
+}
+```
+
+**After (correct — computed property on the ViewModel):**
+```swift
+// ✅ ViewModel exposes a single testable property
+@Observable @MainActor
+final class SomeViewModel {
+    var isLoading = false
+    var hasError = false
+
+    var showRetry: Bool { !isLoading && hasError }
+}
+
+// ✅ View reads one property
+if viewModel.showRetry {
+    RetryButton()
+}
+```
+
+**Rationale:** Compound conditions in views cannot be unit-tested. Computed properties on the ViewModel can be tested in isolation, keeping view logic minimal and verifiable.
+
+## ViewModels — `@Observable @MainActor`
+
+All ViewModels use the `@Observable` macro AND `@MainActor`. `ObservableObject` and `@Published` must **not** be used in new code. Existing ViewModels using `ObservableObject` must be migrated when touched.
+
+```swift
+// ✅ All ViewModels use @Observable @MainActor final class
+@Observable @MainActor
 final class BlockSetupViewModel {
     var isLoading = false
     var errorMessage: String?
@@ -134,9 +207,21 @@ struct ReadOnlyChildView: View {
 
 ## Reusable Components
 
-Any UI piece used in more than one place — or likely to be reused — must be a separate `struct` in its own file under the nearest `Components/` folder.
+### Reusability check
+
+Whenever you write or touch a view, ask: **"Is this used (or likely to be used) in more than one place?"** If yes, extract it into its own file — never leave it inlined in a screen or another component.
+
+### Placement rule
+
+| Scope | Location |
+|-------|----------|
+| Used only within one feature | `Features/FeatureName/Components/` |
+| Used across multiple features or app-wide | `DesignSystem/Components/` |
+
+### Rules
 
 - Do **not** inline ad-hoc sub-views inside screen files.
+- **Never copy-paste a view body into two screens.** Extract once, share everywhere.
 - Use `private struct` only for trivial, truly local layout helpers that have no reuse potential and would clutter a separate file.
 
 ```
@@ -145,48 +230,83 @@ Features/
     BlockSetupScreen.swift
     BlockSetupViewModel.swift
     Components/
-      AppRowView.swift      ✅ reusable row → own file
-      SectionHeaderView.swift
+      AppRowView.swift          ✅ feature-scoped reusable view → own file
+      SectionHeaderView.swift   ✅ feature-scoped reusable view → own file
+
+DesignSystem/
+  Components/
+    PrimaryButtonView.swift     ✅ app-wide reusable view → DesignSystem/Components/
 ```
 
 ## Dependency Injection
 
-Services, managers, and handlers are resolved in the **ViewModel's `init`**, never in the view.
+Services are injected into ViewModels using Factory's `@Injected` property wrapper — **not** via `init` parameters or `Container.shared.resolve()`.
 
 **Pattern:**
 ```swift
-@Observable
+@Observable @MainActor
 final class BlockSetupViewModel {
-    private let screenTimeService: ScreenTimeServicing
-    private let analyticsService: AnalyticsServicing
-
-    init(
-        screenTimeService: ScreenTimeServicing = Container.shared.resolve(ScreenTimeServicing.self),
-        analyticsService: AnalyticsServicing = Container.shared.resolve(AnalyticsServicing.self)
-    ) {
-        self.screenTimeService = screenTimeService
-        self.analyticsService = analyticsService
-    }
+    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
 }
 ```
 
 Rules:
-- Views **never** call `Container.shared.resolve()` — that belongs exclusively in a ViewModel's `init`.
-- `Container.shared` is allowed only to bootstrap ViewModels; services themselves are never accessed as singletons from views.
-- `SharedDefaults` is for lightweight app-group persistence only; it must not be used as a substitute for injected services.
+- Always pair `@ObservationIgnored` with `@Injected` — the property wrapper is not observable.
+- Views **never** call `Container.shared.resolve()` or access services directly.
+- Services are registered as singletons in `App/Container+App.swift` — add new services there.
+- Never use `Container.shared.resolve()` in init parameters; the `@Injected` wrapper handles resolution automatically.
 
-**Screens instantiate their ViewModel directly** — the ViewModel's `init` default parameters handle Container resolution:
+**Screens instantiate their ViewModel directly:**
 ```swift
-// ✅ correct — ViewModel init pulls from Container via default params
+// ✅ correct — @Injected in ViewModel handles service resolution
 @State private var viewModel = DashboardViewModel()
 ```
 
-**Child ViewModels** owned by a parent ViewModel are direct `let` properties — no Container registration needed:
+## Services
+
+Services are `@Observable @MainActor` singletons registered in `App/Container+App.swift`:
+
 ```swift
-// ✅ correct — CooldownViewModel is a child, not a root-level service
-let cooldownViewModel = CooldownViewModel()
+// In Container+App.swift
+extension Container {
+    var myService: Factory<MyServiceProtocol> {
+        self { @MainActor in MyService() }.singleton
+    }
+}
+
+// Service definition
+@Observable @MainActor
+final class MyService: MyServiceProtocol {
+    // state and logic
+}
 ```
-Only root-level *services* (ContactBlocker, CooldownTimer, etc.) are registered in Container and resolved via init defaults.
+
+Rules:
+- All service registrations go in `App/Container+App.swift` — never scatter them.
+- Services are never accessed as singletons directly from views.
+
+## Computed View Properties
+
+**Never** use `private var foo: some View` computed properties inside screen or component files. These break SwiftUI's structural diffing and lead to performance issues.
+
+```swift
+// ❌ Wrong — computed view property
+struct MeditationPlayerView: View {
+    private var timerSection: some View {
+        Text("00:00")
+    }
+}
+
+// ✅ Correct — extract to a named View struct in Components/
+struct MeditationTimerView: View {
+    var body: some View {
+        Text("00:00")
+    }
+}
+```
+
+Any non-trivial sub-view must be a separate `struct` in its own file under `Components/`.
 
 ## Swift Concurrency
 
@@ -288,3 +408,45 @@ enum MyFeatureError: Error {
 - Throw the typed enum from services; catch in ViewModels
 - ViewModels expose `var errorMessage: String?`; populate via `.defaultDescription`
 - Never use `try?` to suppress errors — catch and surface them via the ViewModel
+
+## SwiftLint
+
+SwiftLint runs automatically as an Xcode build phase (`swiftlint --fix` then `swiftlint`). Key limits:
+
+| Rule | Warning | Error |
+|------|---------|-------|
+| Line length | — | 130 chars |
+| File length | 400 lines | 500 lines |
+| Function body | 75 lines | — |
+| Closure body | 100 lines | — |
+
+### `empty_count` gotcha
+
+The `empty_count` opt-in rule auto-converts `x.count > 0` → `!x.isEmpty`. For named tuples or custom types that lack `.isEmpty`, suppress with:
+
+```swift
+// swiftlint:disable:next empty_count
+.someModifier(x.count > 0 ? a : b)
+```
+
+## Data Persistence
+
+**No CoreData. No Firebase.** All persistence goes through `UserDefaultsService`.
+
+- `NSUbiquitousKeyValueStore` (iCloud KVS) and App Group `UserDefaults` are accessed **only** via `UserDefaultsService` — never read/write them directly.
+- Keys are defined in the `UserDefaultsKey` enum inside `UserDefaultsService`.
+- `ProfileService` owns all read/write operations on `UserProfile` (root model containing `[CheckIn]`).
+
+```swift
+// ❌ Never access stores directly
+UserDefaults(suiteName: "group.app.ddworks.FocusOnYourself")?.set(value, forKey: "foo")
+
+// ✅ Always go through the service
+userDefaultsService.store(value, for: .someKey)
+```
+
+## Widget Model Sync
+
+The `FocusOnYourselfWidgets` target does **not** import main-target files. Widget-specific model copies live in `FocusOnYourselfWidgets/WidgetDataProvider.swift`.
+
+**When modifying `CheckIn`, `Mood`, or `UserProfile`**, manually update the corresponding model copies in `WidgetDataProvider.swift` to keep them in sync.

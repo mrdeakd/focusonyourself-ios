@@ -7,15 +7,16 @@ struct FOYToggle: View {
     private let trackHeight: CGFloat = 28
     private let thumbSize: CGFloat = 22
     private let thumbPadding: CGFloat = 3
+    private let toggleCornerRadius: CGFloat = 14
 
     var body: some View {
         ZStack(alignment: isOn ? .trailing : .leading) {
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: toggleCornerRadius)
                 .fill(isOn ? Color.foyNavy : Color.foyButtonDisabled)
                 .frame(width: trackWidth, height: trackHeight)
 
             Circle()
-                .fill(Color.white)
+                .fill(Color.foyOnPrimary)
                 .frame(width: thumbSize, height: thumbSize)
                 .padding(thumbPadding)
                 .shadow(color: .black.opacity(0.15), radius: 2, x: 0, y: 1)

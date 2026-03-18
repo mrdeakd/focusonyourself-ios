@@ -60,6 +60,10 @@ extension Color {
             : UIColor(Color(hex: "2E7D5A")).withAlphaComponent(0.10)
     })
 
+    // Always-opaque white / overlay
+    static let foyOnPrimary = Color.white
+    static let foyScrim     = Color.black.opacity(0.4)
+
     // Upgrade / Pro
     static let foyUpgradeCardBg       = Color(light: Color(hex: "F5F8FF"), dark: Color(hex: "1C2C3E"))
     static let foyUpgradeCardBorder   = Color(light: Color(hex: "DDEAFF"), dark: Color(hex: "2C4A6E"))

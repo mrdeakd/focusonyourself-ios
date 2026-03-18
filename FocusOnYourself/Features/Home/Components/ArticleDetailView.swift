@@ -25,7 +25,7 @@ struct ArticleDetailView: View {
             // Read time
             HStack(spacing: Spacing.xxs) {
                 Image(systemName: "clock")
-                    .font(.system(size: 13))
+                    .font(.foyCaption)
                 Text("\(article.readTimeMinutes) min read")
                     .font(.foyCaption)
             }

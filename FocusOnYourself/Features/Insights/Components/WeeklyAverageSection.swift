@@ -23,7 +23,7 @@ struct WeeklyAverageSection: View {
                             y: .value("Avg", item.avg)
                         )
                         .foregroundStyle(viewModel.avgBarColor(for: item.avg))
-                        .cornerRadius(6)
+                        .cornerRadius(CornerRadius.chartBar)
                     }
                     .chartYScale(domain: 0...5)
                     .chartYAxis(.hidden)

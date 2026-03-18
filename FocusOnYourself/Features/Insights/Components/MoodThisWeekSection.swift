@@ -22,7 +22,7 @@ struct MoodThisWeekSection: View {
                         y: .value("Mood", item.checkIn?.mood.numericValue ?? 0)
                     )
                     .foregroundStyle(viewModel.barColor(for: item.checkIn?.mood))
-                    .cornerRadius(6)
+                    .cornerRadius(CornerRadius.chartBar)
                 }
                 .chartYScale(domain: 0...5)
                 .chartYAxis(.hidden)

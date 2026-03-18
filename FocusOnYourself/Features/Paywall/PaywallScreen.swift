@@ -16,7 +16,7 @@ struct PaywallScreen: View {
     private let defaultAnnualPrice  = "$19.99/yr"
     private let planToggleHeight: CGFloat = 56
     private let bestValueBadgeCornerRadius: CGFloat = 10
-    private let loadingOverlay = Color.black.opacity(0.4)
+    private let loadingOverlay = Color.foyScrim
     private let dismissButtonBackground = Color.foyMoodBackground
     private let dismissButtonSize: CGFloat = 32
 
@@ -75,7 +75,7 @@ struct PaywallScreen: View {
                     .fill(dismissButtonBackground)
                     .frame(width: dismissButtonSize, height: dismissButtonSize)
                 Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.foySkipLabel)
                     .foregroundStyle(Color.foyForegroundSecondary)
             }
         }
@@ -130,11 +130,11 @@ struct PaywallScreen: View {
                 VStack(spacing: Spacing.xxs) {
                     Text(plan == .monthly ? "Monthly" : "Annual")
                         .font(.foyBodyMedium)
-                        .foregroundStyle(isSelected ? .white : Color.foyForeground)
+                        .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyForeground)
 
                     Text(price)
                         .font(.foyCaption)
-                        .foregroundStyle(isSelected ? .white.opacity(0.7) : Color.foyForegroundSecondary)
+                        .foregroundStyle(isSelected ? Color.foyOnPrimary.opacity(0.7) : Color.foyForegroundSecondary)
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: planToggleHeight)
@@ -148,7 +148,7 @@ struct PaywallScreen: View {
                 if showBadge {
                     Text("Best Value")
                         .font(.foyMicroMedium)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.foyOnPrimary)
                         .padding(.horizontal, Spacing.xs)
                         .padding(.vertical, Spacing.xxxs)
                         .background(Color.foyOrange)
@@ -166,7 +166,7 @@ struct PaywallScreen: View {
             } label: {
                 Text(viewModel.ctaLabel)
                     .font(.foyButtonLabel)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.foyOnPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: Spacing.inputHeight)
                     .background(Color.foyNavy)

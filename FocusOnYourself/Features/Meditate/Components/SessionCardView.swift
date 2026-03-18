@@ -5,6 +5,7 @@ struct SessionCardView: View {
     let isPro: Bool
 
     private var isLocked: Bool { session.isPro && !isPro }
+    private let proBadgePaddingV: CGFloat = 2
 
     var body: some View {
         HStack(spacing: Spacing.md) {
@@ -24,9 +25,9 @@ struct SessionCardView: View {
                     if session.isPro {
                         Text("PRO")
                             .font(.foyMicroMedium)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.foyOnPrimary)
                             .padding(.horizontal, Spacing.xxs)
-                            .padding(.vertical, 2)
+                            .padding(.vertical, proBadgePaddingV)
                             .background(Color.foyOrange)
                             .clipShape(Capsule())
                     }
@@ -44,7 +45,7 @@ struct SessionCardView: View {
             Spacer()
 
             Image(systemName: isLocked ? "lock.fill" : "chevron.right")
-                .font(.system(size: 13, weight: .medium))
+                .font(.foyCaptionMedium)
                 .foregroundStyle(isLocked ? Color.foyOrange : Color.foyPlaceholder)
         }
         .padding(Spacing.md)

@@ -91,7 +91,7 @@ struct InsightsScreen: View {
                         x: .value("Day", item.label),
                         y: .value("Mood", item.checkIn?.mood.numericValue ?? 0)
                     )
-                    .foregroundStyle(barColor(for: item.checkIn?.mood))
+                    .foregroundStyle(viewModel.barColor(for: item.checkIn?.mood))
                     .cornerRadius(6)
                 }
                 .chartYScale(domain: 0...5)
@@ -179,7 +179,7 @@ struct InsightsScreen: View {
                             x: .value("Week", item.week),
                             y: .value("Avg", item.avg)
                         )
-                        .foregroundStyle(avgBarColor(for: item.avg))
+                        .foregroundStyle(viewModel.avgBarColor(for: item.avg))
                         .cornerRadius(6)
                     }
                     .chartYScale(domain: 0...5)
@@ -220,7 +220,7 @@ struct InsightsScreen: View {
                             x: .value("Month", item.month),
                             y: .value("Avg", item.avg)
                         )
-                        .foregroundStyle(avgBarColor(for: item.avg))
+                        .foregroundStyle(viewModel.avgBarColor(for: item.avg))
                         .cornerRadius(6)
                     }
                     .chartYScale(domain: 0...5)
@@ -301,24 +301,4 @@ struct InsightsScreen: View {
             .multilineTextAlignment(.center)
     }
 
-    private func avgBarColor(for avg: Double) -> Color {
-        switch Int(avg.rounded()) {
-        case 5: return Color.foyOrange
-        case 4: return Color.foyOrangeAccent
-        case 3: return Color.foyForegroundSecondary
-        case 2: return Color.foyPlaceholder
-        default: return Color.foyBorder
-        }
-    }
-
-    private func barColor(for mood: Mood?) -> Color {
-        guard let mood else { return Color.foyBorder }
-        switch mood {
-        case .great: return Color.foyOrange
-        case .good:  return Color.foyOrangeAccent
-        case .okay:  return Color.foyForegroundSecondary
-        case .low:   return Color.foyPlaceholder
-        case .rough: return Color.foyBorder
-        }
-    }
 }

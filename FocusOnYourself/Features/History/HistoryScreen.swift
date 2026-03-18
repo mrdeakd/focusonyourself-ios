@@ -18,15 +18,7 @@ struct HistoryScreen: View {
 
             VStack(spacing: 0) {
                 if showsHeader {
-                    HStack {
-                        Text("History")
-                            .font(.foyNavTitle)
-                            .foregroundStyle(Color.foyForeground)
-                        Spacer()
-                    }
-                    .padding(.horizontal, Spacing.screenHorizontal)
-                    .padding(.top, Spacing.lg)
-                    .padding(.bottom, Spacing.md)
+                    ScreenHeaderView(title: "History")
                 }
 
                 HStack(spacing: Spacing.sm) {

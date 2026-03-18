@@ -10,7 +10,7 @@ struct MeditateScreen: View {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                headerRow
+                ScreenHeaderView(title: "Meditate")
 
                 CategoryFilterChipsView(viewModel: viewModel)
                     .padding(.bottom, Spacing.sm)
@@ -39,18 +39,6 @@ struct MeditateScreen: View {
         .sheet(isPresented: $showingPaywall) {
             PaywallScreen()
         }
-    }
-
-    private var headerRow: some View {
-        HStack {
-            Text("Meditate")
-                .font(.foyNavTitle)
-                .foregroundStyle(Color.foyForeground)
-            Spacer()
-        }
-        .padding(.horizontal, Spacing.screenHorizontal)
-        .padding(.top, Spacing.lg)
-        .padding(.bottom, Spacing.md)
     }
 
     private func handleSessionTap(_ session: MeditationSession) {

@@ -20,7 +20,7 @@ struct InsightsScreen: View {
 
             VStack(spacing: 0) {
                 if showsHeader {
-                    header
+                    ScreenHeaderView(title: "Insights")
                 }
 
                 statsRow
@@ -56,18 +56,6 @@ struct InsightsScreen: View {
         .sheet(isPresented: $showingPaywall) {
             PaywallScreen()
         }
-    }
-
-    private var header: some View {
-        HStack {
-            Text("Insights")
-                .font(.foyNavTitle)
-                .foregroundStyle(Color.foyForeground)
-            Spacer()
-        }
-        .padding(.horizontal, Spacing.screenHorizontal)
-        .padding(.top, Spacing.lg)
-        .padding(.bottom, Spacing.md)
     }
 
     private var statsRow: some View {

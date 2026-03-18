@@ -8,4 +8,5 @@ struct UserProfile: Codable, Equatable {
     var onboardingCompleted: Bool = false
     var checkIns: [CheckIn] = []
     var appearanceOverride: String?
+    var preferredLanguage: String?
 }

@@ -20,9 +20,13 @@ final class UserDefaultsService: UserDefaultsServiceProtocol {
         kvs.data(forKey: key.rawValue)
     }
 
-    func setData(_ key: UserDefaultsKey, value: Data?) {
+    private func store(_ value: Any?, forKey key: UserDefaultsKey) {
         kvs.set(value, forKey: key.rawValue)
         appGroupDefaults.set(value, forKey: key.rawValue)
+    }
+
+    func setData(_ key: UserDefaultsKey, value: Data?) {
+        store(value, forKey: key)
     }
 
     func getBool(_ key: UserDefaultsKey) -> Bool {
@@ -30,8 +34,7 @@ final class UserDefaultsService: UserDefaultsServiceProtocol {
     }
 
     func setBool(_ key: UserDefaultsKey, value: Bool) {
-        kvs.set(value, forKey: key.rawValue)
-        appGroupDefaults.set(value, forKey: key.rawValue)
+        store(value, forKey: key)
     }
 
     func getString(_ key: UserDefaultsKey) -> String? {
@@ -39,7 +42,6 @@ final class UserDefaultsService: UserDefaultsServiceProtocol {
     }
 
     func setString(_ key: UserDefaultsKey, value: String?) {
-        kvs.set(value, forKey: key.rawValue)
-        appGroupDefaults.set(value, forKey: key.rawValue)
+        store(value, forKey: key)
     }
 }

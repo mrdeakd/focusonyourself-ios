@@ -40,14 +40,12 @@ final class InsightsViewModel {
     func dailyMoodData(days: Int) -> [(label: String, checkIn: CheckIn?)] {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEE"
 
         return (0..<days).reversed().map { offset in
             let date = cal.date(byAdding: .day, value: -offset, to: today) ?? today
             let ds = CheckIn.dateString(for: date)
             let checkIn = profileService.profile.checkIns.first { $0.dateString == ds }
-            return (label: formatter.string(from: date), checkIn: checkIn)
+            return (label: date.dayOfWeekAbbreviated, checkIn: checkIn)
         }
     }
 
@@ -67,18 +65,13 @@ final class InsightsViewModel {
             let avg = checkIns.isEmpty
                 ? 0.0
                 : Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            let label = formatter.string(from: weekInterval.start)
-            return (week: label, avg: avg)
+            return (week: weekInterval.start.weekStart, avg: avg)
         }
     }
 
     func monthlyAverages() -> [(month: String, avg: Double)] {
         let cal = Calendar.current
         let today = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
 
         return (0..<6).reversed().map { offset in
             guard let monthDate = cal.date(byAdding: .month, value: -offset, to: today),
@@ -91,7 +84,7 @@ final class InsightsViewModel {
             let avg = checkIns.isEmpty
                 ? 0.0
                 : Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
-            return (month: formatter.string(from: monthInterval.start), avg: avg)
+            return (month: monthInterval.start.monthAbbreviated, avg: avg)
         }
     }
 
@@ -107,8 +100,6 @@ final class InsightsViewModel {
         let checkIns = recentCheckIns(days: days)
         guard !checkIns.isEmpty else { return nil }
         let cal = Calendar.current
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
 
         var byWeekday: [Int: [Int]] = [:]
         for ci in checkIns {
@@ -122,6 +113,6 @@ final class InsightsViewModel {
         }) else { return nil }
 
         let date = cal.date(bySetting: .weekday, value: best.key, of: Date()) ?? Date()
-        return formatter.string(from: date)
+        return date.dayOfWeekFull
     }
 }

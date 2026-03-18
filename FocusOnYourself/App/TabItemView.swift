@@ -19,7 +19,7 @@ struct TabItemView: View {
                     .font(.foySectionLabel)
                     .kerning(0.5)
             }
-            .foregroundStyle(isSelected ? Color.white : Color.foyPlaceholder)
+            .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyPlaceholder)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 if isSelected {

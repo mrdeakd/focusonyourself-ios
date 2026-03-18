@@ -1,6 +1,7 @@
 import SwiftUI
 
 private let cardCornerRadius: CGFloat = 18
+private let barCornerRadius: CGFloat = 4
 
 struct MoodBreakdownSection: View {
     var viewModel: InsightsViewModel
@@ -32,14 +33,14 @@ struct MoodBreakdownSection: View {
 
                             GeometryReader { geo in
                                 ZStack(alignment: .leading) {
-                                    RoundedRectangle(cornerRadius: 4)
+                                    RoundedRectangle(cornerRadius: barCornerRadius)
                                         .fill(Color.foyNavy.opacity(0.08))
                                         .frame(maxWidth: .infinity)
 
                                     let fillWidth = maxCount > 0
                                         ? geo.size.width * CGFloat(item.count) / CGFloat(maxCount)
                                         : 0
-                                    RoundedRectangle(cornerRadius: 4)
+                                    RoundedRectangle(cornerRadius: barCornerRadius)
                                         .fill(Color.foyNavy)
                                         // swiftlint:disable:next empty_count
                                         .frame(width: max(fillWidth, item.count > 0 ? 4 : 0))

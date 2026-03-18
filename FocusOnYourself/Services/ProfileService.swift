@@ -11,9 +11,13 @@ final class ProfileService: ProfileServiceProtocol {
 
     init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
         self.userDefaultsService = userDefaultsService
-        if let data = userDefaultsService.getData(.userProfile),
-           let saved = try? JSONDecoder().decode(UserProfile.self, from: data) {
-            self.profile = saved
+        if let data = userDefaultsService.getData(.userProfile) {
+            do {
+                self.profile = try JSONDecoder().decode(UserProfile.self, from: data)
+            } catch {
+                assertionFailure("Failed to decode UserProfile: \(error)")
+                self.profile = UserProfile()
+            }
         } else {
             self.profile = UserProfile()
         }
@@ -31,17 +35,21 @@ final class ProfileService: ProfileServiceProtocol {
     }
 
     private func reloadProfile() {
-        guard
-            let data = userDefaultsService.getData(.userProfile),
-            let saved = try? JSONDecoder().decode(UserProfile.self, from: data)
-        else { return }
-        self.profile = saved
+        guard let data = userDefaultsService.getData(.userProfile) else { return }
+        do {
+            self.profile = try JSONDecoder().decode(UserProfile.self, from: data)
+        } catch {
+            assertionFailure("Failed to decode UserProfile from external change: \(error)")
+        }
     }
 
     func updateProfile(_ profile: UserProfile) {
         self.profile = profile
-        if let data = try? JSONEncoder().encode(profile) {
+        do {
+            let data = try JSONEncoder().encode(profile)
             userDefaultsService.setData(.userProfile, value: data)
+        } catch {
+            assertionFailure("Failed to encode UserProfile: \(error)")
         }
     }
 

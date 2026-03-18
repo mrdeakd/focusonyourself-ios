@@ -31,7 +31,7 @@ struct ArticleCardView: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .medium))
+                .font(.foyCaptionMedium)
                 .foregroundStyle(Color.foyPlaceholder)
         }
         .padding(Spacing.md)

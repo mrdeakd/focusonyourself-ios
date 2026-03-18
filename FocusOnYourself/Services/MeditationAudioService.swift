@@ -18,12 +18,16 @@ final class MeditationAudioService: NSObject {
     }
 
     private func loadNarrationMap() {
-        guard let url = Bundle.main.url(forResource: "narration_map", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let map = try? JSONDecoder().decode([String: String].self, from: data) else {
+        guard let url = Bundle.main.url(forResource: "narration_map", withExtension: "json") else {
+            assertionFailure("narration_map.json not found in bundle")
             return
         }
-        narrationMap = map
+        do {
+            let data = try Data(contentsOf: url)
+            narrationMap = try JSONDecoder().decode([String: String].self, from: data)
+        } catch {
+            assertionFailure("Failed to load narration map: \(error)")
+        }
     }
 
     private func configureAudioSession() {
@@ -113,7 +117,12 @@ final class MeditationAudioService: NSObject {
         let player = AVAudioPlayerNode()
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: format)
-        guard (try? engine.start()) != nil else { return }
+        do {
+            try engine.start()
+        } catch {
+            assertionFailure("AVAudioEngine failed to start: \(error)")
+            return
+        }
 
         bellEngine = engine
         player.scheduleBuffer(buffer, at: nil, completionCallbackType: .dataPlayedBack) { [weak self] _ in

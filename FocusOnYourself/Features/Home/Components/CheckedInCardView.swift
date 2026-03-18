@@ -42,7 +42,7 @@ struct CheckedInCardView: View {
                         .font(.foyHintMedium)
                         .foregroundStyle(Color.foyNavy)
                 }
-                .padding(.vertical, 6)
+                .padding(.vertical, Spacing.xxs)
                 .padding(.horizontal, Spacing.sm)
                 .background(Color.foyNavyTint)
                 .clipShape(Capsule())

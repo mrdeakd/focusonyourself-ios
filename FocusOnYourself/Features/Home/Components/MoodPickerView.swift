@@ -28,7 +28,7 @@ struct MoodPickerView: View {
             Button(action: onCheckIn) {
                 Text("Complete Check-In")
                     .font(.foyBodyMedium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.foyOnPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: checkInHeight)
                     .background(selectedMood == nil ? Color.foyButtonDisabled : Color.foyNavy)
@@ -52,7 +52,7 @@ struct MoodPickerView: View {
                     Text("Express yourself freely…")
                         .font(.foySkipLabel)
                         .foregroundStyle(Color.foyPlaceholder)
-                        .padding(.top, 8)
+                        .padding(.top, Spacing.xs)
                         .padding(.leading, 4)
                         .allowsHitTesting(false)
                 }

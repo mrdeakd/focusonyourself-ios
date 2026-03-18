@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsScreen: View {
     @State private var viewModel = SettingsViewModel()
     @State private var showChangeNameSheet = false
+    private let badgePaddingH: CGFloat = 10
     @State private var showChangeCategoriesSheet = false
     @State private var showPaywall = false
 
@@ -17,10 +18,10 @@ struct SettingsScreen: View {
                         .foregroundStyle(Color.foyForeground)
                     Spacer()
                     Text(viewModel.isPro ? "PRO" : "FREE")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.foySectionLabelSemibold)
                         .foregroundStyle(viewModel.isPro ? Color.foyOrangeAccent : Color.foyNavy)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, badgePaddingH)
+                        .padding(.vertical, Spacing.xxxs)
                         .background(viewModel.isPro ? Color.foyOrangeAccent.opacity(0.15) : Color.foyFreeBadgeBg)
                         .clipShape(Capsule())
                 }
@@ -196,7 +197,7 @@ struct SettingsScreen: View {
                     } label: {
                         Text(option)
                             .font(.foyCaptionMedium)
-                            .foregroundStyle(isSelected ? .white : Color.foyPlaceholder)
+                            .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyPlaceholder)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, Spacing.sm)
                             .background(isSelected ? Color.foyNavy : Color.foyMoodBackground)

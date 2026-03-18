@@ -32,6 +32,7 @@ struct DayDetailSheet: View {
                     journalSection
                 }
             }
+            .scrollIndicators(.hidden)
             doneButton
                 .padding(.bottom, Spacing.xl)
         }

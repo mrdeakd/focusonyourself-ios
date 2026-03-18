@@ -11,7 +11,7 @@ final class NotificationService: NotificationServiceProtocol {
 
     func schedule(name: String) {
         let content = UNMutableNotificationContent()
-        content.title = name.isEmpty ? 
+        content.title = name.isEmpty ?
         "Good morning ✨" :
         "Good morning, \(name) ✨"
         content.body  = "Your daily affirmation is ready. Take a moment for yourself."

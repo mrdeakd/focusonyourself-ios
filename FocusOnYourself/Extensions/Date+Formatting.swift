@@ -2,39 +2,39 @@ import Foundation
 
 extension Date {
     private static let homeScreenFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "EEEE, MMMM d"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMMM d"
+        return formatter
     }()
 
     private static let calendarMonthFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "MMMM yyyy"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter
     }()
 
     private static let dayOfWeekAbbreviatedFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "EEE"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter
     }()
 
     private static let weekStartFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "MMM d"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
     }()
 
     private static let monthAbbreviatedFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "MMM"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+        return formatter
     }()
 
     private static let dayOfWeekFullFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "EEEE"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE"
+        return formatter
     }()
 
     var homeScreenFormatted: String {

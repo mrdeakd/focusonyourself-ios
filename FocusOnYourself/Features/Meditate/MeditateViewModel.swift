@@ -4,7 +4,7 @@ import Observation
 
 @Observable @MainActor
 final class MeditateViewModel {
-    var selectedCategory: MeditationCategory? = nil
+    var selectedCategory: MeditationCategory?
 
     @ObservationIgnored @Injected(\.meditationService) private var meditationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService

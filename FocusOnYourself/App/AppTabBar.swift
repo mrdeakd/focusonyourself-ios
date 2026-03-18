@@ -56,4 +56,3 @@ struct AppTabBar: View {
         .background(Color.foyBackground)
     }
 }
-

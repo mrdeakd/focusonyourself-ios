@@ -4,9 +4,9 @@ import Observation
 
 @Observable @MainActor
 final class HomeViewModel {
-    var selectedMood: Mood? = nil
+    var selectedMood: Mood?
     var hasCheckedIn: Bool = false
-    var todaysMood: Mood? = nil
+    var todaysMood: Mood?
     var feelingsDescription: String = ""
     var isGeneratingAffirmation: Bool = false
     var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []

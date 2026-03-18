@@ -1,7 +1,7 @@
 import Factory
 import Foundation
-import StoreKit
 import Observation
+import StoreKit
 
 @Observable
 @MainActor
@@ -35,9 +35,9 @@ final class PaywallViewModel {
               offer.paymentMode == .freeTrial else {
             return "Subscribe Now"
         }
-        let p = offer.period
-        if p.unit == .day {
-            return "Start \(p.value)-Day Free Trial"
+        let period = offer.period
+        if period.unit == .day {
+            return "Start \(period.value)-Day Free Trial"
         }
         return "Start Free Trial"
     }

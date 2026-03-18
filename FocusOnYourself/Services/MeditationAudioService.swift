@@ -103,9 +103,10 @@ final class MeditationAudioService: NSObject {
         buffer.frameLength = frameCount
 
         let ptr = buffer.floatChannelData![0]
-        for i in 0..<Int(frameCount) {
-            let t = Double(i) / sampleRate
-            ptr[i] = Float(sin(2 * .pi * 528 * t) * exp(-t * 1.8) * 0.6)
+        for index in 0..<Int(frameCount) {
+            // swiftlint:disable:next identifier_name
+            let t = Double(index) / sampleRate
+            ptr[index] = Float(sin(2 * .pi * 528 * t) * exp(-t * 1.8) * 0.6)
         }
 
         let engine = AVAudioEngine()

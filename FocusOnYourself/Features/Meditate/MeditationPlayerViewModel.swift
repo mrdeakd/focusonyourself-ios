@@ -1,6 +1,6 @@
+import Factory
 import Foundation
 import Observation
-import Factory
 
 enum MeditationPhase: Equatable {
     case narrating
@@ -37,9 +37,9 @@ final class MeditationPlayerViewModel {
     var isLastStep: Bool { currentStepIndex == stepCount - 1 }
 
     var timerDisplay: String {
-        let m = timerSecondsRemaining / 60
-        let s = timerSecondsRemaining % 60
-        return String(format: "%d:%02d", m, s)
+        let minutes = timerSecondsRemaining / 60
+        let seconds = timerSecondsRemaining % 60
+        return String(format: "%d:%02d", minutes, seconds)
     }
 
     // MARK: - Lifecycle
@@ -152,8 +152,8 @@ final class MeditationPlayerViewModel {
     private func runTimer() {
         runCountdown(
             onTick: { [weak self] in
-                guard let self, self.phase == .timerRunning else { return }
-                self.timerSecondsRemaining -= 1
+                guard let self, phase == .timerRunning else { return }
+                timerSecondsRemaining -= 1
             },
             onComplete: { [weak self] in self?.onTimerFinished() }
         )

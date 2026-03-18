@@ -36,10 +36,10 @@ private struct WidgetCheckIn: Codable {
     let feelingsDescription: String?
 
     private static let formatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        f.locale = Locale(identifier: "en_US_POSIX")
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
     }()
 
     var date: Date { Self.formatter.date(from: dateString) ?? .distantPast }
@@ -80,15 +80,17 @@ struct WidgetDataProvider {
         let sorted = checkInDates.sorted()
         var longest = 0
         var run = 0
-        var prev: Date? = nil
-        for d in sorted {
-            if let p = prev, let expected = cal.date(byAdding: .day, value: 1, to: p), expected == d {
+        var prev: Date?
+        for checkInDate in sorted {
+            if let prevDate = prev,
+               let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
+               expected == checkInDate {
                 run += 1
             } else {
                 run = 1
             }
             if run > longest { longest = run }
-            prev = d
+            prev = checkInDate
         }
 
         return (current: current, longest: longest)
@@ -106,9 +108,9 @@ struct WidgetDataProvider {
     }
 
     private static func todayDateString() -> String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        f.locale = Locale(identifier: "en_US_POSIX")
-        return f.string(from: Date())
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.string(from: Date())
     }
 }

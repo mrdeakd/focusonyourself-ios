@@ -80,5 +80,4 @@ struct ChangeNameSheet: View {
         .buttonStyle(FoyPrimaryButtonStyle())
         .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
     }
-
 }

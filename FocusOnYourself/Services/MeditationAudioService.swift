@@ -84,6 +84,11 @@ final class MeditationAudioService: NSObject {
         }
     }
 
+    private func fireAndClearNarrationCallback() {
+        onNarrationComplete?()
+        onNarrationComplete = nil
+    }
+
     private func activateAudioSession() {
         #if os(iOS)
         try? AVAudioSession.sharedInstance().setActive(true)
@@ -124,8 +129,7 @@ extension MeditationAudioService: AVSpeechSynthesizerDelegate {
         Task { @MainActor in
             guard utterance === self.currentUtterance else { return }
             self.currentUtterance = nil
-            self.onNarrationComplete?()
-            self.onNarrationComplete = nil
+            self.fireAndClearNarrationCallback()
         }
     }
 }
@@ -135,8 +139,7 @@ extension MeditationAudioService: AVAudioPlayerDelegate {
         Task { @MainActor in
             guard player === self.narrationPlayer else { return }
             self.narrationPlayer = nil
-            self.onNarrationComplete?()
-            self.onNarrationComplete = nil
+            self.fireAndClearNarrationCallback()
         }
     }
 }

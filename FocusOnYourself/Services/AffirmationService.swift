@@ -19,6 +19,10 @@ final class AffirmationService: AffirmationServiceProtocol {
         return cached.map { (quote: $0.quote, category: $0.category) }
     }
 
+    func clearDailyCache() {
+        userDefaultsService.setString(.affirmationCacheDate, value: "")
+    }
+
     func cacheBatch(_ pairs: [(quote: String, category: AffirmationCategory)]) {
         let cached = pairs.map { CachedAffirmation(quote: $0.quote, category: $0.category) }
         if let data = try? JSONEncoder().encode(cached) {
@@ -51,10 +55,12 @@ final class AffirmationService: AffirmationServiceProtocol {
         var results: [(quote: String, category: AffirmationCategory)] = []
 
         for (category, affirmationCount) in zip(categories, counts) {
+            let langCode = Locale.current.language.languageCode?.identifier
+            let languageInstruction = langCode == "hu" ? "Write in Hungarian (Magyar)." : "Write in English."
             let prompt = """
+                \(languageInstruction)
                 Write \(affirmationCount) short, powerful daily affirmations in the theme of: \(category.displayName). \
-                Use first person ("I am", "I have", or "I choose"). \
-                Format as a numbered list (1. ... 2. ... etc.), one affirmation per line. \
+                Use first person. Format as a numbered list (1. ... 2. ... etc.), one affirmation per line. \
                 Return only the affirmation texts, no explanations.
                 """
             let session = LanguageModelSession()
@@ -76,9 +82,11 @@ final class AffirmationService: AffirmationServiceProtocol {
         }
         let data = try Data(contentsOf: url)
         let decoded = try JSONDecoder().decode([StaticAffirmation].self, from: data)
+        let langCode = Locale.current.language.languageCode?.identifier
         let result = decoded.compactMap { entry -> (quote: String, category: AffirmationCategory)? in
             guard let category = AffirmationCategory(rawValue: entry.category) else { return nil }
-            return (quote: entry.quote, category: category)
+            let quote = (langCode == "hu" ? entry.quoteHu : nil) ?? entry.quote
+            return (quote: quote, category: category)
         }
         staticAffirmations = result
         return result

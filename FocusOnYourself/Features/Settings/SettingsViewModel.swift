@@ -8,6 +8,7 @@ final class SettingsViewModel {
     @ObservationIgnored @Injected(\.profileService) private var profileService
     @ObservationIgnored @Injected(\.notificationService) private var notificationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
+    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
 
     var currentName: String {
         profileService.profile.name
@@ -50,6 +51,7 @@ final class SettingsViewModel {
         var profile = profileService.profile
         profile.preferredLanguage = code
         profileService.updateProfile(profile)
+        affirmationService.clearDailyCache()
         UserDefaults.standard.set([code], forKey: "AppleLanguages")
         exit(0)
     }

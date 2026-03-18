@@ -29,9 +29,9 @@ final class HomeViewModel {
         let hour = Calendar.current.component(.hour, from: Date())
         let timeOfDay: String
         switch hour {
-        case 5..<12:  timeOfDay = "Good morning"
-        case 12..<17: timeOfDay = "Good afternoon"
-        default:      timeOfDay = "Good evening"
+        case 5..<12:  timeOfDay = String(localized: "greeting.morning")
+        case 12..<17: timeOfDay = String(localized: "greeting.afternoon")
+        default:      timeOfDay = String(localized: "greeting.evening")
         }
         return profileService.profile.name.isEmpty
             ? timeOfDay

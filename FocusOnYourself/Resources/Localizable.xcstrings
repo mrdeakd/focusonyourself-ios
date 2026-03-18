@@ -1,1958 +1,2103 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "“”" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“”"
+  "sourceLanguage": "en",
+  "strings": {
+    "": {},
+    "“%@”": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“”"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”"
           }
         }
       }
     },
-    "“%@”" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@”"
+    "#%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "#%@"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@”"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "#%@"
           }
         }
       }
     },
-    "#%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "#%@"
+    "%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "#%@"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
           }
         }
       }
     },
-    "%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
+    "%lld days": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld days"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld nap"
           }
         }
       }
     },
-    "%lld days" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld days"
+    "%lld min": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld nap"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld perc"
           }
         }
       }
     },
-    "%lld min" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld min"
+    "%lld min read": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min read"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld perc"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld perces olvasás"
           }
         }
       }
     },
-    "%lld min read" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld min read"
+    "30-day trends, best day & more": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30-day trends, best day & more"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld perces olvasás"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 napos trendek, legjobb nap és több"
           }
         }
       }
     },
-    "30-day trends, best day & more" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30-day trends, best day & more"
+    "A daily moment of intention.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A daily moment of intention."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 napos trendek, legjobb nap és több"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egy napi szándékos pillanat."
           }
         }
       }
     },
-    "A daily moment of intention." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A daily moment of intention."
+    "Annual": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annual"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Egy napi szándékos pillanat."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éves"
           }
         }
       }
     },
-    "Annual" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annual"
+    "Avg": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avg"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Éves"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Átl"
           }
         }
       }
     },
-    "Avg" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avg"
+    "Back": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Átl"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vissza"
           }
         }
       }
     },
-    "Back" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Back"
+    "Best Value": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best Value"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vissza"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legjobb ajánlat"
           }
         }
       }
     },
-    "Best Value" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Best Value"
+    "Breathe and rest": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Breathe and rest"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Legjobb ajánlat"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lélegezz és pihenj"
           }
         }
       }
     },
-    "Breathe and rest" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Breathe and rest"
+    "Cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lélegezz és pihenj"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mégse"
           }
         }
       }
     },
-    "Cancel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
+    "category.career": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Career & Success"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mégse"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karrier & Siker"
           }
         }
       }
     },
-    "category.career" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Career & Success"
+    "category.confidence": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confidence & Self-Worth"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Karrier & Siker"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magabiztosság"
           }
         }
       }
     },
-    "category.confidence" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confidence & Self-Worth"
+    "category.health": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health & Body"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Magabiztosság"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egészség & Test"
           }
         }
       }
     },
-    "category.health" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Health & Body"
+    "category.mindfulness": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mindfulness & Calm"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Egészség & Test"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tudatosság & Nyugalom"
           }
         }
       }
     },
-    "category.mindfulness" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mindfulness & Calm"
+    "category.relationships": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relationships & Love"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tudatosság & Nyugalom"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapcsolatok & Szeretet"
           }
         }
       }
     },
-    "category.relationships" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relationships & Love"
+    "category.resilience": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resilience & Strength"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kapcsolatok & Szeretet"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kitartás & Erő"
           }
         }
       }
     },
-    "category.resilience" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resilience & Strength"
+    "changeName.currentName": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CURRENT NAME"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kitartás & Erő"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JELENLEGI NÉV"
           }
         }
       }
     },
-    "changeName.currentName" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CURRENT NAME"
+    "changeName.newName": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEW NAME"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JELENLEGI NÉV"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ÚJ NÉV"
           }
         }
       }
     },
-    "changeName.newName" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NEW NAME"
+    "Check-in complete for today!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in complete for today!"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ÚJ NÉV"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mai bejelentkezés kész!"
           }
         }
       }
     },
-    "Check-in complete for today!" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-in complete for today!"
+    "Choose topics for your daily affirmations.\nSelect at least one.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose topics for your daily affirmations.\nSelect at least one."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mai bejelentkezés kész!"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válassz témákat napi megerősítéseidhez.\nVálassz legalább egyet."
           }
         }
       }
     },
-    "Choose topics for your daily affirmations.\nSelect at least one." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose topics for your daily affirmations.\nSelect at least one."
+    "Complete Check-In": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete Check-In"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Válassz témákat napi megerősítéseidhez.\nVálassz legalább egyet."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bejelentkezés befejezése"
           }
         }
       }
     },
-    "Complete Check-In" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Complete Check-In"
+    "Continue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bejelentkezés befejezése"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folytatás"
           }
         }
       }
     },
-    "Continue" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue"
+    "Day": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folytatás"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nap"
           }
         }
       }
     },
-    "Day" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Day"
+    "Done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nap"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kész"
           }
         }
       }
     },
-    "Done" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
+    "Enable Notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Notifications"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kész"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Értesítések engedélyezése"
           }
         }
       }
     },
-    "Enable Notifications" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable Notifications"
+    "Enter new name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter new name"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Értesítések engedélyezése"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add meg az új nevet"
           }
         }
       }
     },
-    "Enter new name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter new name"
+    "Enter your name to continue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter your name to continue"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add meg az új nevet"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add meg a neved a folytatáshoz"
           }
         }
       }
     },
-    "Enter your name to continue" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter your name to continue"
+    "Everything you need for daily growth": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything you need for daily growth"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add meg a neved a folytatáshoz"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minden, amire szükséged van a napi fejlődéshez"
           }
         }
       }
     },
-    "Everything you need for daily growth" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Everything you need for daily growth"
+    "Express yourself freely…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Express yourself freely…"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minden, amire szükséged van a napi fejlődéshez"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fejezd ki magad szabadon…"
           }
         }
       }
     },
-    "Express yourself freely…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Express yourself freely…"
+    "Finish": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fejezd ki magad szabadon…"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befejezés"
           }
         }
       }
     },
-    "Finish" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finish"
+    "Focus On Yourself": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus On Yourself"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Befejezés"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus On Yourself"
           }
         }
       }
     },
-    "Focus On Yourself" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus On Yourself"
+    "FREE": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FREE"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus On Yourself"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "INGYENES"
           }
         }
       }
     },
-    "FREE" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "FREE"
+    "Generating your affirmation…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generating your affirmation…"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "INGYENES"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Megerősítés generálása…"
           }
         }
       }
     },
-    "Generating your affirmation…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generating your affirmation…"
+    "Get Started": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Started"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Megerősítés generálása…"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kezdjük el"
           }
         }
       }
     },
-    "Get Started" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Get Started"
+    "history.journal": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JOURNAL"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kezdjük el"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NAPLÓ"
           }
         }
       }
     },
-    "history.journal" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JOURNAL"
+    "home.healthWellness": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HEALTH & WELLNESS"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NAPLÓ"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EGÉSZSÉG & JÓLÉT"
           }
         }
       }
     },
-    "home.healthWellness" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HEALTH & WELLNESS"
+    "How are you feeling?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How are you feeling?"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "EGÉSZSÉG & JÓLÉT"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hogy érzed magad?"
           }
         }
       }
     },
-    "How are you feeling?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How are you feeling?"
+    "insights.monthlyAverage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MONTHLY AVERAGE"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hogy érzed magad?"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HAVI ÁTLAG"
           }
         }
       }
     },
-    "insights.moodBreakdown" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MOOD BREAKDOWN"
+    "insights.moodBreakdown": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MOOD BREAKDOWN"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HANGULAT MEGOSZLÁSA"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HANGULAT MEGOSZLÁSA"
           }
         }
       }
     },
-    "insights.moodThisWeek" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MOOD THIS WEEK"
+    "insights.moodThisWeek": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MOOD THIS WEEK"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HETI HANGULAT"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HETI HANGULAT"
           }
         }
       }
     },
-    "insights.monthlyAverage" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MONTHLY AVERAGE"
+    "insights.weeklyAverage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WEEKLY AVERAGE"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HAVI ÁTLAG"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HETI ÁTLAG"
           }
         }
       }
     },
-    "insights.weeklyAverage" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WEEKLY AVERAGE"
+    "meditation.anxiety": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anxiety & Stress"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HETI ÁTLAG"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szorongás & Stressz"
           }
         }
       }
     },
-    "meditation.anxiety" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anxiety & Stress"
+    "meditation.focus": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus & Productivity"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Szorongás & Stressz"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fókusz & Termelékenység"
           }
         }
       }
     },
-    "meditation.focus" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus & Productivity"
+    "meditation.morning": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morning & Energy"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fókusz & Termelékenység"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reggel & Energia"
           }
         }
       }
     },
-    "meditation.morning" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Morning & Energy"
+    "meditation.sleep": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep & Rest"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reggel & Energia"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alvás & Pihenés"
           }
         }
       }
     },
-    "meditation.sleep" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleep & Rest"
+    "Month": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Month"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alvás & Pihenés"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hónap"
           }
         }
       }
     },
-    "Month" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Month"
+    "Monthly": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monthly"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hónap"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Havi"
           }
         }
       }
     },
-    "Monthly" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monthly"
+    "Mood": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mood"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Havi"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangulat"
           }
         }
       }
     },
-    "Mood" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mood"
+    "mood.good": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hangulat"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jó"
           }
         }
       }
     },
-    "mood.good" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Good"
+    "mood.great": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Great"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jó"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagyszerű"
           }
         }
       }
     },
-    "mood.great" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Great"
+    "mood.low": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nagyszerű"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Levert"
           }
         }
       }
     },
-    "mood.low" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Low"
+    "mood.okay": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okay"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Levert"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oké"
           }
         }
       }
     },
-    "mood.okay" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Okay"
+    "mood.rough": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rough"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oké"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rossz"
           }
         }
       }
     },
-    "mood.rough" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rough"
+    "Next": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rossz"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Következő"
           }
         }
       }
     },
-    "Next" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Next"
+    "No check-ins in the last 30 days": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No check-ins in the last 30 days"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Következő"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nincs bejelentkezés az elmúlt 30 napban"
           }
         }
       }
     },
-    "No check-ins in the last 30 days" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No check-ins in the last 30 days"
+    "Pause": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nincs bejelentkezés az elmúlt 30 napban"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szünet"
           }
         }
       }
     },
-    "Pause" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pause"
+    "paywall.aiAffirmations.subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalized with Apple Intelligence"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Szünet"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Személyre szabva Apple Intelligence-szel"
           }
         }
       }
     },
-    "paywall.aiAffirmations.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Personalized with Apple Intelligence"
+    "paywall.aiAffirmations.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Affirmations"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Személyre szabva Apple Intelligence-szel"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI megerősítések"
           }
         }
       }
     },
-    "paywall.aiAffirmations.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI Affirmations"
+    "paywall.allCategories.subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confidence, Health, Relationships & more"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI megerősítések"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magabiztosság, egészség, kapcsolatok és több"
           }
         }
       }
     },
-    "paywall.allCategories.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confidence, Health, Relationships & more"
+    "paywall.allCategories.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Categories"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Magabiztosság, egészség, kapcsolatok és több"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Összes kategória"
           }
         }
       }
     },
-    "paywall.allCategories.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All Categories"
+    "paywall.customReminder.subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set your perfect daily moment"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Összes kategória"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Állítsd be a tökéletes napi pillanatot"
           }
         }
       }
     },
-    "paywall.customReminder.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set your perfect daily moment"
+    "paywall.customReminder.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom Reminder Time"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Állítsd be a tökéletes napi pillanatot"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egyéni emlékeztető időpont"
           }
         }
       }
     },
-    "paywall.customReminder.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Custom Reminder Time"
+    "paywall.futureFeatures.subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get everything we build next"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Egyéni emlékeztető időpont"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minden jövőbeli fejlesztés jár"
           }
         }
       }
     },
-    "paywall.futureFeatures.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Get everything we build next"
+    "paywall.futureFeatures.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Future Features"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minden jövőbeli fejlesztés jár"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jövőbeli funkciók"
           }
         }
       }
     },
-    "paywall.futureFeatures.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Future Features"
+    "Pro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jövőbeli funkciók"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro"
           }
         }
       }
     },
-    "Pro" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pro"
+    "PRO": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRO"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pro"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRO"
           }
         }
       }
     },
-    "PRO" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PRO"
+    "Progress": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progress"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PRO"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haladás"
           }
         }
       }
     },
-    "Progress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progress"
+    "Restore Purchase": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore Purchase"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haladás"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vásárlás visszaállítása"
           }
         }
       }
     },
-    "Restore Purchase" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restore Purchase"
+    "Resume": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vásárlás visszaállítása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folytatás"
           }
         }
       }
     },
-    "Resume" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resume"
+    "Save Changes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Changes"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folytatás"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Változtatások mentése"
           }
         }
       }
     },
-    "Save Changes" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save Changes"
+    "Select the topics you want to focus on.\nAt least one must be selected.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select the topics you want to focus on.\nAt least one must be selected."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Változtatások mentése"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válaszd ki a témákat, amelyekre fókuszálni szeretnél.\nLegalább egyet kötelező kiválasztani."
           }
         }
       }
     },
-    "Select the topics you want to focus on.\nAt least one must be selected." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select the topics you want to focus on.\nAt least one must be selected."
+    "Session Complete": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session Complete"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Válaszd ki a témákat, amelyekre fókuszálni szeretnél.\nLegalább egyet kötelező kiválasztani."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ülés befejezve"
           }
         }
       }
     },
-    "Session Complete" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session Complete"
+    "settings.affirmationCategories": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AFFIRMATION CATEGORIES"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ülés befejezve"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEGERŐSÍTÉSI KATEGÓRIÁK"
           }
         }
       }
     },
-    "settings.affirmationCategories" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AFFIRMATION CATEGORIES"
+    "settings.appearance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "APPEARANCE"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MEGERŐSÍTÉSI KATEGÓRIÁK"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEGJELENÉS"
           }
         }
       }
     },
-    "settings.appearance" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APPEARANCE"
+    "settings.appearance.dark": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dark"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MEGJELENÉS"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sötét"
           }
         }
       }
     },
-    "settings.appearance.dark" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dark"
+    "settings.appearance.light": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sötét"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Világos"
           }
         }
       }
     },
-    "settings.appearance.light" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Light"
+    "settings.appearance.system": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Világos"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rendszer"
           }
         }
       }
     },
-    "settings.appearance.system" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "System"
+    "settings.appleIntelligence": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "APPLE INTELLIGENCE"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rendszer"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "APPLE INTELLIGENCE"
           }
         }
       }
     },
-    "settings.appleIntelligence" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APPLE INTELLIGENCE"
+    "settings.appleIntelligenceHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After check-in, generate a personalized affirmation using on-device AI. Requires iPhone 15 Pro or newer."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APPLE INTELLIGENCE"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bejelentkezés után személyre szabott megerősítést generál az eszközön futó AI-jal. iPhone 15 Pro vagy újabb szükséges."
           }
         }
       }
     },
-    "settings.appleIntelligenceHint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After check-in, generate a personalized affirmation using on-device AI. Requires iPhone 15 Pro or newer."
+    "settings.appleIntelligenceToggle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bejelentkezés után személyre szabott megerősítést generál az eszközön futó AI-jal. iPhone 15 Pro vagy újabb szükséges."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence"
           }
         }
       }
     },
-    "settings.appleIntelligenceToggle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Intelligence"
+    "settings.changeCategories": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change categories"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Intelligence"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategóriák módosítása"
           }
         }
       }
     },
-    "settings.changeCategories" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Change categories"
+    "settings.changeName": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change name"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kategóriák módosítása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Név módosítása"
           }
         }
       }
     },
-    "settings.changeName" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Change name"
+    "settings.dailyReminder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily 9am Reminder"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Név módosítása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Napi emlékeztető (9:00)"
           }
         }
       }
     },
-    "settings.dailyReminder" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daily 9am Reminder"
+    "settings.language": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LANGUAGE"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Napi emlékeztető (9:00)"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NYELV"
           }
         }
       }
     },
-    "settings.language" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LANGUAGE"
+    "settings.language.cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NYELV"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mégse"
           }
         }
       }
     },
-    "settings.language.cancel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
+    "settings.language.ok": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mégse"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         }
       }
     },
-    "settings.language.ok" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
+    "settings.language.restartAlertMessage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app will restart to apply the language change."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az alkalmazás újraindul a nyelvváltás alkalmazásához."
           }
         }
       }
     },
-    "settings.language.restartAlertMessage" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The app will restart to apply the language change."
+    "settings.language.restartAlertTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language Change"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Az alkalmazás újraindul a nyelvváltás alkalmazásához."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nyelv módosítása"
           }
         }
       }
     },
-    "settings.language.restartAlertTitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language Change"
+    "settings.notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NOTIFICATIONS"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nyelv módosítása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ÉRTESÍTÉSEK"
           }
         }
       }
     },
-    "settings.notifications" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NOTIFICATIONS"
+    "settings.subscription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SUBSCRIPTION"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ÉRTESÍTÉSEK"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ELŐFIZETÉS"
           }
         }
       }
     },
-    "settings.subscription" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SUBSCRIPTION"
+    "settings.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ELŐFIZETÉS"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beállítások"
           }
         }
       }
     },
-    "settings.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
+    "settings.unlockFeatures": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock all categories & features"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beállítások"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Összes kategória és funkció feloldása"
           }
         }
       }
     },
-    "settings.unlockFeatures" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock all categories & features"
+    "settings.upgradeToPro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Összes kategória és funkció feloldása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Váltás Próra"
           }
         }
       }
     },
-    "settings.upgradeToPro" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upgrade to Pro"
+    "settings.yourName": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YOUR NAME"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Váltás Próra"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEVED"
           }
         }
       }
     },
-    "settings.yourName" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YOUR NAME"
+    "settings.yourNamePlaceholder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NEVED"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neved"
           }
         }
       }
     },
-    "settings.yourNamePlaceholder" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your name"
+    "Skip for now": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip for now"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neved"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kihagyom most"
           }
         }
       }
     },
-    "Skip for now" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skip for now"
+    "Stay on track": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stay on track"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kihagyom most"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maradj a pályán"
           }
         }
       }
     },
-    "Stay on track" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stay on track"
+    "Step %lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Step %1$lld of %2$lld"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maradj a pályán"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld. lépés / %2$lld"
           }
         }
       }
     },
-    "Step %lld of %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Step %1$lld of %2$lld"
+    "Take a moment to reflect": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take a moment to reflect"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld. lépés / %2$lld"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szánj egy percet az elmélkedésre"
           }
         }
       }
     },
-    "Take a moment to reflect" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Take a moment to reflect"
+    "Tell me about your feelings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tell me about your feelings"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Szánj egy percet az elmélkedésre"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesélj az érzéseidről"
           }
         }
       }
     },
-    "Tell me about your feelings" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tell me about your feelings"
+    "This is the name shown in your daily greeting.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is the name shown in your daily greeting."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mesélj az érzéseidről"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a név jelenik meg a napi köszöntőben."
           }
         }
       }
     },
-    "This is the name shown in your daily greeting." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This is the name shown in your daily greeting."
+    "TODAY'S AFFIRMATIONS": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODAY'S AFFIRMATIONS"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ez a név jelenik meg a napi köszöntőben."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAI MEGERŐSÍTÉSEK"
           }
         }
       }
     },
-    "TODAY'S AFFIRMATIONS" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "TODAY'S AFFIRMATIONS"
+    "topic.mentalHealth": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mental Health"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MAI MEGERŐSÍTÉSEK"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentális egészség"
           }
         }
       }
     },
-    "topic.mentalHealth" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mental Health"
+    "topic.movement": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Movement & Exercise"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mentális egészség"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mozgás & Edzés"
           }
         }
       }
     },
-    "topic.movement" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Movement & Exercise"
+    "topic.nutrition": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutrition & Gut Health"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mozgás & Edzés"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Táplálkozás & Bélflóra"
           }
         }
       }
     },
-    "topic.nutrition" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nutrition & Gut Health"
+    "topic.sleep": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep & Recovery"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Táplálkozás & Bélflóra"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alvás & Regeneráció"
           }
         }
       }
     },
-    "topic.sleep" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleep & Recovery"
+    "Unlock FocusOnYourself Pro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock FocusOnYourself Pro"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alvás & Regeneráció"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusOnYourself Pro feloldása"
           }
         }
       }
     },
-    "Unlock FocusOnYourself Pro" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock FocusOnYourself Pro"
+    "Unlock Full History": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock Full History"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "FocusOnYourself Pro feloldása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teljes előzmény feloldása"
           }
         }
       }
     },
-    "Unlock Full History" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock Full History"
+    "Unlock trends with Pro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock trends with Pro"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Teljes előzmény feloldása"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trendek feloldása Próval"
           }
         }
       }
     },
-    "Unlock trends with Pro" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock trends with Pro"
+    "We'll send you a gentle reminder at 9:00 AM each morning so you never miss a day.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We'll send you a gentle reminder at 9:00 AM each morning so you never miss a day."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trendek feloldása Próval"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minden reggel 9:00-kor küldünk egy emlékeztetőt, hogy ne hagyj ki egyetlen napot sem."
           }
         }
       }
     },
-    "We'll send you a gentle reminder at 9:00 AM each morning so you never miss a day." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "We'll send you a gentle reminder at 9:00 AM each morning so you never miss a day."
+    "We'll use your name to personalize\nyour daily greetings.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We'll use your name to personalize\nyour daily greetings."
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minden reggel 9:00-kor küldünk egy emlékeztetőt, hogy ne hagyj ki egyetlen napot sem."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A nevedet a napi üdvözlések személyre szabásához használjuk."
           }
         }
       }
     },
-    "We'll use your name to personalize\nyour daily greetings." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "We'll use your name to personalize\nyour daily greetings."
+    "Week": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A nevedet a napi üdvözlések személyre szabásához használjuk."
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hét"
           }
         }
       }
     },
-    "Week" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Week"
+    "What matters\nto you?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What matters\nto you?"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hét"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mi fontos\nneked?"
           }
         }
       }
     },
-    "What matters\nto you?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What matters\nto you?"
+    "What should\nwe call you?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What should\nwe call you?"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mi fontos\nneked?"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hogyan\nszóljunk hozzád?"
           }
         }
       }
     },
-    "What should\nwe call you?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What should\nwe call you?"
+    "Your Day": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Day"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hogyan\nszóljunk hozzád?"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A napod"
           }
         }
       }
     },
-    "Your Day" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your Day"
+    "Your mood today": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your mood today"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A napod"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mai hangulatod"
           }
         }
       }
     },
-    "Your mood today" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your mood today"
+    "Your name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mai hangulatod"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neved"
           }
         }
       }
     },
-    "Your name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your name"
+    "tab.checkin": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CHECK-IN"
           }
         },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neved"
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BEJELENTKEZÉS"
+          }
+        }
+      }
+    },
+    "tab.meditate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEDITATE"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEDITÁLJ"
+          }
+        }
+      }
+    },
+    "tab.progress": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PROGRESS"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HALADÁS"
+          }
+        }
+      }
+    },
+    "tab.settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SETTINGS"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BEÁLLÍTÁSOK"
+          }
+        }
+      }
+    },
+    "greeting.morning": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good morning"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jó reggelt"
+          }
+        }
+      }
+    },
+    "greeting.afternoon": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good afternoon"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jó napot"
+          }
+        }
+      }
+    },
+    "greeting.evening": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good evening"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jó estét"
+          }
+        }
+      }
+    },
+    "history.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "History"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Előzmények"
+          }
+        }
+      }
+    },
+    "history.currentStreak": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current Streak"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jelenlegi sorozat"
+          }
+        }
+      }
+    },
+    "history.longestStreak": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Longest Streak"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leghosszabb sorozat"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

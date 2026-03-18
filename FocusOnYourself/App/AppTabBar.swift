@@ -5,10 +5,10 @@ enum AppTab: CaseIterable {
 
     var label: String {
         switch self {
-        case .checkin:         return "CHECK-IN"
-        case .meditate:        return "MEDITATE"
-        case .historyInsights: return "PROGRESS"
-        case .settings:        return "SETTINGS"
+        case .checkin:         return String(localized: "tab.checkin")
+        case .meditate:        return String(localized: "tab.meditate")
+        case .historyInsights: return String(localized: "tab.progress")
+        case .settings:        return String(localized: "tab.settings")
         }
     }
 

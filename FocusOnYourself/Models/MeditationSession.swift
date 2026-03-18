@@ -8,10 +8,10 @@ enum MeditationCategory: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .morning: return "Morning & Energy"
-        case .focus:   return "Focus & Productivity"
-        case .anxiety: return "Anxiety & Stress"
-        case .sleep:   return "Sleep & Rest"
+        case .morning: return String(localized: "meditation.morning")
+        case .focus:   return String(localized: "meditation.focus")
+        case .anxiety: return String(localized: "meditation.anxiety")
+        case .sleep:   return String(localized: "meditation.sleep")
         }
     }
 

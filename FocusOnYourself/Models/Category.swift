@@ -5,12 +5,12 @@ enum AffirmationCategory: String, CaseIterable, Codable, Identifiable {
     var id: String { rawValue }
     var displayName: String {
         switch self {
-        case .confidence:    return "Confidence & Self-Worth"
-        case .health:        return "Health & Body"
-        case .relationships: return "Relationships & Love"
-        case .mindfulness:   return "Mindfulness & Calm"
-        case .career:        return "Career & Success"
-        case .resilience:    return "Resilience & Strength"
+        case .confidence:    return String(localized: "category.confidence")
+        case .health:        return String(localized: "category.health")
+        case .relationships: return String(localized: "category.relationships")
+        case .mindfulness:   return String(localized: "category.mindfulness")
+        case .career:        return String(localized: "category.career")
+        case .resilience:    return String(localized: "category.resilience")
         }
     }
     var isFree: Bool {

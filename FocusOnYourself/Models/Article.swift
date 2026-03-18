@@ -8,10 +8,10 @@ enum ArticleTopic: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .sleep:        return "Sleep & Recovery"
-        case .mentalHealth: return "Mental Health"
-        case .nutrition:    return "Nutrition & Gut Health"
-        case .movement:     return "Movement & Exercise"
+        case .sleep:        return String(localized: "topic.sleep")
+        case .mentalHealth: return String(localized: "topic.mentalHealth")
+        case .nutrition:    return String(localized: "topic.nutrition")
+        case .movement:     return String(localized: "topic.movement")
         }
     }
 

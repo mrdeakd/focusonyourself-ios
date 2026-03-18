@@ -8,11 +8,11 @@ enum Mood: String, CaseIterable, Codable, Identifiable {
     }
     var displayName: String {
         switch self {
-        case .rough: return "Rough"
-        case .low:   return "Low"
-        case .okay:  return "Okay"
-        case .good:  return "Good"
-        case .great: return "Great"
+        case .rough: return String(localized: "mood.rough")
+        case .low:   return String(localized: "mood.low")
+        case .okay:  return String(localized: "mood.okay")
+        case .good:  return String(localized: "mood.good")
+        case .great: return String(localized: "mood.great")
         }
     }
 

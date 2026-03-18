@@ -22,16 +22,13 @@ final class InsightsViewModel {
 
     func averageMood(days: Int) -> Mood? {
         let checkIns = recentCheckIns(days: days)
-        guard !checkIns.isEmpty else { return nil }
-        let avg = Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
-        let rounded = Int(avg.rounded())
-        return Mood.allCases.first { $0.numericValue == rounded }
+        guard let avg = averageMoodDouble(from: checkIns) else { return nil }
+        return Mood.allCases.first { $0.numericValue == Int(avg.rounded()) }
     }
 
     func averageMoodText(days: Int) -> String {
         let checkIns = recentCheckIns(days: days)
-        guard !checkIns.isEmpty else { return "—" }
-        let avg = Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
+        guard let avg = averageMoodDouble(from: checkIns) else { return "—" }
         let rounded = Int(avg.rounded())
         return Mood.allCases.first { $0.numericValue == rounded }?.displayName ?? "—"
     }
@@ -62,9 +59,7 @@ final class InsightsViewModel {
             let checkIns = profileService.profile.checkIns.filter {
                 weekInterval.contains($0.date)
             }
-            let avg = checkIns.isEmpty
-                ? 0.0
-                : Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
+            let avg = averageMoodDouble(from: checkIns) ?? 0.0
             return (week: weekInterval.start.weekStart, avg: avg)
         }
     }
@@ -81,9 +76,7 @@ final class InsightsViewModel {
             let checkIns = profileService.profile.checkIns.filter {
                 monthInterval.contains($0.date)
             }
-            let avg = checkIns.isEmpty
-                ? 0.0
-                : Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
+            let avg = averageMoodDouble(from: checkIns) ?? 0.0
             return (month: monthInterval.start.monthAbbreviated, avg: avg)
         }
     }
@@ -93,6 +86,11 @@ final class InsightsViewModel {
         return Mood.allCases.reversed().map { mood in
             (mood: mood, count: checkIns.filter { $0.mood == mood }.count)
         }
+    }
+
+    private func averageMoodDouble(from checkIns: [CheckIn]) -> Double? {
+        guard !checkIns.isEmpty else { return nil }
+        return Double(checkIns.map { $0.mood.numericValue }.reduce(0, +)) / Double(checkIns.count)
     }
 
     // Best day of week by average mood over `days` days (Pro feature)

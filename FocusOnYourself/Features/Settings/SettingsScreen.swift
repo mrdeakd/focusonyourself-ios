@@ -44,6 +44,7 @@ struct SettingsScreen: View {
                     .padding(.horizontal, Spacing.screenHorizontal)
                     .padding(.bottom, Spacing.lg)
                 }
+                .scrollIndicators(.hidden)
             }
         }
         .sheet(isPresented: $showChangeNameSheet) {
@@ -246,5 +247,4 @@ struct SettingsScreen: View {
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
-
 }

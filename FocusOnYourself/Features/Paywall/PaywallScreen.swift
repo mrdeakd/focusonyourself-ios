@@ -1,15 +1,15 @@
-import SwiftUI
 import StoreKit
+import SwiftUI
 
 struct PaywallScreen: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = PaywallViewModel()
 
     private let benefits: [(symbol: String, title: String, subtitle: String)] = [
-        ("lock.open",  "All Categories",         "Confidence, Health, Relationships & more"),
-        ("sparkles",   "AI Affirmations",         "Personalized with Apple Intelligence"),
-        ("timer",      "Custom Reminder Time",    "Set your perfect daily moment"),
-        ("gift",       "Future Features",         "Get everything we build next"),
+        ("lock.open", "All Categories", "Confidence, Health, Relationships & more"),
+        ("sparkles", "AI Affirmations", "Personalized with Apple Intelligence"),
+        ("timer", "Custom Reminder Time", "Set your perfect daily moment"),
+        ("gift", "Future Features", "Get everything we build next")
     ]
 
     private let defaultMonthlyPrice = "$2.99/mo"

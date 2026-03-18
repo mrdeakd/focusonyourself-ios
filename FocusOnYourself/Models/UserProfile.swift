@@ -7,5 +7,5 @@ struct UserProfile: Codable, Equatable {
     var appleIntelligenceEnabled: Bool = false
     var onboardingCompleted: Bool = false
     var checkIns: [CheckIn] = []
-    var appearanceOverride: String? = nil
+    var appearanceOverride: String?
 }

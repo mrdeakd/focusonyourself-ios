@@ -40,7 +40,7 @@ final class ArticlesService: ArticlesServiceProtocol {
     private func dateHash(_ date: Date) -> UInt64 {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        let s = formatter.string(from: date)
-        return s.unicodeScalars.reduce(UInt64(5381)) { ($0 &* 31) &+ UInt64($1.value) }
+        let dateString = formatter.string(from: date)
+        return dateString.unicodeScalars.reduce(UInt64(5381)) { ($0 &* 31) &+ UInt64($1.value) }
     }
 }

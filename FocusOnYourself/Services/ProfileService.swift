@@ -78,15 +78,17 @@ final class ProfileService: ProfileServiceProtocol {
         let sorted = checkInDates.sorted()
         var longest = 0
         var run = 0
-        var prev: Date? = nil
-        for d in sorted {
-            if let p = prev, let expected = cal.date(byAdding: .day, value: 1, to: p), expected == d {
+        var prev: Date?
+        for checkInDate in sorted {
+            if let prevDate = prev,
+               let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
+               expected == checkInDate {
                 run += 1
             } else {
                 run = 1
             }
             if run > longest { longest = run }
-            prev = d
+            prev = checkInDate
         }
 
         return (current: current, longest: longest)
@@ -118,7 +120,7 @@ final class ProfileService: ProfileServiceProtocol {
         if !checkInDates.contains(day) {
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day
         }
-        var start: Date? = nil
+        var start: Date?
         while checkInDates.contains(day) {
             start = day
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day

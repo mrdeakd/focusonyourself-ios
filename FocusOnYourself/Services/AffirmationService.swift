@@ -27,7 +27,11 @@ final class AffirmationService: AffirmationServiceProtocol {
         userDefaultsService.setString(.affirmationCacheDate, value: CheckIn.dateString(for: Date()))
     }
 
-    func generateBatch(count: Int, for categories: [AffirmationCategory], useAppleIntelligence: Bool) async throws -> [(quote: String, category: AffirmationCategory)] {
+    func generateBatch(
+        count: Int,
+        for categories: [AffirmationCategory],
+        useAppleIntelligence: Bool
+    ) async throws -> [(quote: String, category: AffirmationCategory)] {
         guard !categories.isEmpty else { return [] }
 
         if useAppleIntelligence {
@@ -39,20 +43,23 @@ final class AffirmationService: AffirmationServiceProtocol {
 
     // MARK: - Apple Intelligence path
 
-    private func generateWithAppleIntelligence(count: Int, categories: [AffirmationCategory]) async throws -> [(quote: String, category: AffirmationCategory)] {
+    private func generateWithAppleIntelligence(
+        count: Int,
+        categories: [AffirmationCategory]
+    ) async throws -> [(quote: String, category: AffirmationCategory)] {
         let counts = distribute(total: count, across: categories.count)
         var results: [(quote: String, category: AffirmationCategory)] = []
 
-        for (category, n) in zip(categories, counts) {
+        for (category, affirmationCount) in zip(categories, counts) {
             let prompt = """
-                Write \(n) short, powerful daily affirmations in the theme of: \(category.displayName). \
+                Write \(affirmationCount) short, powerful daily affirmations in the theme of: \(category.displayName). \
                 Use first person ("I am", "I have", or "I choose"). \
                 Format as a numbered list (1. ... 2. ... etc.), one affirmation per line. \
                 Return only the affirmation texts, no explanations.
                 """
             let session = LanguageModelSession()
             let response = try await session.respond(to: prompt)
-            let quotes = parseNumberedList(response.content, expected: n)
+            let quotes = parseNumberedList(response.content, expected: affirmationCount)
             results += quotes.map { (quote: $0, category: category) }
         }
 

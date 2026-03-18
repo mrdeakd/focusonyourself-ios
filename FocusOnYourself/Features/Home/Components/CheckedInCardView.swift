@@ -48,6 +48,6 @@ struct CheckedInCardView: View {
                 .clipShape(Capsule())
             }
         }
-        .alignmentGuide(.firstTextBaseline) { d in d[.firstTextBaseline] }
+        .alignmentGuide(.firstTextBaseline) { dims in dims[.firstTextBaseline] }
     }
 }

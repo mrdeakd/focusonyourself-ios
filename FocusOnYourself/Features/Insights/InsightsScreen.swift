@@ -1,5 +1,5 @@
-import SwiftUI
 import Charts
+import SwiftUI
 
 private let cardCornerRadius: CGFloat = 18
 
@@ -96,5 +96,4 @@ struct InsightsScreen: View {
         }
         .buttonStyle(.plain)
     }
-
 }

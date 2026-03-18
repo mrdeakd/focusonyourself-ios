@@ -1,5 +1,5 @@
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 struct MoodEntry: TimelineEntry {
     let date: Date

@@ -1,5 +1,5 @@
-import SwiftUI
 import Charts
+import SwiftUI
 
 private let cardCornerRadius: CGFloat = 18
 private let chartHeight: CGFloat = 160

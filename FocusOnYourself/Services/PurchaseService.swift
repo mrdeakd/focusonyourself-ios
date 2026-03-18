@@ -22,7 +22,6 @@ private let kProductAnnualID  = "com.focusonyourself.pro.annual.renewal"
 @Observable
 @MainActor
 final class PurchaseService: PurchaseServiceProtocol {
-
     let productMonthly = kProductMonthlyID
     let productAnnual  = kProductAnnualID
 
@@ -95,7 +94,7 @@ final class PurchaseService: PurchaseServiceProtocol {
         var hasEntitlement = false
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
-               (transaction.productID == productMonthly || transaction.productID == productAnnual),
+               transaction.productID == productMonthly || transaction.productID == productAnnual,
                transaction.revocationDate == nil {
                 hasEntitlement = true
                 break

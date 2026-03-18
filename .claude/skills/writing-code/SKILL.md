@@ -22,6 +22,10 @@ When writing or modifying any SwiftUI view, **always use the design system const
 
 If a value has no matching token (e.g. a one-off icon size), extract it to a `private let` constant at the top of the struct — never leave magic numbers inline in the view body.
 
+### ScrollView indicators
+
+Always apply `.scrollIndicators(.hidden)` to every `ScrollView`. Never leave the default visible indicator.
+
 ### Color tokens
 
 Full token list: `foyBackground`, `foyNavy`, `foyNavyTint`, `foyForeground`, `foyForegroundSecondary`, `foyPlaceholder`, `foyBorder`, `foyButtonDisabled`, `foyCard`, `foyOrange`, `foyOrangeTint`, `foyMoodBackground`, `foyCalendarSkipped`

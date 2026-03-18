@@ -41,6 +41,7 @@ struct MoodBreakdownSection: View {
                                         : 0
                                     RoundedRectangle(cornerRadius: 4)
                                         .fill(Color.foyNavy)
+                                        // swiftlint:disable:next empty_count
                                         .frame(width: max(fillWidth, item.count > 0 ? 4 : 0))
                                 }
                             }

@@ -3,9 +3,27 @@ import Foundation
 final class ArticlesService: ArticlesServiceProtocol {
     private var loaded: [Article]?
 
+    // MARK: - Internal raw model (includes bilingual fields)
+    private struct RawArticle: Decodable {
+        let id: String
+        let title: String
+        let titleHu: String?
+        let topic: ArticleTopic
+        let readTimeMinutes: Int
+        let body: String
+        let bodyHu: String?
+    }
+
     private func load() -> [Article] {
         if let cached = loaded { return cached }
-        let result = Bundle.main.decodeJSON([Article].self, from: "articles") ?? []
+        let langCode = Locale.current.language.languageCode?.identifier
+        let raw = Bundle.main.decodeJSON([RawArticle].self, from: "articles") ?? []
+        let result = raw.map { raw in
+            let title = (langCode == "hu" ? raw.titleHu : nil) ?? raw.title
+            let body  = (langCode == "hu" ? raw.bodyHu : nil) ?? raw.body
+            return Article(id: raw.id, title: title, topic: raw.topic,
+                           readTimeMinutes: raw.readTimeMinutes, body: body)
+        }
         loaded = result
         return result
     }

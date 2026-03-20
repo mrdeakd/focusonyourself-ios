@@ -12,8 +12,8 @@ struct PaywallScreen: View {
         ("gift", "Future Features", "Get everything we build next")
     ]
 
-    private let defaultMonthlyPrice = "$2.99/mo"
-    private let defaultAnnualPrice  = "$19.99/yr"
+    private let defaultMonthlyPrice = "$1.99/mo"
+    private let defaultAnnualPrice  = "$14.99/yr"
     private let planToggleHeight: CGFloat = 56
     private let bestValueBadgeCornerRadius: CGFloat = 10
     private let loadingOverlay = Color.foyScrim

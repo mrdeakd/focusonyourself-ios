@@ -189,6 +189,8 @@ struct PaywallScreen: View {
                     .foregroundStyle(Color.foyOrange)
                     .multilineTextAlignment(.center)
             }
+
+            PaywallLegalFooterView()
         }
     }
 }

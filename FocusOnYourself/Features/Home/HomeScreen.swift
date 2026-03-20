@@ -13,6 +13,11 @@ struct HomeScreen: View {
             VStack(spacing: Spacing.lg) {
                 headerRow
 
+                if let error = viewModel.error {
+                    InlineErrorView(error: error)
+                        .padding(.horizontal, Spacing.xl)
+                }
+
                 ScrollView {
                     VStack(spacing: Spacing.lg) {
                         AffirmationsCarouselView(

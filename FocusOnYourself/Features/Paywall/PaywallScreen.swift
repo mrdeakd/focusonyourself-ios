@@ -58,9 +58,21 @@ struct PaywallScreen: View {
                     .progressViewStyle(.circular)
                     .tint(.white)
             }
+
+            if viewModel.showSuccess {
+                PaywallSuccessView(onContinue: { viewModel.dismissSuccess() })
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: viewModel.showSuccess)
+        .task {
+            await viewModel.onAppear()
         }
         .onChange(of: viewModel.isPro) { _, isPro in
-            if isPro { dismiss() }
+            if isPro && !viewModel.showSuccess { dismiss() }
+        }
+        .onChange(of: viewModel.shouldDismiss) { _, should in
+            if should { dismiss() }
         }
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color.foyBackground)
@@ -169,10 +181,10 @@ struct PaywallScreen: View {
                     .foregroundStyle(Color.foyOnPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: Spacing.inputHeight)
-                    .background(Color.foyNavy)
+                    .background(viewModel.ctaDisabled ? Color.foyButtonDisabled : Color.foyNavy)
                     .clipShape(RoundedRectangle(cornerRadius: CornerRadius.pill))
             }
-            .disabled(viewModel.isLoading)
+            .disabled(viewModel.ctaDisabled)
 
             Button {
                 viewModel.restore()
@@ -183,11 +195,8 @@ struct PaywallScreen: View {
             }
             .disabled(viewModel.isLoading)
 
-            if let error = viewModel.errorMessage {
-                Text(error)
-                    .font(.foyHint)
-                    .foregroundStyle(Color.foyOrange)
-                    .multilineTextAlignment(.center)
+            if let error = viewModel.error {
+                InlineErrorView(error: error)
             }
 
             PaywallLegalFooterView()

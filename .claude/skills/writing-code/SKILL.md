@@ -406,8 +406,27 @@ enum MyFeatureError: Error {
 ```
 
 - Throw the typed enum from services; catch in ViewModels
-- ViewModels expose `var errorMessage: String?`; populate via `.defaultDescription`
+- ViewModels expose `var error: ErrorInfo?`; populate via `ErrorInfo(title:description:)` with `.defaultDescription` for the description
 - Never use `try?` to suppress errors — catch and surface them via the ViewModel
+
+### Displaying errors in views
+
+Use `InlineErrorView` from `DesignSystem/` to display errors in any view. Never use raw `Text` with `Color.foyOrange` directly.
+
+`ErrorInfo` carries a **title** (problem type, shown bold) and a **description** (detail, shown smaller below):
+
+```swift
+// In ViewModel
+var error: ErrorInfo?
+
+// Setting an error
+error = ErrorInfo(title: "Purchase Failed", description: purchaseError.defaultDescription)
+
+// In View
+if let error = viewModel.error {
+    InlineErrorView(error: error)
+}
+```
 
 ## SwiftLint
 

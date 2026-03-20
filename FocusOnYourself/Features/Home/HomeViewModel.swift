@@ -10,7 +10,7 @@ final class HomeViewModel {
     var feelingsDescription: String = ""
     var isGeneratingAffirmation: Bool = false
     var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
-    var errorMessage: String?
+    var error: ErrorInfo?
 
     @ObservationIgnored @Injected(\.profileService) private var profileService
     @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
@@ -69,7 +69,7 @@ final class HomeViewModel {
             generatedQuotes = pairs
             affirmationService.cacheBatch(pairs)
         } catch {
-            errorMessage = error.localizedDescription
+            self.error = ErrorInfo(title: "Couldn't Load Affirmations", description: error.localizedDescription)
         }
     }
 }

@@ -10,7 +10,9 @@ final class PaywallViewModel {
 
     var selectedPlan: Plan = .annual
     var isLoading = false
-    var errorMessage: String?
+    var error: ErrorInfo?
+    var shouldDismiss = false
+    var showSuccess = false
 
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
@@ -30,6 +32,10 @@ final class PaywallViewModel {
         purchaseService.isPro
     }
 
+    var ctaDisabled: Bool {
+        isLoading || selectedProduct == nil
+    }
+
     var ctaLabel: String {
         guard let offer = selectedProduct?.subscription?.introductoryOffer,
               offer.paymentMode == .freeTrial else {
@@ -42,31 +48,62 @@ final class PaywallViewModel {
         return "Start Free Trial"
     }
 
+    func onAppear() async {
+        await purchaseService.refreshEntitlements()
+    }
+
     func purchase() {
-        guard let product = selectedProduct else { return }
+        error = nil
+
+        guard let product = selectedProduct else {
+            error = ErrorInfo(
+                title: "Products Unavailable",
+                description: "Please try again in a moment."
+            )
+            return
+        }
+
         isLoading = true
-        errorMessage = nil
+
         Task {
             do {
-                try await purchaseService.purchase(product)
-            } catch let error as PurchaseError {
-                if error != .userCancelled {
-                    errorMessage = error.defaultDescription
+                let outcome = try await purchaseService.purchase(product)
+                switch outcome {
+                case .success:
+                    showSuccess = true
+                case .pending:
+                    error = ErrorInfo(
+                        title: "Purchase Pending",
+                        description: "Awaiting approval. You'll get access once it's approved."
+                    )
+                case .cancelled:
+                    break
                 }
+            } catch let purchaseError as PurchaseError {
+                error = ErrorInfo(
+                    title: "Purchase Failed",
+                    description: purchaseError.defaultDescription
+                )
             } catch {}
             isLoading = false
         }
     }
 
+    func dismissSuccess() {
+        shouldDismiss = true
+    }
+
     func restore() {
+        error = nil
+
         isLoading = true
-        errorMessage = nil
+
         Task {
             do {
                 try await purchaseService.restorePurchases()
-            } catch let error as PurchaseError {
-                if error != .userCancelled {
-                    errorMessage = error.defaultDescription
+            } catch let purchaseError as PurchaseError {
+                if purchaseError != .userCancelled {
+                    error = ErrorInfo(title: "Restore Failed", description: purchaseError.defaultDescription)
                 }
             } catch {}
             isLoading = false

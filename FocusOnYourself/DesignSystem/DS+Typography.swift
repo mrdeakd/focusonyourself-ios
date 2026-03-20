@@ -19,7 +19,8 @@ extension Font {
     static let foyButtonLabel  = Font.inter(16, weight: .medium)
     static let foyInputText    = Font.inter(16)
     static let foyHint         = Font.inter(12)
-    static let foySkipLabel    = Font.inter(14)
+    static let foySkipLabel       = Font.inter(14)
+    static let foySkipLabelMedium = Font.inter(14, weight: .medium)
     static let foySectionLabel = Font.inter(11, weight: .medium)
 
     static let foyCaption         = Font.inter(13)

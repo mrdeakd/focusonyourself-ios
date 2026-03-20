@@ -48,12 +48,12 @@ final class PurchaseService: PurchaseServiceProtocol {
         }
     }
 
-    func purchase(_ product: Product) async throws {
+    func purchase(_ product: Product) async throws -> PurchaseOutcome {
         let result: Product.PurchaseResult
         do {
             result = try await product.purchase()
         } catch StoreKitError.userCancelled {
-            throw PurchaseError.userCancelled
+            return .cancelled
         } catch {
             throw PurchaseError.purchaseFailed
         }
@@ -63,10 +63,11 @@ final class PurchaseService: PurchaseServiceProtocol {
             let transaction = try verifiedTransaction(verification)
             await transaction.finish()
             await refreshEntitlements()
+            return .success
         case .userCancelled:
-            throw PurchaseError.userCancelled
+            return .cancelled
         case .pending:
-            break
+            return .pending
         @unknown default:
             throw PurchaseError.purchaseFailed
         }
@@ -90,7 +91,7 @@ final class PurchaseService: PurchaseServiceProtocol {
         }
     }
 
-    private func refreshEntitlements() async {
+    func refreshEntitlements() async {
         var hasEntitlement = false
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,

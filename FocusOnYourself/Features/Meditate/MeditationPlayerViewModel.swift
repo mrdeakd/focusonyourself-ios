@@ -13,6 +13,7 @@ enum MeditationPhase: Equatable {
 final class MeditationPlayerViewModel {
     let session: MeditationSession
     private let audioService: MeditationAudioService
+    @ObservationIgnored @Injected(\.meditationService) private var meditationService
 
     var currentStepIndex: Int = 0
     var isComplete: Bool = false
@@ -31,6 +32,9 @@ final class MeditationPlayerViewModel {
     // MARK: - Computed
 
     var currentStep: MeditationStep { session.steps[currentStepIndex] }
+
+    var localizedTitle: String { meditationService.localizedTitle(for: session) }
+    var localizedCurrentInstruction: String? { meditationService.localizedInstruction(for: currentStep) }
     var stepCount: Int { session.steps.count }
     var progress: Double { guard stepCount > 1 else { return 1 }; return Double(currentStepIndex) / Double(stepCount - 1) }
     var isFirstStep: Bool { currentStepIndex == 0 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ScreenHeaderView<Trailing: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     @ViewBuilder let trailing: () -> Trailing
 
     var body: some View {
@@ -19,7 +19,7 @@ struct ScreenHeaderView<Trailing: View>: View {
 }
 
 extension ScreenHeaderView where Trailing == EmptyView {
-    init(title: String) {
+    init(title: LocalizedStringKey) {
         self.title = title
         self.trailing = { EmptyView() }
     }

@@ -5,7 +5,7 @@ struct CalendarMonthView: View {
     let checkInDates: Set<String>
     var onDayTapped: ((String) -> Void)?
 
-    private let dayLabels = ["S", "M", "T", "W", "T", "F", "S"]
+    private var dayLabels: [String] { Calendar.current.veryShortWeekdaySymbols }
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Text(monthTitle)

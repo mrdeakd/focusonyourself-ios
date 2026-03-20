@@ -11,6 +11,10 @@ final class MeditateViewModel {
 
     var isPro: Bool { purchaseService.isPro }
 
+    func localizedTitle(for session: MeditationSession) -> String {
+        meditationService.localizedTitle(for: session)
+    }
+
     var filteredSessions: [MeditationSession] {
         let categoryOrder = MeditationCategory.allCases
         return meditationService.sessions(for: selectedCategory)

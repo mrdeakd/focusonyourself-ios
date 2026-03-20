@@ -21,7 +21,11 @@ struct MeditateScreen: View {
                             Button {
                                 handleSessionTap(session)
                             } label: {
-                                SessionCardView(session: session, isPro: viewModel.isPro)
+                                SessionCardView(
+                                session: session,
+                                localizedTitle: viewModel.localizedTitle(for: session),
+                                isPro: viewModel.isPro
+                            )
                             }
                             .buttonStyle(.plain)
                         }

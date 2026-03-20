@@ -18,12 +18,14 @@ struct HistoryScreen: View {
 
             VStack(spacing: 0) {
                 if showsHeader {
-                    ScreenHeaderView(title: String(localized: "history.title"))
+                    ScreenHeaderView(title: "history.title")
                 }
 
                 HStack(spacing: Spacing.sm) {
-                    StatCard(label: String(localized: "history.currentStreak"), value: "\(viewModel.streakStats.current) days")
-                    StatCard(label: String(localized: "history.longestStreak"), value: "\(viewModel.streakStats.longest) days")
+                    StatCard(label: String(localized: "history.currentStreak"),
+                             value: "\(viewModel.streakStats.current) \(String(localized: "history.days"))")
+                    StatCard(label: String(localized: "history.longestStreak"),
+                             value: "\(viewModel.streakStats.longest) \(String(localized: "history.days"))")
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.xxxs)

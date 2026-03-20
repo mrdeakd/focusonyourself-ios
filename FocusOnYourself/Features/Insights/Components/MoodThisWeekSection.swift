@@ -14,7 +14,7 @@ struct MoodThisWeekSection: View {
             let data = viewModel.dailyMoodData(days: 7)
 
             if data.allSatisfy({ $0.checkIn == nil }) {
-                emptyChartPlaceholder(message: "No check-ins yet this week")
+                emptyChartPlaceholder(message: String(localized: "insights.noCheckInsThisWeek"))
             } else {
                 Chart(data, id: \.label) { item in
                     BarMark(

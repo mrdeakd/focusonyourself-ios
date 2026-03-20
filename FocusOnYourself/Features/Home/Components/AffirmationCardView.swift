@@ -34,7 +34,7 @@ struct AffirmationCardView: View {
                     .clipShape(RoundedRectangle(cornerRadius: CornerRadius.categoryTag))
                     .redacted(reason: .placeholder)
             } else {
-                Text("#\(category.rawValue)")
+                Text("#\(category.displayName)")
                     .font(.foySectionLabel)
                     .foregroundStyle(Color.foyNavy)
                     .padding(.vertical, Spacing.xxxs)

@@ -1,5 +1,5 @@
 {
-  "version": "2.8",
+  "version": "2.9",
   "children": [
     {
       "type": "frame",
@@ -11391,7 +11391,8 @@
                       "fill": "#ADADAD",
                       "content": "keep it up! 💪",
                       "fontFamily": "Inter",
-                      "fontSize": 10
+                      "fontSize": 10,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -11464,7 +11465,8 @@
                       "fill": "#ADADAD",
                       "content": "logged today ✓",
                       "fontFamily": "Inter",
-                      "fontSize": 10
+                      "fontSize": 10,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -11565,7 +11567,8 @@
                       "width": "fill_container",
                       "content": "How are you feeling today?",
                       "fontFamily": "Inter",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "frame",
@@ -11798,7 +11801,8 @@
                               "fill": "#9C9A97",
                               "content": "day streak",
                               "fontFamily": "Inter",
-                              "fontSize": 11
+                              "fontSize": 11,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11823,7 +11827,8 @@
                               "fill": "#9C9A97",
                               "content": "Today's Focus",
                               "fontFamily": "Inter",
-                              "fontSize": 11
+                              "fontSize": 11,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
@@ -12064,7 +12069,8 @@
                           "fill": "#FFFFFF",
                           "content": "day streak",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -12746,7 +12752,8 @@
               "content": "Check in. Reflect. Grow.",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -12860,7 +12867,8 @@
               "content": "Pick what matters most",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -12974,7 +12982,8 @@
               "content": "Never miss your daily moment",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -13098,13 +13107,13 @@
               "type": "frame",
               "id": "Cl84D",
               "name": "if4",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
                 "url": "./screenshots/appstore/04_home.png",
-                "mode": "fit"
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {
@@ -13200,13 +13209,13 @@
               "type": "frame",
               "id": "wEya7",
               "name": "if6",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./screenshots/appstore/2026-03-17 21.38.25.jpg",
-                "mode": "fit"
+                "url": "./screenshots/appstore/06_home_checkedin.png",
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {
@@ -13292,13 +13301,14 @@
               "content": "Your full check-in history",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
         {
           "type": "frame",
-          "id": "TXif1",
+          "id": "XYrsn",
           "name": "ic7",
           "width": "fill_container",
           "height": "fill_container",
@@ -13312,15 +13322,15 @@
           "children": [
             {
               "type": "frame",
-              "id": "MEFBP",
+              "id": "nfMjk",
               "name": "if7",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./screenshots/appstore/2026-03-17 21.38.19.jpg",
-                "mode": "fit"
+                "url": "./screenshots/appstore/07_history.png",
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {
@@ -13406,7 +13416,8 @@
               "content": "Weekly and monthly trends",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -13428,13 +13439,13 @@
               "type": "frame",
               "id": "yf90f",
               "name": "if8",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./screenshots/appstore/2026-03-17 21.38.29.jpg",
-                "mode": "fit"
+                "url": "./screenshots/appstore/08_insights.png",
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {
@@ -13520,7 +13531,8 @@
               "content": "Categories, reminders, appearance",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -13542,13 +13554,13 @@
               "type": "frame",
               "id": "v8Yxd",
               "name": "if9",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./screenshots/appstore/2026-03-17 21.38.34.jpg",
-                "mode": "fit"
+                "url": "./screenshots/appstore/08_settings.png",
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {
@@ -13634,7 +13646,8 @@
               "content": "AI affirmations · Full history",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 15
+              "fontSize": 15,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -13656,13 +13669,13 @@
               "type": "frame",
               "id": "94vI0",
               "name": "if10",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./screenshots/appstore/2026-03-17 21.38.44.jpg",
-                "mode": "fit"
+                "url": "./screenshots/appstore/09_pro_paywall.png",
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {
@@ -13701,8 +13714,21 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "eUP1d": {
+              "x": 20,
+              "y": 22
+            },
             "Isvbx": {
-              "x": 310
+              "x": 310,
+              "width": "fit_content",
+              "height": "fit_content",
+              "y": 23
+            },
+            "rvBum": {
+              "x": 22
+            },
+            "sbyoG": {
+              "x": 44
             }
           }
         },
@@ -14974,8 +15000,21 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "eUP1d": {
+              "x": 20,
+              "y": 22
+            },
             "Isvbx": {
-              "x": 310
+              "x": 310,
+              "width": "fit_content",
+              "height": "fit_content",
+              "y": 23
+            },
+            "rvBum": {
+              "x": 22
+            },
+            "sbyoG": {
+              "x": 44
             }
           }
         },
@@ -15213,8 +15252,21 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "eUP1d": {
+              "x": 20,
+              "y": 22
+            },
             "Isvbx": {
-              "x": 310
+              "x": 310,
+              "width": "fit_content",
+              "height": "fit_content",
+              "y": 23
+            },
+            "rvBum": {
+              "x": 22
+            },
+            "sbyoG": {
+              "x": 44
             }
           }
         },
@@ -16375,7 +16427,7 @@
     {
       "type": "frame",
       "id": "IYzo8",
-      "x": 8589,
+      "x": 8641,
       "y": 976,
       "name": "10 · Meditate",
       "clip": true,
@@ -16463,13 +16515,13 @@
               "type": "frame",
               "id": "RigY7",
               "name": "ifM",
-              "width": "fill_container",
-              "height": "fill_container",
+              "width": 388,
+              "height": 785,
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./screenshots/appstore/2026-03-17 21.38.08.jpg",
-                "mode": "fit"
+                "url": "./screenshots/appstore/10_meditate.png",
+                "mode": "fill"
               },
               "cornerRadius": 44,
               "effect": {

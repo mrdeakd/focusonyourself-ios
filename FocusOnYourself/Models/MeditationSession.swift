@@ -27,12 +27,14 @@ enum MeditationCategory: String, CaseIterable, Codable {
 
 struct MeditationStep: Codable {
     let instruction: String?
+    let instructionHu: String?
     let silenceDurationSeconds: Int?
 }
 
 struct MeditationSession: Codable, Identifiable {
     let id: String
     let title: String
+    let titleHu: String?
     let category: MeditationCategory
     let durationMinutes: Int
     let isPro: Bool

@@ -15,7 +15,7 @@ struct MonthlyAverageSection: View {
                 let data = viewModel.monthlyAverages()
 
                 if data.allSatisfy({ $0.avg == 0 }) {
-                    emptyChartPlaceholder(message: "Check in regularly to see monthly trends")
+                    emptyChartPlaceholder(message: String(localized: "insights.emptyMonthlyTrend"))
                 } else {
                     Chart(data, id: \.month) { item in
                         BarMark(

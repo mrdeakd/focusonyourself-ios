@@ -18,7 +18,7 @@ struct InsightsScreen: View {
 
             VStack(spacing: 0) {
                 if showsHeader {
-                    ScreenHeaderView(title: "Insights")
+                    ScreenHeaderView(title: "insights.title")
                 }
 
                 statsRow
@@ -58,8 +58,8 @@ struct InsightsScreen: View {
 
     private var statsRow: some View {
         HStack(spacing: Spacing.sm) {
-            StatCard(label: "Avg Mood", value: viewModel.averageMoodText(days: 7))
-            StatCard(label: "This Week", value: "\(viewModel.checkInCount(days: 7))")
+            StatCard(label: String(localized: "insights.avgMood"), value: viewModel.averageMoodText(days: 7))
+            StatCard(label: String(localized: "insights.thisWeek"), value: "\(viewModel.checkInCount(days: 7))")
         }
     }
 

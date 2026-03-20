@@ -4,6 +4,7 @@ import FoundationModels
 
 final class AffirmationService: AffirmationServiceProtocol {
     private var staticAffirmations: [(quote: String, category: AffirmationCategory)]?
+    private var staticAffirmationsLangCode: String?
     private let userDefaultsService: UserDefaultsServiceProtocol
 
     init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
@@ -11,8 +12,7 @@ final class AffirmationService: AffirmationServiceProtocol {
     }
 
     func cachedBatch() -> [(quote: String, category: AffirmationCategory)]? {
-        let today = CheckIn.dateString(for: Date())
-        guard userDefaultsService.getString(.affirmationCacheDate) == today,
+        guard userDefaultsService.getString(.affirmationCacheDate) == cacheKey,
               let data = userDefaultsService.getData(.affirmationCache),
               let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data)
         else { return nil }
@@ -21,6 +21,7 @@ final class AffirmationService: AffirmationServiceProtocol {
 
     func clearDailyCache() {
         userDefaultsService.setString(.affirmationCacheDate, value: "")
+        staticAffirmations = nil
     }
 
     func cacheBatch(_ pairs: [(quote: String, category: AffirmationCategory)]) {
@@ -28,7 +29,12 @@ final class AffirmationService: AffirmationServiceProtocol {
         if let data = try? JSONEncoder().encode(cached) {
             userDefaultsService.setData(.affirmationCache, value: data)
         }
-        userDefaultsService.setString(.affirmationCacheDate, value: CheckIn.dateString(for: Date()))
+        userDefaultsService.setString(.affirmationCacheDate, value: cacheKey)
+    }
+
+    private var cacheKey: String {
+        let langCode = Locale.current.language.languageCode?.identifier ?? "en"
+        return "\(CheckIn.dateString(for: Date()))-\(langCode)"
     }
 
     func generateBatch(
@@ -75,20 +81,21 @@ final class AffirmationService: AffirmationServiceProtocol {
     // MARK: - Static dataset path
 
     private func loadStaticAffirmations() throws -> [(quote: String, category: AffirmationCategory)] {
-        if let cached = staticAffirmations { return cached }
+        let langCode = Locale.current.language.languageCode?.identifier
+        if let cached = staticAffirmations, staticAffirmationsLangCode == langCode { return cached }
 
         guard let url = Bundle.main.url(forResource: "affirmations", withExtension: "json") else {
             throw AffirmationServiceError.datasetNotFound
         }
         let data = try Data(contentsOf: url)
         let decoded = try JSONDecoder().decode([StaticAffirmation].self, from: data)
-        let langCode = Locale.current.language.languageCode?.identifier
         let result = decoded.compactMap { entry -> (quote: String, category: AffirmationCategory)? in
             guard let category = AffirmationCategory(rawValue: entry.category) else { return nil }
             let quote = (langCode == "hu" ? entry.quoteHu : nil) ?? entry.quote
             return (quote: quote, category: category)
         }
         staticAffirmations = result
+        staticAffirmationsLangCode = langCode
         return result
     }
 

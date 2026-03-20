@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SessionCardView: View {
     let session: MeditationSession
+    let localizedTitle: String
     let isPro: Bool
 
     private var isLocked: Bool { session.isPro && !isPro }
@@ -33,7 +34,7 @@ struct SessionCardView: View {
                     }
                 }
 
-                Text(session.title)
+                Text(localizedTitle)
                     .font(.foyBodyMedium)
                     .foregroundStyle(Color.foyForeground)
 

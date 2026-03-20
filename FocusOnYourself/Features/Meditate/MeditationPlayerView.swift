@@ -15,9 +15,9 @@ struct MeditationPlayerView: View {
             Color.foyNavy.ignoresSafeArea()
 
             if viewModel.isComplete {
-                MeditationCompletionView(sessionTitle: session.title, onDone: { dismiss() })
+                MeditationCompletionView(sessionTitle: viewModel.localizedTitle, onDone: { dismiss() })
             } else {
-                MeditationPlayerContentView(session: session, viewModel: viewModel)
+                MeditationPlayerContentView(viewModel: viewModel)
             }
         }
         .preferredColorScheme(.dark)

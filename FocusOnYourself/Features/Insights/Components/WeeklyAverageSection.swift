@@ -15,7 +15,7 @@ struct WeeklyAverageSection: View {
                 let data = viewModel.weeklyAverages()
 
                 if data.allSatisfy({ $0.avg == 0 }) {
-                    emptyChartPlaceholder(message: "Check in daily to see weekly trends")
+                    emptyChartPlaceholder(message: String(localized: "insights.emptyWeeklyTrend"))
                 } else {
                     Chart(data, id: \.week) { item in
                         BarMark(

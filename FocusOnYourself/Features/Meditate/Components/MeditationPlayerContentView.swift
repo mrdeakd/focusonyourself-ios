@@ -1,19 +1,18 @@
 import SwiftUI
 
 struct MeditationPlayerContentView: View {
-    let session: MeditationSession
     let viewModel: MeditationPlayerViewModel
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(session.title)
+            Text(viewModel.localizedTitle)
                 .font(.foyCaption)
                 .foregroundStyle(Color.foyOnPrimary.opacity(0.5))
                 .padding(.top, Spacing.xl)
 
             Spacer()
 
-            if viewModel.phase == .narrating, let instruction = viewModel.currentStep.instruction {
+            if viewModel.phase == .narrating, let instruction = viewModel.localizedCurrentInstruction {
                 Text(instruction)
                     .font(.foyBody)
                     .foregroundStyle(Color.foyOnPrimary)

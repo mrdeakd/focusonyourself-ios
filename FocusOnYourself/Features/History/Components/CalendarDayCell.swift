@@ -1,19 +1,12 @@
 import SwiftUI
 
-enum DayState {
-    case streakDay
-    case skipped
-    case today
-    case future
-    case empty
-}
-
 struct CalendarDayCell: View {
     let day: Int
     let state: DayState
 
     private let cellSize: CGFloat = 32
     private let borderWidth: CGFloat = 1.5
+
     var body: some View {
         ZStack {
             cellBackground
@@ -25,16 +18,13 @@ struct CalendarDayCell: View {
         }
         .frame(width: cellSize, height: cellSize)
         .clipShape(Circle())
-        .overlay(
-            Group {
-                if state == .today {
-                    Circle().stroke(Color.foyNavy, lineWidth: borderWidth)
-                }
+        .overlay {
+            if state == .today {
+                Circle().stroke(Color.foyNavy, lineWidth: borderWidth)
             }
-        )
+        }
     }
 
-    @ViewBuilder
     private var cellBackground: some View {
         switch state {
         case .streakDay: Color.foyNavy

@@ -1,38 +1,26 @@
 import SwiftUI
 
 struct HistoryInsightsScreen: View {
-    private enum Segment: String, CaseIterable {
-        case history = "History"
-        case insights = "Insights"
-    }
-
-    @State private var selectedSegment: Segment = .history
+    @State private var viewModel = HistoryInsightsViewModel()
 
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
-                    Text("Progress")
-                        .font(.foyNavTitle)
-                        .foregroundStyle(Color.foyForeground)
-                    Spacer()
-                }
-                .padding(.horizontal, Spacing.screenHorizontal)
-                .padding(.top, Spacing.lg)
-                .padding(.bottom, Spacing.md)
+                ScreenHeaderView(title: "Progress")
 
-                Picker("", selection: $selectedSegment) {
-                    ForEach(Segment.allCases, id: \.self) { segment in
+                Picker("View", selection: Bindable(viewModel).selectedSegment) {
+                    ForEach(HistoryInsightsViewModel.Segment.allCases, id: \.self) { segment in
                         Text(segment.rawValue).tag(segment)
                     }
                 }
                 .pickerStyle(.segmented)
+                .labelsHidden()
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.sm)
 
-                switch selectedSegment {
+                switch viewModel.selectedSegment {
                 case .history:
                     HistoryScreen(showsHeader: false)
                 case .insights:

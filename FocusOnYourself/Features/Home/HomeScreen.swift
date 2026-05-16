@@ -2,20 +2,21 @@ import SwiftUI
 
 struct HomeScreen: View {
     @State private var viewModel = HomeViewModel()
-    @State private var selectedArticle: Article?
-
-    private let iconSize: CGFloat = 14
 
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: Spacing.lg) {
-                headerRow
+                // Screen has no header: personalized greeting with streak badge
+                HomeHeaderRow(
+                    greeting: viewModel.greeting,
+                    date: viewModel.formattedDate,
+                    streakCount: viewModel.streakCount
+                )
 
                 if let error = viewModel.error {
                     InlineErrorView(error: error)
-                        .padding(.horizontal, Spacing.xl)
                 }
 
                 ScrollView {
@@ -24,11 +25,12 @@ struct HomeScreen: View {
                             affirmations: viewModel.generatedQuotes,
                             isLoading: viewModel.isGeneratingAffirmation
                         )
-                        .padding(.horizontal, -Spacing.xl)
+                        .padding(.horizontal, -Spacing.screenHorizontal)
                         if viewModel.hasCheckedIn {
                             CheckedInCardView(
                                 mood: viewModel.todaysMood,
-                                streakCount: viewModel.streakCount
+                                streakCount: viewModel.streakCount,
+                                viewModel: viewModel
                             )
                         } else {
                             MoodPickerView(
@@ -39,68 +41,36 @@ struct HomeScreen: View {
                             )
                         }
 
-                        articlesSection
+                        HomeArticlesSectionView(
+                            articles: viewModel.articles,
+                            onSelect: { viewModel.selectArticle($0) }
+                        )
                     }
+                    .padding(.bottom, Spacing.screenBottom)
                 }
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
             .padding(.top, Spacing.md)
-            .padding(.horizontal, Spacing.xl)
+            .padding(.horizontal, Spacing.screenHorizontal)
         }
         .simultaneousGesture(TapGesture().onEnded {
             UIApplication.shared.sendAction(
                 #selector(UIResponder.resignFirstResponder),
-                to: nil, from: nil, for: nil
+                to: nil,
+                from: nil,
+                for: nil
             )
         })
-        .sheet(item: $selectedArticle) { article in
+        .sheet(item: Bindable(viewModel).selectedArticle) { article in
             ArticleDetailView(article: article)
         }
+        .sheet(isPresented: Bindable(viewModel).showingContextSheet) {
+            DailyFactorsSheet(viewModel: viewModel)
+        }
         .task {
+            await viewModel.loadArticles()
             await viewModel.generateAffirmationIfNeeded()
-        }
-    }
-
-    private var articlesSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionLabel("HEALTH & WELLNESS")
-
-            ForEach(viewModel.articles.prefix(4)) { article in
-                Button {
-                    selectedArticle = article
-                } label: {
-                    ArticleCardView(article: article)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var headerRow: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: Spacing.xxxs) {
-                Text(viewModel.greeting)
-                    .font(.foyNavTitle)
-                    .foregroundStyle(Color.foyForeground)
-                Text(viewModel.formattedDate)
-                    .font(.foyCaption)
-                    .foregroundStyle(Color.foyForegroundSecondary)
-            }
-            Spacer()
-            HStack(spacing: Spacing.xxs) {
-                Image(systemName: "flame.fill")
-                    .resizable()
-                    .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(Color.foyOrange)
-                Text("\(viewModel.streakCount) days")
-                    .font(.foyCaptionSemibold)
-                    .foregroundStyle(Color.foyOrange)
-            }
-            .padding(.vertical, Spacing.xxs)
-            .padding(.horizontal, Spacing.sm)
-            .background(Color.foyOrangeTint)
-            .clipShape(Capsule())
         }
     }
 }

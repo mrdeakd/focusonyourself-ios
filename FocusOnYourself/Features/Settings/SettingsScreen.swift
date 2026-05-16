@@ -2,250 +2,67 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @State private var viewModel = SettingsViewModel()
-    @State private var showChangeNameSheet = false
-    private let badgePaddingH: CGFloat = 10
-    @State private var showChangeCategoriesSheet = false
-    @State private var showPaywall = false
 
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
-                    Text("Settings")
-                        .font(.foyNavTitle)
-                        .foregroundStyle(Color.foyForeground)
-                    Spacer()
+                ScreenHeaderView(title: "Settings") {
                     Text(viewModel.isPro ? "PRO" : "FREE")
                         .font(.foySectionLabelSemibold)
                         .foregroundStyle(viewModel.isPro ? Color.foyOrangeAccent : Color.foyNavy)
-                        .padding(.horizontal, badgePaddingH)
+                        .padding(.horizontal, Spacing.badgeHorizontal)
                         .padding(.vertical, Spacing.xxxs)
                         .background(viewModel.isPro ? Color.foyOrangeAccent.opacity(0.15) : Color.foyFreeBadgeBg)
                         .clipShape(Capsule())
                 }
-                .padding(.horizontal, Spacing.screenHorizontal)
-                .padding(.top, Spacing.lg)
-                .padding(.bottom, Spacing.md)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.lg) {
                         if !viewModel.isPro {
-                            subscriptionSection
+                            SettingsSubscriptionSection(showPaywall: Bindable(viewModel).showPaywall)
                         }
-                        nameSection
-                        categoriesSection
-                        notificationsSection
-                        appearanceSection
+                        SettingsNameSection(viewModel: viewModel)
+                        SettingsCategoriesSection(viewModel: viewModel)
+                        SettingsNotificationsSection(viewModel: viewModel)
+                        SettingsDailyContextSection(viewModel: viewModel)
+                        SettingsAppearanceSection(viewModel: viewModel)
+                        SettingsResetSection(viewModel: viewModel)
                         if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
-                            appleIntelligenceSection
+                            SettingsAppleIntelligenceSection(viewModel: viewModel)
                         }
                     }
                     .padding(.horizontal, Spacing.screenHorizontal)
-                    .padding(.bottom, Spacing.lg)
+                    .padding(.bottom, Spacing.screenBottom)
                 }
                 .scrollIndicators(.hidden)
             }
         }
-        .sheet(isPresented: $showChangeNameSheet) {
+        .sheet(isPresented: Bindable(viewModel).showChangeNameSheet) {
             ChangeNameSheet(viewModel: viewModel)
         }
-        .sheet(isPresented: $showChangeCategoriesSheet) {
+        .sheet(isPresented: Bindable(viewModel).showChangeCategoriesSheet) {
             ChangeCategoriesSheet(viewModel: viewModel)
         }
-        .sheet(isPresented: $showPaywall) {
+        .sheet(isPresented: Bindable(viewModel).showDailyContextSheet) {
+            DailyContextSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: Bindable(viewModel).showPaywall) {
             PaywallScreen()
         }
-    }
-
-    private var subscriptionSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("SUBSCRIPTION")
-            Button {
-                showPaywall = true
-            } label: {
-                HStack(spacing: Spacing.sm) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: CornerRadius.categoryTag)
-                            .fill(Color.foyUpgradeIconBg)
-                            .frame(width: 36, height: 36)
-                        Image(systemName: "crown.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 18, height: 18)
-                            .foregroundStyle(Color.foyOrangeAccent)
-                    }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Upgrade to Pro")
-                            .font(.foyCaptionMedium)
-                            .foregroundStyle(Color.foyNavy)
-                        Text("Unlock all categories & features")
-                            .font(.foyHint)
-                            .foregroundStyle(Color.foyForegroundSecondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(Color.foyPlaceholder)
-                }
-                .padding(Spacing.md)
+        // swiftlint:disable vertical_parameter_alignment_on_call
+        .confirmationDialog(
+            "Reset All Progress?",
+            isPresented: Bindable(viewModel).showResetConfirmation,
+            titleVisibility: .visible
+        ) { // swiftlint:enable vertical_parameter_alignment_on_call
+            Button("Reset Everything", role: .destructive) {
+                viewModel.resetAllData()
             }
-            .background(Color.foyUpgradeCardBg)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-            .overlay(
-                RoundedRectangle(cornerRadius: CornerRadius.card)
-                    .strokeBorder(Color.foyUpgradeCardBorder, lineWidth: 1)
-            )
-        }
-    }
-
-    private var nameSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("YOUR NAME")
-            VStack(spacing: 0) {
-                HStack {
-                    Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
-                        .font(.foyBody)
-                        .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
-                    Spacer()
-                }
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-
-                Rectangle()
-                    .fill(Color.foyBorder)
-                    .frame(height: 1)
-
-                Button {
-                    showChangeNameSheet = true
-                } label: {
-                    HStack {
-                        Text("Change name")
-                            .font(.foyCaptionMedium)
-                            .foregroundStyle(Color.foyNavy)
-                        Spacer()
-                    }
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.vertical, Spacing.md)
-                }
-            }
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-        }
-    }
-
-    private var categoriesSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("AFFIRMATION CATEGORIES")
-            VStack(spacing: 0) {
-                HStack {
-                    Text(viewModel.currentCategories.map(\.displayName).sorted().joined(separator: ", "))
-                        .font(.foyHint)
-                        .foregroundStyle(Color.foyForegroundSecondary)
-                    Spacer()
-                }
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-
-                Rectangle()
-                    .fill(Color.foyBorder)
-                    .frame(height: 1)
-
-                Button {
-                    showChangeCategoriesSheet = true
-                } label: {
-                    HStack {
-                        Text("Change categories")
-                            .font(.foyCaptionMedium)
-                            .foregroundStyle(Color.foyNavy)
-                        Spacer()
-                    }
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.vertical, Spacing.md)
-                }
-            }
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-        }
-    }
-
-    private var notificationsSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("NOTIFICATIONS")
-            HStack {
-                Text("Daily 9am Reminder")
-                    .font(.foyBody)
-                    .foregroundStyle(Color.foyForeground)
-                Spacer()
-                FOYToggle(isOn: $viewModel.currentNotifications)
-            }
-            .padding(.horizontal, Spacing.md)
-            .padding(.vertical, Spacing.md)
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-        }
-    }
-
-    private var appearanceSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("APPEARANCE")
-            HStack(spacing: Spacing.xs) {
-                ForEach(["System", "Light", "Dark"], id: \.self) { option in
-                    let isSelected = selectedAppearanceOption == option
-                    Button {
-                        viewModel.appearanceOverride = option == "System" ? nil : option.lowercased()
-                    } label: {
-                        Text(option)
-                            .font(.foyCaptionMedium)
-                            .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyPlaceholder)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, Spacing.sm)
-                            .background(isSelected ? Color.foyNavy : Color.foyMoodBackground)
-                            .clipShape(Capsule())
-                    }
-                }
-            }
-            .padding(Spacing.sm)
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-        }
-    }
-
-    private var selectedAppearanceOption: String {
-        switch viewModel.appearanceOverride {
-        case "light": return "Light"
-        case "dark": return "Dark"
-        default: return "System"
-        }
-    }
-
-    private var appleIntelligenceSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("APPLE INTELLIGENCE")
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Apple Intelligence")
-                        .font(.foyBody)
-                        .foregroundStyle(Color.foyForeground)
-                    Spacer()
-                    FOYToggle(isOn: $viewModel.currentAppleIntelligence)
-                }
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-
-                Divider()
-                    .background(Color.foyBorder)
-                    .padding(.horizontal, Spacing.md)
-
-                Text("After check-in, generate a personalized affirmation using on-device AI. Requires iPhone 15 Pro or newer.")
-                    .font(.foyHint)
-                    .foregroundStyle(Color.foyPlaceholder)
-                    .lineSpacing(Spacing.xxs)
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.vertical, Spacing.md)
-            }
-            .background(Color.foyCard)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete all your check-ins, streaks, and settings. This cannot be undone.")
         }
     }
 }

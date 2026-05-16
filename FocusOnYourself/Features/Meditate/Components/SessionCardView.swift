@@ -47,6 +47,7 @@ struct SessionCardView: View {
             Image(systemName: isLocked ? "lock.fill" : "chevron.right")
                 .font(.foyCaptionMedium)
                 .foregroundStyle(isLocked ? Color.foyOrange : Color.foyPlaceholder)
+                .accessibilityHidden(true)
         }
         .padding(Spacing.md)
         .foyCardStyle()

@@ -2,16 +2,13 @@ import Factory
 import Foundation
 import Observation
 
-enum OnboardingStep: Int, CaseIterable {
-    case welcome, name, categories, notifications
-}
-
 @MainActor
 @Observable
 final class OnboardingViewModel {
     var currentStep: OnboardingStep = .welcome
     var nameInput: String = ""
     var selectedCategories: [AffirmationCategory] = []
+    var showPaywall = false
     private(set) var notificationsEnabled = false
     private(set) var isCompleted = false
 
@@ -21,9 +18,15 @@ final class OnboardingViewModel {
 
     var isPro: Bool { purchaseService.isPro }
 
+    var sortedCategories: [AffirmationCategory] {
+        AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }
+    }
+
     var isNameValid: Bool {
         !nameInput.trimmingCharacters(in: .whitespaces).isEmpty
     }
+
+    func requestUnlock() { showPaywall = true }
 
     func advance() {
         let all = OnboardingStep.allCases

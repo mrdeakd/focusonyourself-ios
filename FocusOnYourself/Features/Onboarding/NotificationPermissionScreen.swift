@@ -3,6 +3,7 @@ import SwiftUI
 struct NotificationPermissionScreen: View {
     var viewModel: OnboardingViewModel
 
+    // Screen has no header: onboarding step uses its own title layout
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
@@ -18,6 +19,7 @@ struct NotificationPermissionScreen: View {
                             .scaledToFit()
                             .frame(width: Spacing.iconImage, height: Spacing.iconImage)
                             .foregroundStyle(Color.foyNavy)
+                            .accessibilityHidden(true)
                     }
                     VStack(spacing: Spacing.sm) {
                         Text("Stay on track")

@@ -47,24 +47,13 @@ struct MoodPickerView: View {
                 .font(.foyHintMedium)
                 .foregroundStyle(Color.foyForegroundSecondary)
 
-            ZStack(alignment: .topLeading) {
-                if feelingsDescription.isEmpty {
-                    Text("Express yourself freely…")
-                        .font(.foySkipLabel)
-                        .foregroundStyle(Color.foyPlaceholder)
-                        .padding(.top, Spacing.xs)
-                        .padding(.leading, 4)
-                        .allowsHitTesting(false)
-                }
-                TextEditor(text: $feelingsDescription)
-                    .font(.foySkipLabel)
-                    .foregroundStyle(Color.foyForeground)
-                    .scrollContentBackground(.hidden)
-                    .frame(minHeight: 80)
-                    .focused($isEditorFocused)
-            }
-            .padding(Spacing.sm)
-            .foyCardStyle(cornerRadius: CornerRadius.card)
+            TextField("Express yourself freely…", text: $feelingsDescription, axis: .vertical)
+                .font(.foySkipLabel)
+                .foregroundStyle(Color.foyForeground)
+                .lineLimit(4...)
+                .padding(Spacing.sm)
+                .foyCardStyle(cornerRadius: CornerRadius.card)
+                .focused($isEditorFocused)
         }
     }
 }

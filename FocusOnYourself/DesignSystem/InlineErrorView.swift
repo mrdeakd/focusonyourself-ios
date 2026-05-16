@@ -1,10 +1,5 @@
 import SwiftUI
 
-struct ErrorInfo {
-    let title: String
-    let description: String
-}
-
 struct InlineErrorView: View {
     let error: ErrorInfo
 
@@ -23,14 +18,20 @@ struct InlineErrorView: View {
                     .foregroundStyle(Color.white)
             }
             .frame(width: 32, height: 32)
-            VStack(alignment: .leading, spacing: Spacing.xxxs) {
+            if let description = error.description {
+                VStack(alignment: .leading, spacing: Spacing.xxxs) {
+                    Text(error.title)
+                        .font(.foySkipLabelMedium)
+                        .foregroundStyle(Color.white)
+                    Text(description)
+                        .font(.foyHint)
+                        .foregroundStyle(Color.white.opacity(0.8))
+                        .multilineTextAlignment(.leading)
+                }
+            } else {
                 Text(error.title)
                     .font(.foySkipLabelMedium)
                     .foregroundStyle(Color.white)
-                Text(error.description)
-                    .font(.foyHint)
-                    .foregroundStyle(Color.white.opacity(0.8))
-                    .multilineTextAlignment(.leading)
             }
         }
         .padding(.horizontal, horizontalPadding)

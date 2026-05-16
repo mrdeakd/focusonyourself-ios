@@ -3,16 +3,16 @@ import SwiftUI
 struct NameEntryScreen: View {
     @Bindable var viewModel: OnboardingViewModel
 
-    private let headerInternalGap: CGFloat = 10
     private let inputBorderWidth: CGFloat = 1.5
 
+    // Screen has no header: onboarding step uses its own title layout
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: Spacing.xl) {
-                    VStack(alignment: .leading, spacing: headerInternalGap) {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    VStack(alignment: .leading, spacing: Spacing.badgeHorizontal) {
                         Text("What should\nwe call you?")
                             .foySectionTitleStyle()
                             .foregroundStyle(Color.foyForeground)
@@ -24,10 +24,10 @@ struct NameEntryScreen: View {
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: CornerRadius.input)
                             .fill(Color.foyCard)
-                            .overlay(
+                            .overlay {
                                 RoundedRectangle(cornerRadius: CornerRadius.input)
                                     .stroke(Color.foyBorder, lineWidth: inputBorderWidth)
-                            )
+                            }
                         if viewModel.nameInput.isEmpty {
                             Text("Your name")
                                 .font(.foyInputText)

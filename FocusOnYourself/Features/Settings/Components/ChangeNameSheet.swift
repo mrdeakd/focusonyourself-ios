@@ -12,32 +12,37 @@ struct ChangeNameSheet: View {
 
             SheetHeader(title: "Change name") { dismiss() }
 
-            content
+            VStack(alignment: .leading, spacing: Spacing.lg) {
+                ChangeNameCurrentSection(viewModel: viewModel)
+                ChangeNameNewSection(name: $newName)
+                Text("This is the name shown in your daily greeting.")
+                    .font(.foyHint)
+                    .foregroundStyle(Color.foyPlaceholder)
+
+                Spacer()
+
+                ChangeNameSaveButton(name: newName) {
+                    viewModel.updateName(newName)
+                    dismiss()
+                }
+            }
+            .padding(.top, Spacing.xl)
+            .padding(.horizontal, Spacing.md)
+            .padding(.bottom, Spacing.lg)
         }
         .background(Color.foyBackground)
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color.foyBackground)
     }
+}
 
-    private var content: some View {
-        VStack(alignment: .leading, spacing: Spacing.lg) {
-            currentNameSection
-            newNameSection
-            Text("This is the name shown in your daily greeting.")
-                .font(.foyHint)
-                .foregroundStyle(Color.foyPlaceholder)
+// MARK: - ChangeNameCurrentSection
 
-            Spacer()
+struct ChangeNameCurrentSection: View {
+    let viewModel: SettingsViewModel
 
-            saveButton
-        }
-        .padding(.top, Spacing.xl)
-        .padding(.horizontal, Spacing.md)
-        .padding(.bottom, Spacing.lg)
-    }
-
-    private var currentNameSection: some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             SectionLabel("CURRENT NAME")
             HStack {
@@ -47,6 +52,7 @@ struct ChangeNameSheet: View {
                 Spacer()
                 Image(systemName: "lock")
                     .foregroundStyle(Color.foyPlaceholder)
+                    .accessibilityHidden(true)
             }
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.md)
@@ -54,30 +60,42 @@ struct ChangeNameSheet: View {
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
+}
 
-    private var newNameSection: some View {
+// MARK: - ChangeNameNewSection
+
+struct ChangeNameNewSection: View {
+    @Binding var name: String
+
+    var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             SectionLabel("NEW NAME")
-            TextField("Enter new name", text: $newName)
+            TextField("Enter new name", text: $name)
                 .font(.foyInputText)
                 .foregroundStyle(Color.foyForeground)
                 .padding(.horizontal, Spacing.md)
                 .frame(height: Spacing.inputHeight)
                 .background(Color.foyCard)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-                .overlay(
+                .overlay {
                     RoundedRectangle(cornerRadius: CornerRadius.card)
                         .stroke(Color.foyNavy, lineWidth: 1)
-                )
+                }
         }
     }
+}
 
-    private var saveButton: some View {
+// MARK: - ChangeNameSaveButton
+
+struct ChangeNameSaveButton: View {
+    let name: String
+    let onSave: () -> Void
+
+    var body: some View {
         Button("Save Changes") {
-            viewModel.updateName(newName)
-            dismiss()
+            onSave()
         }
         .buttonStyle(FoyPrimaryButtonStyle())
-        .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
+        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
     }
 }

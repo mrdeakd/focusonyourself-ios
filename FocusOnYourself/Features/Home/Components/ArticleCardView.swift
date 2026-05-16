@@ -33,6 +33,7 @@ struct ArticleCardView: View {
             Image(systemName: "chevron.right")
                 .font(.foyCaptionMedium)
                 .foregroundStyle(Color.foyPlaceholder)
+                .accessibilityHidden(true)
         }
         .padding(Spacing.md)
         .foyCardStyle()

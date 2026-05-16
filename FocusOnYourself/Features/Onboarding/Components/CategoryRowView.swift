@@ -58,14 +58,14 @@ struct CategoryRowView: View {
             .padding(Spacing.md)
             .background(isSelected && !isLocked ? Color.foyNavyTint : Color.foyCard)
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-            .overlay(
+            .overlay {
                 RoundedRectangle(cornerRadius: CornerRadius.card)
                     .stroke(
                         isSelected && !isLocked ? Color.foyNavy : Color.foyBorder,
                         lineWidth: isSelected && !isLocked ? selectedBorderWidth : unselectedBorderWidth
                     )
                     .opacity(isLocked ? lockedOpacity : 1)
-            )
+            }
         }
         .buttonStyle(.plain)
     }

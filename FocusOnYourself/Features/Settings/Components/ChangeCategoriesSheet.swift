@@ -13,11 +13,18 @@ struct ChangeCategoriesSheet: View {
 
             SheetHeader(title: "Change categories") { dismiss() }
 
-            content
+            ChangeCategoriesContent(
+                viewModel: viewModel,
+                draftCategories: $draftCategories,
+                showPaywall: $showPaywall
+            )
 
             Spacer()
 
-            saveWrapper
+            ChangeCategoriesSaveButton(isDisabled: draftCategories.isEmpty) {
+                viewModel.updateCategories(draftCategories)
+                dismiss()
+            }
         }
         .background(Color.foyBackground)
         .presentationDetents([.large])
@@ -30,8 +37,16 @@ struct ChangeCategoriesSheet: View {
             PaywallScreen()
         }
     }
+}
 
-    private var content: some View {
+// MARK: - ChangeCategoriesContent
+
+struct ChangeCategoriesContent: View {
+    let viewModel: SettingsViewModel
+    @Binding var draftCategories: Set<AffirmationCategory>
+    @Binding var showPaywall: Bool
+
+    var body: some View {
         VStack(alignment: .leading, spacing: Spacing.md) {
             Text("Select the topics you want to focus on.\nAt least one must be selected.")
                 .font(.foyCaption)
@@ -39,7 +54,7 @@ struct ChangeCategoriesSheet: View {
                 .lineSpacing(Spacing.xxs)
 
             VStack(spacing: Spacing.sm) {
-                ForEach(AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }) { category in
+                ForEach(viewModel.sortedCategories) { category in
                     let isLocked = !category.isFree && !viewModel.isPro
                     CategoryRowView(
                         category: category,
@@ -61,14 +76,20 @@ struct ChangeCategoriesSheet: View {
         .padding(.horizontal, Spacing.screenHorizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
 
-    private var saveWrapper: some View {
+// MARK: - ChangeCategoriesSaveButton
+
+struct ChangeCategoriesSaveButton: View {
+    let isDisabled: Bool
+    let onSave: () -> Void
+
+    var body: some View {
         Button("Save Changes") {
-            viewModel.updateCategories(draftCategories)
-            dismiss()
+            onSave()
         }
         .buttonStyle(FoyPrimaryButtonStyle())
-        .disabled(draftCategories.isEmpty)
+        .disabled(isDisabled)
         .padding(.top, Spacing.sm)
         .padding(.horizontal, Spacing.screenHorizontal)
         .padding(.bottom, Spacing.xxl)

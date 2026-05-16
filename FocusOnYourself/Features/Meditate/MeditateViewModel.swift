@@ -5,20 +5,38 @@ import Observation
 @Observable @MainActor
 final class MeditateViewModel {
     var selectedCategory: MeditationCategory?
+    var sessions: [MeditationSession] = []
+    var selectedSession: MeditationSession?
+    var showingPaywall = false
+    var error: ErrorInfo?
 
     @ObservationIgnored @Injected(\.meditationService) private var meditationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var isPro: Bool { purchaseService.isPro }
 
-    var filteredSessions: [MeditationSession] {
-        let categoryOrder = MeditationCategory.allCases
-        return meditationService.sessions(for: selectedCategory)
-            .sorted {
-                let catA = categoryOrder.firstIndex(of: $0.category) ?? 0
-                let catB = categoryOrder.firstIndex(of: $1.category) ?? 0
-                if catA != catB { return catA < catB }
-                return !$0.isPro && $1.isPro
-            }
+    func handleSessionTap(_ session: MeditationSession) {
+        if session.isPro && !isPro {
+            showingPaywall = true
+        } else {
+            selectedSession = session
+        }
+    }
+
+    func loadSessions() async {
+        do {
+            let categoryOrder = MeditationCategory.allCases
+            sessions = try await meditationService.sessions(for: selectedCategory)
+                .sorted { lhs, rhs in
+                    let catA = categoryOrder.firstIndex(of: lhs.category) ?? 0
+                    let catB = categoryOrder.firstIndex(of: rhs.category) ?? 0
+                    if catA != catB {
+                        return catA < catB
+                    }
+                    return !lhs.isPro && rhs.isPro
+                }
+        } catch {
+            self.error = ErrorInfo(title: "Couldn't Load Meditations", description: error.localizedDescription)
+        }
     }
 }

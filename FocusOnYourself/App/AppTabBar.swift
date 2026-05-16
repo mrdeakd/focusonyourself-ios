@@ -1,27 +1,5 @@
 import SwiftUI
 
-enum AppTab: CaseIterable {
-    case checkin, meditate, historyInsights, settings
-
-    var label: String {
-        switch self {
-        case .checkin:         return "CHECK-IN"
-        case .meditate:        return "MEDITATE"
-        case .historyInsights: return "PROGRESS"
-        case .settings:        return "SETTINGS"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .checkin:         return "heart.fill"
-        case .meditate:        return "figure.mind.and.body"
-        case .historyInsights: return "chart.bar.fill"
-        case .settings:        return "gearshape"
-        }
-    }
-}
-
 struct AppTabBar: View {
     @Binding var selectedTab: AppTab
     @Namespace private var tabNamespace
@@ -46,10 +24,10 @@ struct AppTabBar: View {
         .frame(height: pillHeight)
         .background(Color.foyCard)
         .clipShape(RoundedRectangle(cornerRadius: pillCornerRadius))
-        .overlay(
+        .overlay {
             RoundedRectangle(cornerRadius: pillCornerRadius)
                 .stroke(Color.foyBorder, lineWidth: 1)
-        )
+        }
         .padding(.horizontal, tabContainerPadding)
         .padding(.top, tabContainerTop)
         .padding(.bottom, tabContainerPadding)

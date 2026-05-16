@@ -38,7 +38,7 @@ final class PaywallViewModel {
 
     var ctaLabel: String {
         guard let offer = selectedProduct?.subscription?.introductoryOffer,
-              offer.paymentMode == .freeTrial else {
+            offer.paymentMode == .freeTrial else {
             return "Subscribe Now"
         }
         let period = offer.period
@@ -84,7 +84,9 @@ final class PaywallViewModel {
                     title: "Purchase Failed",
                     description: purchaseError.defaultDescription
                 )
-            } catch {}
+            } catch {
+                self.error = ErrorInfo(title: "Purchase Failed", description: "Something went wrong. Please try again.")
+            }
             isLoading = false
         }
     }
@@ -105,7 +107,9 @@ final class PaywallViewModel {
                 if purchaseError != .userCancelled {
                     error = ErrorInfo(title: "Restore Failed", description: purchaseError.defaultDescription)
                 }
-            } catch {}
+            } catch {
+                self.error = ErrorInfo(title: "Restore Failed", description: "Something went wrong. Please try again.")
+            }
             isLoading = false
         }
     }

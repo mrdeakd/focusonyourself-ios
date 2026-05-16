@@ -4,7 +4,7 @@ struct CategoryFilterChipsView: View {
     @Bindable var viewModel: MeditateViewModel
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        ScrollView(.horizontal) {
             HStack(spacing: Spacing.xs) {
                 categoryChip(label: "All", category: nil)
                 ForEach(MeditationCategory.allCases, id: \.self) { category in
@@ -13,6 +13,7 @@ struct CategoryFilterChipsView: View {
             }
             .padding(.horizontal, Spacing.screenHorizontal)
         }
+        .scrollIndicators(.hidden)
     }
 
     @ViewBuilder

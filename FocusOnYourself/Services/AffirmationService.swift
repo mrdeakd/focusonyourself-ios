@@ -1,20 +1,21 @@
 import Factory
 import Foundation
 import FoundationModels
+import Observation
 
-final class AffirmationService: AffirmationServiceProtocol {
-    private var staticAffirmations: [(quote: String, category: AffirmationCategory)]?
-    private let userDefaultsService: UserDefaultsServiceProtocol
+@Observable @MainActor final class AffirmationService: AffirmationServiceProtocol {
+    private let networkClient: NetworkClientProtocol
+    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
 
-    init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
-        self.userDefaultsService = userDefaultsService
+    init(networkClient: NetworkClientProtocol) {
+        self.networkClient = networkClient
     }
 
     func cachedBatch() -> [(quote: String, category: AffirmationCategory)]? {
-        let today = CheckIn.dateString(for: Date())
+        let today = CheckIn.dateString(for: Date.now)
         guard userDefaultsService.getString(.affirmationCacheDate) == today,
-              let data = userDefaultsService.getData(.affirmationCache),
-              let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data)
+            let data = userDefaultsService.getData(.affirmationCache),
+            let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data)
         else { return nil }
         return cached.map { (quote: $0.quote, category: $0.category) }
     }
@@ -24,7 +25,7 @@ final class AffirmationService: AffirmationServiceProtocol {
         if let data = try? JSONEncoder().encode(cached) {
             userDefaultsService.setData(.affirmationCache, value: data)
         }
-        userDefaultsService.setString(.affirmationCacheDate, value: CheckIn.dateString(for: Date()))
+        userDefaultsService.setString(.affirmationCacheDate, value: CheckIn.dateString(for: Date.now))
     }
 
     func generateBatch(
@@ -37,7 +38,10 @@ final class AffirmationService: AffirmationServiceProtocol {
         if useAppleIntelligence {
             return try await generateWithAppleIntelligence(count: count, categories: categories)
         } else {
-            return try loadStaticBatch(count: count, categories: categories)
+            let categoryParams = categories.map(\.rawValue).joined(separator: ",")
+            let path = "/api/affirmations/batch?categories=\(categoryParams)&count=\(count)"
+            let items: [CachedAffirmation] = try await networkClient.get(path)
+            return items.map { (quote: $0.quote, category: $0.category) }
         }
     }
 
@@ -66,38 +70,10 @@ final class AffirmationService: AffirmationServiceProtocol {
         return results
     }
 
-    // MARK: - Static dataset path
-
-    private func loadStaticAffirmations() throws -> [(quote: String, category: AffirmationCategory)] {
-        if let cached = staticAffirmations { return cached }
-
-        guard let url = Bundle.main.url(forResource: "affirmations", withExtension: "json") else {
-            throw AffirmationServiceError.datasetNotFound
-        }
-        let data = try Data(contentsOf: url)
-        let decoded = try JSONDecoder().decode([StaticAffirmation].self, from: data)
-        let result = decoded.compactMap { entry -> (quote: String, category: AffirmationCategory)? in
-            guard let category = AffirmationCategory(rawValue: entry.category) else { return nil }
-            return (quote: entry.quote, category: category)
-        }
-        staticAffirmations = result
-        return result
-    }
-
-    private func loadStaticBatch(
-        count: Int, categories: [AffirmationCategory]
-    ) throws -> [(quote: String, category: AffirmationCategory)] {
-        let all = try loadStaticAffirmations()
-        let categorySet = Set(categories)
-        let filtered = all.filter { categorySet.contains($0.category) }
-        guard !filtered.isEmpty else { return [] }
-        let shuffled = filtered.shuffled()
-        return Array(shuffled.prefix(count))
-    }
-
     // MARK: - Helpers
 
     private func distribute(total: Int, across count: Int) -> [Int] {
+        // swiftlint:disable:next empty_count
         guard count > 0 else { return [] }
         var counts = [Int](repeating: 1, count: count)
         var remaining = total - count
@@ -114,25 +90,11 @@ final class AffirmationService: AffirmationServiceProtocol {
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { continue }
-            let stripped = trimmed.replacingOccurrences(
-                of: #"^\d+\.\s*"#,
-                with: "",
-                options: .regularExpression
-            )
+            let stripped = trimmed.replacing(#/^\d+\.\s*/#, with: "")
             if !stripped.isEmpty {
                 results.append(stripped)
             }
         }
         return Array(results.prefix(expected))
-    }
-}
-
-enum AffirmationServiceError: Error {
-    case datasetNotFound
-
-    var defaultDescription: String {
-        switch self {
-        case .datasetNotFound: return "The affirmations dataset could not be found."
-        }
     }
 }

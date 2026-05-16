@@ -3,7 +3,7 @@ import SwiftUI
 struct AffirmationCardView: View {
     let quote: String
     let category: AffirmationCategory
-    var isLoading: Bool = false
+    var isLoading = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {

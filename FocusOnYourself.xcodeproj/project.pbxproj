@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B01BDE972FB83B6000F94C10 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B01BDE962FB83B6000F94C10 /* HealthKit.framework */; };
 		B031FB0C2F671B0B0093CA57 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B031FB0B2F671B0B0093CA57 /* StoreKit.framework */; };
 		B0F0A89E2F68002800C468D1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0F0A89D2F68002800C468D1 /* WidgetKit.framework */; };
 		B0F0A8A02F68002800C468D1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0F0A89F2F68002800C468D1 /* SwiftUI.framework */; };
@@ -40,6 +41,7 @@
 
 /* Begin PBXFileReference section */
 		B006DFAB2F63F8680013416E /* FocusOnYourself.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusOnYourself.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B01BDE962FB83B6000F94C10 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		B031FB0B2F671B0B0093CA57 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		B0F0A89C2F68002800C468D1 /* FocusOnYourselfWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusOnYourselfWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0F0A89D2F68002800C468D1 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -48,6 +50,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B01BDE992FB83B7F00F94C10 /* Exceptions for "FocusOnYourself" folder in "FocusOnYourself" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B006DFAA2F63F8680013416E /* FocusOnYourself */;
+		};
 		B0F0A8AC2F68002900C468D1 /* Exceptions for "FocusOnYourselfWidgets" folder in "FocusOnYourselfWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -60,6 +69,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B006DFAD2F63F8680013416E /* FocusOnYourself */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B01BDE992FB83B7F00F94C10 /* Exceptions for "FocusOnYourself" folder in "FocusOnYourself" target */,
+			);
 			path = FocusOnYourself;
 			sourceTree = "<group>";
 		};
@@ -78,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B01BDE972FB83B6000F94C10 /* HealthKit.framework in Frameworks */,
 				B031FB0C2F671B0B0093CA57 /* StoreKit.framework in Frameworks */,
 				B0FAC7052F70000000000003 /* Factory in Frameworks */,
 			);
@@ -118,6 +131,7 @@
 		B031FB0A2F671B0B0093CA57 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B01BDE962FB83B6000F94C10 /* HealthKit.framework */,
 				B031FB0B2F671B0B0093CA57 /* StoreKit.framework */,
 				B0F0A89D2F68002800C468D1 /* WidgetKit.framework */,
 				B0F0A89F2F68002800C468D1 /* SwiftUI.framework */,
@@ -414,6 +428,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusOnYourself/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Focus On Yourself";
 				INFOPLIST_KEY_UIAppFonts = "Inter-Regular.ttf Inter-Light.ttf Inter-Medium.ttf Inter-SemiBold.ttf";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -453,6 +469,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusOnYourself/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Focus On Yourself";
 				INFOPLIST_KEY_UIAppFonts = "Inter-Regular.ttf Inter-Light.ttf Inter-Medium.ttf Inter-SemiBold.ttf";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

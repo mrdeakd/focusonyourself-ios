@@ -40,8 +40,8 @@ struct CalendarMonthView: View {
     }
 
     private var cellRows: [[(offset: Int, day: Int, state: DayState, dateKey: String?)]] {
-        stride(from: 0, to: cells.count, by: 7).map {
-            Array(cells[$0..<min($0 + 7, cells.count)])
+        stride(from: 0, to: cells.count, by: 7).map { offset in
+            Array(cells[offset..<min(offset + 7, cells.count)])
         }
     }
 
@@ -51,7 +51,7 @@ struct CalendarMonthView: View {
 
     private var cells: [(offset: Int, day: Int, state: DayState, dateKey: String?)] {
         let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
+        let today = cal.startOfDay(for: Date.now)
 
         let comps = cal.dateComponents([.year, .month], from: month)
         guard let firstDay = cal.date(from: comps) else { return [] }

@@ -1,12 +1,5 @@
 import SwiftUI
 
-private let emojiSize: CGFloat = 52
-private let moodCardPadding: CGFloat = 20
-private let dotSize: CGFloat = 10
-private let dotSpacing: CGFloat = 8
-private let emptyDotFill = Color.foyDetailDotFill
-private let emptyDotStroke = Color.foyDetailDotStroke
-
 struct DayDetailSheet: View {
     let checkIn: CheckIn
 
@@ -25,16 +18,18 @@ struct DayDetailSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             SheetDragHandle()
-            headerSection
+            DayDetailHeaderSection(checkIn: checkIn)
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
-                    moodSection
-                    journalSection
+                    DayMoodSection(checkIn: checkIn, moodLevel: moodLevel)
+                    DayJournalSection(checkIn: checkIn)
                 }
             }
             .scrollIndicators(.hidden)
-            doneButton
-                .padding(.bottom, Spacing.xl)
+            DayDoneButton {
+                dismiss()
+            }
+            .padding(.bottom, Spacing.xl)
         }
         .padding(.horizontal, Spacing.md)
         .background(Color.foyBackground)
@@ -42,10 +37,14 @@ struct DayDetailSheet: View {
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color.foyBackground)
     }
+}
 
-    // MARK: - Subviews
+// MARK: - DayDetailHeaderSection
 
-    private var headerSection: some View {
+struct DayDetailHeaderSection: View {
+    let checkIn: CheckIn
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(checkIn.date.homeScreenFormatted)
                 .font(.foyCaption)
@@ -56,8 +55,18 @@ struct DayDetailSheet: View {
         }
         .padding(.vertical, Spacing.md)
     }
+}
 
-    private var moodSection: some View {
+// MARK: - DayMoodSection
+
+struct DayMoodSection: View {
+    let checkIn: CheckIn
+    let moodLevel: Int
+
+    private let emojiSize: CGFloat = 52
+    private let moodCardPadding: CGFloat = 20
+
+    var body: some View {
         VStack(spacing: Spacing.xs) {
             Image(checkIn.mood.imageName)
                 .renderingMode(.template)
@@ -68,15 +77,26 @@ struct DayDetailSheet: View {
             Text(checkIn.mood.displayName)
                 .font(.foyHeadline)
                 .foregroundStyle(Color.foyNavy)
-            moodDotsRow
+            DayMoodDotsRow(moodLevel: moodLevel)
         }
         .frame(maxWidth: .infinity)
         .padding(moodCardPadding)
         .foyCardStyle(borderColor: .foyNavy)
         .padding(Spacing.xxs)
     }
+}
 
-    private var moodDotsRow: some View {
+// MARK: - DayMoodDotsRow
+
+struct DayMoodDotsRow: View {
+    let moodLevel: Int
+
+    private let dotSize: CGFloat = 10
+    private let dotSpacing: CGFloat = 8
+    private let emptyDotFill = Color.foyDetailDotFill
+    private let emptyDotStroke = Color.foyDetailDotStroke
+
+    var body: some View {
         HStack(spacing: dotSpacing) {
             ForEach(1...5, id: \.self) { index in
                 if index <= moodLevel {
@@ -87,15 +107,21 @@ struct DayDetailSheet: View {
                     Circle()
                         .fill(emptyDotFill)
                         .frame(width: dotSize, height: dotSize)
-                        .overlay(
+                        .overlay {
                             Circle().stroke(emptyDotStroke, lineWidth: 1.5)
-                        )
+                        }
                 }
             }
         }
     }
+}
 
-    private var journalSection: some View {
+// MARK: - DayJournalSection
+
+struct DayJournalSection: View {
+    let checkIn: CheckIn
+
+    var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             SectionLabel("JOURNAL")
             Text(checkIn.feelingsDescription ?? "No notes for this day.")
@@ -104,10 +130,16 @@ struct DayDetailSheet: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
+}
 
-    private var doneButton: some View {
+// MARK: - DayDoneButton
+
+struct DayDoneButton: View {
+    let onDismiss: () -> Void
+
+    var body: some View {
         Button("Done") {
-            dismiss()
+            onDismiss()
         }
         .buttonStyle(FoyPrimaryButtonStyle())
         .padding(.top, Spacing.md)

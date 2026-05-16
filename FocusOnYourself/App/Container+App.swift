@@ -12,18 +12,25 @@ extension Container {
         self { @MainActor in NotificationService() }.singleton
     }
     var affirmationService: Factory<AffirmationServiceProtocol> {
-        self { @MainActor in AffirmationService(userDefaultsService: self.userDefaultsService()) }.singleton
+        self { @MainActor in AffirmationService(networkClient: self.networkClient()) }.singleton
     }
     var purchaseService: Factory<PurchaseServiceProtocol> {
         self { @MainActor in PurchaseService(userDefaultsService: self.userDefaultsService()) }.singleton
     }
+    var networkClient: Factory<NetworkClientProtocol> {
+        self { URLSessionNetworkClient() }.singleton
+    }
     var articlesService: Factory<ArticlesServiceProtocol> {
-        self { ArticlesService() }.singleton
+        self { ArticlesService(networkClient: self.networkClient()) }.singleton
     }
     var meditationService: Factory<MeditationServiceProtocol> {
-        self { MeditationService() }.singleton
+        self { MeditationService(networkClient: self.networkClient()) }.singleton
     }
     var meditationAudioService: Factory<MeditationAudioService> {
         self { @MainActor in MeditationAudioService() }.singleton
+    }
+    @available(iOS 18, *)
+    var healthKitService: Factory<HealthKitService> {
+        self { @MainActor in HealthKitService() }.singleton
     }
 }

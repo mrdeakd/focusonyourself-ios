@@ -31,20 +31,12 @@ struct MoodBreakdownSection: View {
                                 .foregroundStyle(.primary)
                                 .frame(width: 24, alignment: .center)
 
-                            GeometryReader { geo in
-                                ZStack(alignment: .leading) {
-                                    RoundedRectangle(cornerRadius: barCornerRadius)
-                                        .fill(Color.foyNavy.opacity(0.08))
-                                        .frame(maxWidth: .infinity)
-
-                                    let fillWidth = maxCount > 0
-                                        ? geo.size.width * CGFloat(item.count) / CGFloat(maxCount)
-                                        : 0
-                                    RoundedRectangle(cornerRadius: barCornerRadius)
-                                        .fill(Color.foyNavy)
-                                        // swiftlint:disable:next empty_count
-                                        .frame(width: max(fillWidth, item.count > 0 ? 4 : 0))
-                                }
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: barCornerRadius)
+                                    .fill(Color.foyNavy.opacity(0.08))
+                                RoundedRectangle(cornerRadius: barCornerRadius)
+                                    .fill(Color.foyNavy)
+                                    .scaleEffect(x: barScale(count: item.count, max: maxCount), anchor: .leading)
                             }
                             .frame(height: 10)
 
@@ -59,5 +51,13 @@ struct MoodBreakdownSection: View {
         }
         .padding(Spacing.lg)
         .foyCardStyle(borderColor: .foyNavy, cornerRadius: cardCornerRadius)
+    }
+
+    private func barScale(count: Int, max maxCount: Int) -> CGFloat {
+        guard maxCount > 0 else { return 0 }
+        let ratio = CGFloat(count) / CGFloat(maxCount)
+        // swiftlint:disable:next empty_count
+        let minimumScale: CGFloat = count > 0 ? 0.02 : 0
+        return Swift.max(ratio, minimumScale)
     }
 }

@@ -11,7 +11,7 @@ struct SheetHeader: View {
                     .font(.foyNavTitle)
                     .foregroundStyle(Color.foyForeground)
                 Spacer()
-                Button("Cancel", action: onDismiss)
+                Button("Close", action: onDismiss)
                     .font(.foyBodyMedium)
                     .foregroundStyle(Color.foyNavy)
             }

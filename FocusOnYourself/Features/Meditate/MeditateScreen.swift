@@ -2,8 +2,6 @@ import SwiftUI
 
 struct MeditateScreen: View {
     @State private var viewModel = MeditateViewModel()
-    @State private var selectedSession: MeditationSession?
-    @State private var showingPaywall = false
 
     var body: some View {
         ZStack {
@@ -17,9 +15,9 @@ struct MeditateScreen: View {
 
                 ScrollView {
                     LazyVStack(spacing: Spacing.sm) {
-                        ForEach(viewModel.filteredSessions) { session in
+                        ForEach(viewModel.sessions) { session in
                             Button {
-                                handleSessionTap(session)
+                                viewModel.handleSessionTap(session)
                             } label: {
                                 SessionCardView(session: session, isPro: viewModel.isPro)
                             }
@@ -33,19 +31,17 @@ struct MeditateScreen: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .fullScreenCover(item: $selectedSession) { session in
+        .fullScreenCover(item: Bindable(viewModel).selectedSession) { session in
             MeditationPlayerView(session: session)
         }
-        .sheet(isPresented: $showingPaywall) {
+        .sheet(isPresented: Bindable(viewModel).showingPaywall) {
             PaywallScreen()
         }
-    }
-
-    private func handleSessionTap(_ session: MeditationSession) {
-        if session.isPro && !viewModel.isPro {
-            showingPaywall = true
-        } else {
-            selectedSession = session
+        .task {
+            await viewModel.loadSessions()
+        }
+        .onChange(of: viewModel.selectedCategory) {
+            Task { await viewModel.loadSessions() }
         }
     }
 }

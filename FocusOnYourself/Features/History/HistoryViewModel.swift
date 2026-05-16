@@ -14,13 +14,19 @@ final class HistoryViewModel {
         Set(profileService.profile.checkIns.map { $0.dateString })
     }
 
+    var selectedCheckIn: CheckIn?
+
     func checkIn(for dateString: String) -> CheckIn? {
         profileService.profile.checkIns.first { $0.dateString == dateString }
     }
 
+    func selectDay(_ dateString: String) {
+        selectedCheckIn = checkIn(for: dateString)
+    }
+
     var calendarMonths: [Date] {
         let cal = Calendar.current
-        let today = Date()
+        let today = Date.now
 
         let startDate = profileService.earliestCheckInDate ?? today
 

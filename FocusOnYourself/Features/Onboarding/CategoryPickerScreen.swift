@@ -3,13 +3,12 @@ import SwiftUI
 struct CategoryPickerScreen: View {
     var viewModel: OnboardingViewModel
 
-    @State private var showPaywall = false
-
+    // Screen has no header: onboarding step uses its own title layout
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
 
-            VStack(spacing: Spacing.xl) {
+            VStack(spacing: Spacing.lg) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     Text("What matters\nto you?")
                         .foySectionTitleStyle()
@@ -21,7 +20,7 @@ struct CategoryPickerScreen: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 VStack(spacing: Spacing.sm) {
-                    ForEach(AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }) { category in
+                    ForEach(viewModel.sortedCategories) { category in
                         let isLocked = !category.isFree && !viewModel.isPro
                         CategoryRowView(
                             category: category,
@@ -29,7 +28,7 @@ struct CategoryPickerScreen: View {
                             isLocked: isLocked,
                             onTap: {
                                 if isLocked {
-                                    showPaywall = true
+                                    viewModel.requestUnlock()
                                 } else {
                                     viewModel.toggleCategory(category)
                                 }
@@ -56,7 +55,7 @@ struct CategoryPickerScreen: View {
             .padding(.horizontal, Spacing.screenHorizontal)
             .padding(.bottom, Spacing.screenBottom)
         }
-        .sheet(isPresented: $showPaywall) {
+        .sheet(isPresented: Bindable(viewModel).showPaywall) {
             PaywallScreen()
         }
     }
@@ -64,8 +63,8 @@ struct CategoryPickerScreen: View {
 
 #Preview {
     CategoryPickerScreen(viewModel: {
-        let vm = OnboardingViewModel()
-        vm.selectedCategories = [.confidence, .relationships]
-        return vm
+        let viewModel = OnboardingViewModel()
+        viewModel.selectedCategories = [.confidence, .relationships]
+        return viewModel
     }())
 }

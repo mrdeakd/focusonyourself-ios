@@ -8,6 +8,7 @@ final class SettingsViewModel {
     @ObservationIgnored @Injected(\.profileService) private var profileService
     @ObservationIgnored @Injected(\.notificationService) private var notificationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
+    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
 
     var currentName: String {
         profileService.profile.name
@@ -65,5 +66,53 @@ final class SettingsViewModel {
         var profile = profileService.profile
         profile.selectedCategories = Array(categories)
         profileService.updateProfile(profile)
+    }
+
+    var showChangeNameSheet = false
+    var showChangeCategoriesSheet = false
+    var showDailyContextSheet = false
+    var showPaywall = false
+    var showResetConfirmation = false
+
+    var sortedCategories: [AffirmationCategory] {
+        AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }
+    }
+
+    var currentCategoriesSummary: String {
+        currentCategories.map(\.displayName).sorted().joined(separator: ", ")
+    }
+
+    func resetAllData() {
+        profileService.resetAllData()
+    }
+
+    var showSleepFactor: Bool {
+        get { userDefaultsService.getLocalBool(.showSleepFactor, defaultingTo: true) }
+        set { userDefaultsService.setLocalBool(.showSleepFactor, value: newValue) }
+    }
+
+    var showStressFactor: Bool {
+        get { userDefaultsService.getLocalBool(.showStressFactor, defaultingTo: true) }
+        set { userDefaultsService.setLocalBool(.showStressFactor, value: newValue) }
+    }
+
+    var showExerciseFactor: Bool {
+        get { userDefaultsService.getLocalBool(.showExerciseFactor, defaultingTo: true) }
+        set { userDefaultsService.setLocalBool(.showExerciseFactor, value: newValue) }
+    }
+
+    var showSocialFactor: Bool {
+        get { userDefaultsService.getLocalBool(.showSocialFactor, defaultingTo: true) }
+        set { userDefaultsService.setLocalBool(.showSocialFactor, value: newValue) }
+    }
+
+    var activeFactorSummary: String {
+        let labels = [
+            showSleepFactor    ? "Sleep" : nil,
+            showStressFactor   ? "Stress" : nil,
+            showExerciseFactor ? "Exercise" : nil,
+            showSocialFactor   ? "Social" : nil
+        ].compactMap { $0 }
+        return labels.isEmpty ? "None" : labels.joined(separator: ", ")
     }
 }

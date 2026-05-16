@@ -2,7 +2,6 @@ import StoreKit
 import SwiftUI
 
 struct PaywallScreen: View {
-    @Environment(\.dismiss) private var dismiss
     @State private var viewModel = PaywallViewModel()
 
     private let benefits: [(symbol: String, title: String, subtitle: String)] = [
@@ -12,14 +11,9 @@ struct PaywallScreen: View {
         ("gift", "Future Features", "Get everything we build next")
     ]
 
-    private let defaultMonthlyPrice = "$1.99/mo"
-    private let defaultAnnualPrice  = "$14.99/yr"
-    private let planToggleHeight: CGFloat = 56
-    private let bestValueBadgeCornerRadius: CGFloat = 10
     private let loadingOverlay = Color.foyScrim
-    private let dismissButtonBackground = Color.foyMoodBackground
-    private let dismissButtonSize: CGFloat = 32
 
+    // Screen has no header: sheet paywall uses drag handle + custom title layout
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
@@ -28,29 +22,28 @@ struct PaywallScreen: View {
                 VStack(spacing: 0) {
                     SheetDragHandle()
 
-                    dismissButton
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.horizontal, Spacing.screenHorizontal)
-                        .padding(.top, Spacing.xs)
+                    VStack(spacing: 0) {
+                        PaywallDismissButton()
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.top, Spacing.xs)
 
-                    titleSection
-                        .padding(.top, Spacing.sm)
-                        .padding(.horizontal, Spacing.screenHorizontal)
+                        PaywallTitleSection()
+                            .padding(.top, Spacing.sm)
 
-                    benefitsList
-                        .padding(.top, Spacing.xl)
-                        .padding(.horizontal, Spacing.screenHorizontal)
+                        PaywallBenefitsList(benefits: benefits)
+                            .padding(.top, Spacing.xl)
 
-                    planToggle
-                        .padding(.top, Spacing.xl)
-                        .padding(.horizontal, Spacing.screenHorizontal)
+                        PaywallPlanToggle(viewModel: viewModel)
+                            .padding(.top, Spacing.xl)
 
-                    ctaSection
-                        .padding(.top, Spacing.lg)
-                        .padding(.horizontal, Spacing.screenHorizontal)
-                        .padding(.bottom, Spacing.screenBottom)
+                        PaywallCtaSection(viewModel: viewModel)
+                            .padding(.top, Spacing.lg)
+                            .padding(.bottom, Spacing.screenBottom)
+                    }
+                    .padding(.horizontal, Spacing.screenHorizontal)
                 }
             }
+            .scrollIndicators(.hidden)
 
             if viewModel.isLoading {
                 loadingOverlay.ignoresSafeArea()
@@ -78,128 +71,5 @@ struct PaywallScreen: View {
         .presentationBackground(Color.foyBackground)
     }
 
-    private var dismissButton: some View {
-        Button {
-            dismiss()
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(dismissButtonBackground)
-                    .frame(width: dismissButtonSize, height: dismissButtonSize)
-                Image(systemName: "xmark")
-                    .font(.foySkipLabel)
-                    .foregroundStyle(Color.foyForegroundSecondary)
-            }
-        }
-    }
-
-    private var titleSection: some View {
-        VStack(spacing: Spacing.xxs) {
-            Text("Unlock FocusOnYourself Pro")
-                .font(.foyHeadline)
-                .kerning(-0.3)
-                .foregroundStyle(Color.foyForeground)
-                .multilineTextAlignment(.center)
-
-            Text("Everything you need for daily growth")
-                .font(.foyCaption)
-                .foregroundStyle(Color.foyForegroundSecondary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var benefitsList: some View {
-        VStack(spacing: Spacing.xxxs) {
-            ForEach(benefits, id: \.symbol) { benefit in
-                BenefitRow(symbol: benefit.symbol, title: benefit.title, subtitle: benefit.subtitle)
-            }
-        }
-    }
-
-    private var planToggle: some View {
-        HStack(spacing: Spacing.xs) {
-            planButton(
-                plan: .monthly,
-                price: viewModel.monthlyProduct?.displayPrice ?? defaultMonthlyPrice,
-                showBadge: false
-            )
-            planButton(
-                plan: .annual,
-                price: viewModel.annualProduct?.displayPrice ?? defaultAnnualPrice,
-                showBadge: true
-            )
-        }
-    }
-
-    private func planButton(plan: PaywallViewModel.Plan, price: String, showBadge: Bool) -> some View {
-        let isSelected = viewModel.selectedPlan == plan
-
-        return Button {
-            viewModel.selectedPlan = plan
-        } label: {
-            ZStack(alignment: .topTrailing) {
-                VStack(spacing: Spacing.xxs) {
-                    Text(plan == .monthly ? "Monthly" : "Annual")
-                        .font(.foyBodyMedium)
-                        .foregroundStyle(isSelected ? Color.foyOnPrimary : Color.foyForeground)
-
-                    Text(price)
-                        .font(.foyCaption)
-                        .foregroundStyle(isSelected ? Color.foyOnPrimary.opacity(0.7) : Color.foyForegroundSecondary)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: planToggleHeight)
-                .background(isSelected ? Color.foyNavy : Color.foyCard)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.card)
-                        .strokeBorder(isSelected ? Color.clear : Color.foyNavy, lineWidth: 1.5)
-                )
-
-                if showBadge {
-                    Text("Best Value")
-                        .font(.foyMicroMedium)
-                        .foregroundStyle(Color.foyOnPrimary)
-                        .padding(.horizontal, Spacing.xs)
-                        .padding(.vertical, Spacing.xxxs)
-                        .background(Color.foyOrange)
-                        .clipShape(RoundedRectangle(cornerRadius: bestValueBadgeCornerRadius))
-                        .offset(x: -Spacing.xs, y: -Spacing.xs)
-                }
-            }
-        }
-    }
-
-    private var ctaSection: some View {
-        VStack(spacing: Spacing.md) {
-            Button {
-                viewModel.purchase()
-            } label: {
-                Text(viewModel.ctaLabel)
-                    .font(.foyButtonLabel)
-                    .foregroundStyle(Color.foyOnPrimary)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: Spacing.inputHeight)
-                    .background(viewModel.ctaDisabled ? Color.foyButtonDisabled : Color.foyNavy)
-                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.pill))
-            }
-            .disabled(viewModel.ctaDisabled)
-
-            Button {
-                viewModel.restore()
-            } label: {
-                Text("Restore Purchase")
-                    .font(.foyCaption)
-                    .foregroundStyle(Color.foyPlaceholder)
-            }
-            .disabled(viewModel.isLoading)
-
-            if let error = viewModel.error {
-                InlineErrorView(error: error)
-            }
-
-            PaywallLegalFooterView()
-        }
-    }
+    @Environment(\.dismiss) private var dismiss
 }

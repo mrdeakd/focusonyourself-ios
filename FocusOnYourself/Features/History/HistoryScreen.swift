@@ -1,10 +1,7 @@
 import SwiftUI
 
-private let calendarCardRadius: CGFloat = 18
-
 struct HistoryScreen: View {
     @State private var viewModel: HistoryViewModel
-    @State private var selectedCheckIn: CheckIn?
     private let showsHeader: Bool
 
     init(showsHeader: Bool = true) {
@@ -29,27 +26,28 @@ struct HistoryScreen: View {
                 .padding(.bottom, Spacing.xxxs)
 
                 ScrollView {
-                    VStack(spacing: Spacing.lg) {
+                    LazyVStack(spacing: Spacing.lg) {
                         ForEach(viewModel.calendarMonths, id: \.self) { monthDate in
                             CalendarMonthView(
                                 month: monthDate,
                                 checkInDates: viewModel.checkInDateStrings,
                                 onDayTapped: { dateString in
-                                    selectedCheckIn = viewModel.checkIn(for: dateString)
+                                    viewModel.selectDay(dateString)
                                 }
                             )
                             .padding(Spacing.lg)
-                            .foyCardStyle(borderColor: .foyNavy, cornerRadius: calendarCardRadius)
-                            .padding(.horizontal, Spacing.screenHorizontal)
+                            .foyCardStyle(borderColor: .foyNavy, cornerRadius: CornerRadius.calendar)
                             .padding(.top, Spacing.sm)
                         }
                     }
+                    .padding(.horizontal, Spacing.screenHorizontal)
+                    .padding(.bottom, Spacing.screenBottom)
                 }
                 .scrollIndicators(.hidden)
                 .padding(.top, Spacing.xxs)
             }
         }
-        .sheet(item: $selectedCheckIn) { checkIn in
+        .sheet(item: Bindable(viewModel).selectedCheckIn) { checkIn in
             DayDetailSheet(checkIn: checkIn)
         }
     }

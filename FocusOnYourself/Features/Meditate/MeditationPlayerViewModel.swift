@@ -2,20 +2,13 @@ import Factory
 import Foundation
 import Observation
 
-enum MeditationPhase: Equatable {
-    case narrating
-    case processingBreak
-    case timerRunning
-    case timerPaused
-}
-
 @Observable @MainActor
 final class MeditationPlayerViewModel {
     let session: MeditationSession
-    private let audioService: MeditationAudioService
+    @ObservationIgnored @Injected(\.meditationAudioService) private var audioService
 
     var currentStepIndex: Int = 0
-    var isComplete: Bool = false
+    var isComplete = false
     var phase: MeditationPhase = .narrating
     var timerSecondsRemaining: Int = 0
 
@@ -23,9 +16,8 @@ final class MeditationPlayerViewModel {
 
     private let processingBreakDuration = 15
 
-    init(session: MeditationSession, audioService: MeditationAudioService = Container.shared.meditationAudioService()) {
+    init(session: MeditationSession) {
         self.session = session
-        self.audioService = audioService
     }
 
     // MARK: - Computed
@@ -37,9 +29,8 @@ final class MeditationPlayerViewModel {
     var isLastStep: Bool { currentStepIndex == stepCount - 1 }
 
     var timerDisplay: String {
-        let minutes = timerSecondsRemaining / 60
-        let seconds = timerSecondsRemaining % 60
-        return String(format: "%d:%02d", minutes, seconds)
+        Duration.seconds(timerSecondsRemaining)
+            .formatted(.time(pattern: .minuteSecond(padMinuteToLength: 1)))
     }
 
     // MARK: - Lifecycle

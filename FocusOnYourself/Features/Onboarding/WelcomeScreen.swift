@@ -3,8 +3,7 @@ import SwiftUI
 struct WelcomeScreen: View {
     var viewModel: OnboardingViewModel
 
-    private let heroTopPadding: CGFloat = 60
-
+    // Screen has no header: full-bleed hero onboarding layout
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
@@ -20,6 +19,7 @@ struct WelcomeScreen: View {
                             .scaledToFit()
                             .frame(width: Spacing.iconImage, height: Spacing.iconImage)
                             .foregroundStyle(Color.foyNavy)
+                            .accessibilityHidden(true)
                     }
                     Text("Focus On Yourself")
                         .foyDisplayTitleStyle()
@@ -31,7 +31,7 @@ struct WelcomeScreen: View {
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.top, heroTopPadding)
+                .padding(.top, Spacing.heroTop)
 
                 Spacer()
 

@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git
+
+Never add `Co-Authored-By: Claude` or any Claude authorship trailer to commit messages.
+
 ## Build & Lint
 
 **Build (iOS Simulator):**

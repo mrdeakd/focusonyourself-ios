@@ -2,6 +2,7 @@ import Foundation
 
 enum Mood: String, CaseIterable, Codable, Identifiable {
     case rough, low, okay, good, great
+
     var id: String { rawValue }
     var imageName: String {
         "mood-\(rawValue)"

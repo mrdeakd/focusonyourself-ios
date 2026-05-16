@@ -2,7 +2,8 @@ import SwiftUI
 
 enum ArticleTopic: String, CaseIterable, Codable {
     case sleep
-    case mentalHealth
+    // swiftlint:disable:next redundant_string_enum_value
+    case mentalHealth = "mentalHealth"
     case nutrition
     case movement
 

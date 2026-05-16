@@ -5,6 +5,7 @@ struct CheckIn: Codable, Equatable, Identifiable {
     let dateString: String
     let mood: Mood
     let feelingsDescription: String?
+    var factors: CheckInFactors?
 
     var date: Date { Self.formatter.date(from: dateString) ?? .distantPast }
 

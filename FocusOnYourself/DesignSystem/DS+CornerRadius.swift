@@ -9,4 +9,5 @@ enum CornerRadius {
     static let tabPill: CGFloat     = 36
     static let tabItem: CGFloat     = 26
     static let chartBar: CGFloat    = 6   // chart bar marks in SwiftCharts
+    static let calendar: CGFloat = 18  // calendar month cards in HistoryScreen
 }

@@ -15,10 +15,12 @@ enum Spacing {
     static let screenHorizontal: CGFloat = 28
     static let screenTop: CGFloat = 40
     static let screenBottom: CGFloat = 48
+    static let heroTop: CGFloat = 60
 
     // Component
     static let buttonVertical: CGFloat = 17
     static let iconCircle: CGFloat = 96
     static let iconImage: CGFloat = 40
     static let inputHeight: CGFloat = 56
+    static let badgeHorizontal: CGFloat = 10
 }

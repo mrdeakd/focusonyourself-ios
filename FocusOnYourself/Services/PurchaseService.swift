@@ -95,8 +95,8 @@ final class PurchaseService: PurchaseServiceProtocol {
         var hasEntitlement = false
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
-               transaction.productID == productMonthly || transaction.productID == productAnnual,
-               transaction.revocationDate == nil {
+                transaction.productID == productMonthly || transaction.productID == productAnnual,
+                transaction.revocationDate == nil {
                 hasEntitlement = true
                 break
             }

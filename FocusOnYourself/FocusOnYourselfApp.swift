@@ -13,6 +13,7 @@ struct FocusOnYourselfApp: App {
 
 private struct AppRootView: View {
     @Environment(ProfileService.self) private var profileService
+    @Environment(\.scenePhase) private var scenePhase
 
     private var preferredColorScheme: ColorScheme? {
         switch profileService.profile.appearanceOverride {
@@ -25,5 +26,10 @@ private struct AppRootView: View {
     var body: some View {
         ContentView()
             .preferredColorScheme(preferredColorScheme)
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    profileService.mergeWidgetCheckIn()
+                }
+            }
     }
 }

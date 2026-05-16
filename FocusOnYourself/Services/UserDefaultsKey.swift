@@ -6,4 +6,9 @@ enum UserDefaultsKey: String {
     case affirmationCacheDate = "affirmation.date"
     case isPro                = "com.focusonyourself.isPro"
     case appearanceOverride   = "appearanceOverride"
+    case showSleepFactor      = "factor.show.sleep"
+    case showStressFactor     = "factor.show.stress"
+    case showExerciseFactor   = "factor.show.exercise"
+    case showSocialFactor     = "factor.show.social"
+    case pendingWidgetCheckIn = "pendingWidgetCheckIn"
 }

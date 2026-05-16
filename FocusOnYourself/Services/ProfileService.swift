@@ -3,11 +3,18 @@ import Foundation
 import Observation
 import WidgetKit
 
+private struct PendingWidgetCheckIn: Codable {
+    let moodRawValue: String
+    let dateString: String
+    let timestamp: Date
+}
+
 @Observable
 final class ProfileService: ProfileServiceProtocol {
     private(set) var profile: UserProfile
 
     private let userDefaultsService: UserDefaultsServiceProtocol
+    private var externalChangeObserver: NSObjectProtocol?
 
     init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
         self.userDefaultsService = userDefaultsService
@@ -25,7 +32,7 @@ final class ProfileService: ProfileServiceProtocol {
     }
 
     private func observeExternalChanges() {
-        NotificationCenter.default.addObserver(
+        externalChangeObserver = NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: NSUbiquitousKeyValueStore.default,
             queue: .main
@@ -51,13 +58,14 @@ final class ProfileService: ProfileServiceProtocol {
         } catch {
             assertionFailure("Failed to encode UserProfile: \(error)")
         }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
-    func recordCheckIn(mood: Mood, feelingsDescription: String?) {
-        let ds = CheckIn.dateString(for: Date())
+    func recordCheckIn(mood: Mood, feelingsDescription: String?, factors: CheckInFactors? = nil) {
+        let dateString = CheckIn.dateString(for: Date.now)
         var updatedProfile = profile
-        let entry = CheckIn(dateString: ds, mood: mood, feelingsDescription: feelingsDescription)
-        if let idx = updatedProfile.checkIns.firstIndex(where: { $0.dateString == ds }) {
+        let entry = CheckIn(dateString: dateString, mood: mood, feelingsDescription: feelingsDescription, factors: factors)
+        if let idx = updatedProfile.checkIns.firstIndex(where: { $0.dateString == dateString }) {
             updatedProfile.checkIns[idx] = entry
         } else {
             updatedProfile.checkIns.append(entry)
@@ -72,7 +80,7 @@ final class ProfileService: ProfileServiceProtocol {
 
         // Current streak: walk backward from today
         var current = 0
-        var day = cal.startOfDay(for: Date())
+        var day = cal.startOfDay(for: Date.now)
         // If today has no check-in, try from yesterday
         if !checkInDates.contains(day) {
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day
@@ -89,8 +97,8 @@ final class ProfileService: ProfileServiceProtocol {
         var prev: Date?
         for checkInDate in sorted {
             if let prevDate = prev,
-               let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
-               expected == checkInDate {
+                let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
+                expected == checkInDate {
                 run += 1
             } else {
                 run = 1
@@ -103,28 +111,55 @@ final class ProfileService: ProfileServiceProtocol {
     }
 
     var hasCheckedInToday: Bool {
-        let ds = CheckIn.dateString(for: Date())
-        return profile.checkIns.contains { $0.dateString == ds }
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profile.checkIns.contains { $0.dateString == dateString }
     }
 
     var todaysMood: Mood? {
-        let ds = CheckIn.dateString(for: Date())
-        return profile.checkIns.first { $0.dateString == ds }?.mood
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profile.checkIns.first { $0.dateString == dateString }?.mood
     }
 
     var todaysFeelingsDescription: String? {
-        let ds = CheckIn.dateString(for: Date())
-        return profile.checkIns.first { $0.dateString == ds }?.feelingsDescription
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profile.checkIns.first { $0.dateString == dateString }?.feelingsDescription
     }
 
     var earliestCheckInDate: Date? {
         profile.checkIns.map { $0.date }.min()
     }
 
+    var todaysFactors: CheckInFactors? {
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profile.checkIns.first { $0.dateString == dateString }?.factors
+    }
+
+    func resetAllData() {
+        userDefaultsService.setData(.userProfile, value: nil)
+        userDefaultsService.setData(.affirmationCache, value: nil)
+        userDefaultsService.setData(.affirmationCacheDate, value: nil)
+        profile = UserProfile()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    func mergeWidgetCheckIn() {
+        guard let raw = userDefaultsService.getLocalData(.pendingWidgetCheckIn) else { return }
+        guard let pending = try? JSONDecoder().decode(PendingWidgetCheckIn.self, from: raw) else {
+            userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
+            return
+        }
+        let existingCheckIn = profile.checkIns.first { $0.dateString == pending.dateString }
+        let shouldApply = existingCheckIn == nil || pending.timestamp > existingCheckIn!.date
+        if shouldApply, let mood = Mood(rawValue: pending.moodRawValue) {
+            recordCheckIn(mood: mood, feelingsDescription: nil)
+        }
+        userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
+    }
+
     var streakStartDate: Date? {
         let cal = Calendar.current
         let checkInDates = Set(profile.checkIns.map { cal.startOfDay(for: $0.date) })
-        var day = cal.startOfDay(for: Date())
+        var day = cal.startOfDay(for: Date.now)
         if !checkInDates.contains(day) {
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day
         }

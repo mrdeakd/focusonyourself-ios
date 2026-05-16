@@ -1,4 +1,3 @@
 protocol MeditationServiceProtocol {
-    func allSessions() -> [MeditationSession]
-    func sessions(for category: MeditationCategory?) -> [MeditationSession]
+    func sessions(for category: MeditationCategory?) async throws -> [MeditationSession]
 }

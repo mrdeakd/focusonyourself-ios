@@ -14,7 +14,7 @@ final class NotificationService: NotificationServiceProtocol {
         content.title = name.isEmpty ?
         "Good morning ✨" :
         "Good morning, \(name) ✨"
-        content.body  = "Your daily affirmation is ready. Take a moment for yourself."
+        content.body  = "Log your mood & today's context."
         content.sound = .default
 
         var comps = DateComponents()

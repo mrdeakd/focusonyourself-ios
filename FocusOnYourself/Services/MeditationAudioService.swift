@@ -42,8 +42,8 @@ final class MeditationAudioService: NSObject {
         stopSpeaking()
 
         if let filename = narrationMap[text],
-           let url = Bundle.main.url(forResource: filename, withExtension: "mp3"),
-           let player = try? AVAudioPlayer(contentsOf: url) {
+            let url = Bundle.main.url(forResource: filename, withExtension: "mp3"),
+            let player = try? AVAudioPlayer(contentsOf: url) {
             onNarrationComplete = onComplete
             narrationPlayer = player
             narrationPlayer?.delegate = self
@@ -64,8 +64,7 @@ final class MeditationAudioService: NSObject {
     private static let bestEnglishVoice: AVSpeechSynthesisVoice? = {
         AVSpeechSynthesisVoice.speechVoices()
             .filter { $0.language.hasPrefix("en") }
-            .sorted { $0.quality.rawValue > $1.quality.rawValue }
-            .first
+            .max { $0.quality.rawValue < $1.quality.rawValue }
     }()
 
     func stopSpeaking() {

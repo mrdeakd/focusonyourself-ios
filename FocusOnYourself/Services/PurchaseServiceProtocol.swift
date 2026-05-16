@@ -12,6 +12,7 @@ protocol PurchaseServiceProtocol: AnyObject {
     var products: [Product] { get }
     var productMonthly: String { get }
     var productAnnual: String { get }
+
     func purchase(_ product: Product) async throws -> PurchaseOutcome
     func restorePurchases() async throws
     func refreshEntitlements() async

@@ -6,6 +6,7 @@ final class MeditationAudioService: NSObject {
     private var narrationMap: [String: String] = [:]
     private var narrationPlayer: AVAudioPlayer?
     private var onNarrationComplete: (() -> Void)?
+    private var speakTask: Task<Void, Never>?
     private var bellEngine: AVAudioEngine?
     private var audioPlayer: AVAudioPlayer?
 
@@ -41,8 +42,10 @@ final class MeditationAudioService: NSObject {
         }
 
         onNarrationComplete = onComplete
-        Task {
+        speakTask = Task {
+            guard !Task.isCancelled else { return }
             if let localURL = await cachedAudio(for: audioUrl) {
+                guard !Task.isCancelled else { return }
                 if let player = try? AVAudioPlayer(contentsOf: localURL) {
                     narrationPlayer = player
                     narrationPlayer?.delegate = self
@@ -76,6 +79,8 @@ final class MeditationAudioService: NSObject {
     }
 
     func stopSpeaking() {
+        speakTask?.cancel()
+        speakTask = nil
         onNarrationComplete = nil
         narrationPlayer?.stop()
         narrationPlayer = nil

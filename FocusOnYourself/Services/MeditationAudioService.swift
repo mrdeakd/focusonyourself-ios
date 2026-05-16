@@ -2,31 +2,25 @@ import AVFoundation
 
 @MainActor
 final class MeditationAudioService: NSObject {
-    private let synthesizer = AVSpeechSynthesizer()
-    private var audioPlayer: AVAudioPlayer?       // bell
-    private var narrationPlayer: AVAudioPlayer?   // bundled MP3 narrations
+    private let networkClient: NetworkClientProtocol
     private var narrationMap: [String: String] = [:]
+    private var narrationPlayer: AVAudioPlayer?
     private var onNarrationComplete: (() -> Void)?
-    private var currentUtterance: AVSpeechUtterance?
     private var bellEngine: AVAudioEngine?
+    private var audioPlayer: AVAudioPlayer?
 
-    override init() {
+    init(networkClient: NetworkClientProtocol) {
+        self.networkClient = networkClient
         super.init()
-        synthesizer.delegate = self
-        loadNarrationMap()
         configureAudioSession()
+        Task { await fetchNarrationMap() }
     }
 
-    private func loadNarrationMap() {
-        guard let url = Bundle.main.url(forResource: "narration_map", withExtension: "json") else {
-            assertionFailure("narration_map.json not found in bundle")
-            return
-        }
+    private func fetchNarrationMap() async {
         do {
-            let data = try Data(contentsOf: url)
-            narrationMap = try JSONDecoder().decode([String: String].self, from: data)
+            narrationMap = try await networkClient.get("/api/narration-map")
         } catch {
-            assertionFailure("Failed to load narration map: \(error)")
+            // Map unavailable — speak() will silently do nothing until map loads
         }
     }
 
@@ -41,38 +35,50 @@ final class MeditationAudioService: NSObject {
         activateAudioSession()
         stopSpeaking()
 
-        if let filename = narrationMap[text],
-            let url = Bundle.main.url(forResource: filename, withExtension: "mp3"),
-            let player = try? AVAudioPlayer(contentsOf: url) {
-            onNarrationComplete = onComplete
-            narrationPlayer = player
-            narrationPlayer?.delegate = self
-            narrationPlayer?.play()
+        guard let audioUrl = narrationMap[text] else {
+            // No map entry — silent, user reads the instruction and advances manually
             return
         }
 
-        // Fallback: AVSpeechSynthesizer
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
-        utterance.pitchMultiplier = 1.0
-        utterance.voice = Self.bestEnglishVoice
-        currentUtterance = utterance
         onNarrationComplete = onComplete
-        synthesizer.speak(utterance)
+        Task {
+            if let localURL = await cachedAudio(for: audioUrl) {
+                if let player = try? AVAudioPlayer(contentsOf: localURL) {
+                    narrationPlayer = player
+                    narrationPlayer?.delegate = self
+                    narrationPlayer?.play()
+                }
+            }
+            // Download failed — silent, user reads the instruction and advances manually
+        }
     }
 
-    private static let bestEnglishVoice: AVSpeechSynthesisVoice? = {
-        AVSpeechSynthesisVoice.speechVoices()
-            .filter { $0.language.hasPrefix("en") }
-            .max { $0.quality.rawValue < $1.quality.rawValue }
-    }()
+    private func cachedAudio(for urlString: String) async -> URL? {
+        guard let remoteURL = URL(string: urlString) else { return nil }
+        let filename = remoteURL.lastPathComponent
+        let cacheDir = FileManager.default
+            .urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("narrations")
+        let localURL = cacheDir.appendingPathComponent(filename)
+
+        if FileManager.default.fileExists(atPath: localURL.path) {
+            return localURL
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: remoteURL)
+            try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+            try data.write(to: localURL)
+            return localURL
+        } catch {
+            return nil
+        }
+    }
 
     func stopSpeaking() {
         onNarrationComplete = nil
-        currentUtterance = nil
         narrationPlayer?.stop()
         narrationPlayer = nil
-        synthesizer.stopSpeaking(at: .immediate)
     }
 
     func playBell() {
@@ -130,16 +136,6 @@ final class MeditationAudioService: NSObject {
             }
         }
         player.play()
-    }
-}
-
-extension MeditationAudioService: AVSpeechSynthesizerDelegate {
-    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        Task { @MainActor in
-            guard utterance === self.currentUtterance else { return }
-            self.currentUtterance = nil
-            self.fireAndClearNarrationCallback()
-        }
     }
 }
 

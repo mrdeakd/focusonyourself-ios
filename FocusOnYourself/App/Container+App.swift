@@ -27,7 +27,7 @@ extension Container {
         self { MeditationService(networkClient: self.networkClient()) }.singleton
     }
     var meditationAudioService: Factory<MeditationAudioService> {
-        self { @MainActor in MeditationAudioService() }.singleton
+        self { @MainActor in MeditationAudioService(networkClient: self.networkClient()) }.singleton
     }
     @available(iOS 18, *)
     var healthKitService: Factory<HealthKitService> {

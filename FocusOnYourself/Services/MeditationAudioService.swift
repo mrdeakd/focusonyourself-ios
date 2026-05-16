@@ -20,8 +20,9 @@ final class MeditationAudioService: NSObject {
     private func fetchNarrationMap() async {
         do {
             narrationMap = try await networkClient.get("/api/narration-map")
+            print("🗺️ [Audio] Narration map loaded: \(narrationMap.count) entries")
         } catch {
-            // Map unavailable — speak() will silently do nothing until map loads
+            print("❌ [Audio] Failed to load narration map: \(error)")
         }
     }
 
@@ -65,15 +66,22 @@ final class MeditationAudioService: NSObject {
         let localURL = cacheDir.appendingPathComponent(filename)
 
         if FileManager.default.fileExists(atPath: localURL.path) {
+            print("🎵 [Audio] Cache hit: \(filename)")
             return localURL
         }
 
+        print("⬇️ [Audio] Downloading: \(urlString)")
         do {
-            let (data, _) = try await URLSession.shared.data(from: remoteURL)
+            let (data, response) = try await URLSession.shared.data(from: remoteURL)
+            if let http = response as? HTTPURLResponse {
+                print("⬇️ [Audio] Response \(http.statusCode) for \(filename) (\(data.count) bytes)")
+            }
             try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
             try data.write(to: localURL)
+            print("✅ [Audio] Cached: \(filename)")
             return localURL
         } catch {
+            print("❌ [Audio] Failed for \(filename): \(error)")
             return nil
         }
     }

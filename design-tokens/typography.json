@@ -1,0 +1,114 @@
+{
+  "typography": {
+    "display-title": {
+      "value": { "fontFamily": "Inter", "fontWeight": "300", "fontSize": "32", "lineHeight": "AUTO", "letterSpacing": "-0.5" },
+      "type": "typography",
+      "description": "Font.foyDisplayTitle — Inter 32 Light, kerning -0.5"
+    },
+    "section-title": {
+      "value": { "fontFamily": "Inter", "fontWeight": "300", "fontSize": "28", "lineHeight": "AUTO", "letterSpacing": "-0.5" },
+      "type": "typography",
+      "description": "Font.foySectionTitle — Inter 28 Light, kerning -0.5"
+    },
+    "headline": {
+      "value": { "fontFamily": "Inter", "fontWeight": "600", "fontSize": "22", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyHeadline — Inter 22 SemiBold"
+    },
+    "nav-title": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "18", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyNavTitle — Inter 18 Medium"
+    },
+    "quote": {
+      "value": { "fontFamily": "Inter", "fontWeight": "300", "fontSize": "18", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyQuote — Inter 18 Light"
+    },
+    "stat-value": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "24", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyStatValue — Inter 24 Medium"
+    },
+    "body": {
+      "value": { "fontFamily": "Inter", "fontWeight": "400", "fontSize": "15", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyBody — Inter 15 Regular"
+    },
+    "body-medium": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "15", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyBodyMedium — Inter 15 Medium"
+    },
+    "body-semibold": {
+      "value": { "fontFamily": "Inter", "fontWeight": "600", "fontSize": "15", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyBodySemibold — Inter 15 SemiBold"
+    },
+    "button-label": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "16", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyButtonLabel — Inter 16 Medium"
+    },
+    "input-text": {
+      "value": { "fontFamily": "Inter", "fontWeight": "400", "fontSize": "16", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyInputText — Inter 16 Regular"
+    },
+    "skip-label": {
+      "value": { "fontFamily": "Inter", "fontWeight": "400", "fontSize": "14", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foySkipLabel — Inter 14 Regular"
+    },
+    "skip-label-medium": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "14", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foySkipLabelMedium — Inter 14 Medium"
+    },
+    "caption": {
+      "value": { "fontFamily": "Inter", "fontWeight": "400", "fontSize": "13", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyCaption — Inter 13 Regular"
+    },
+    "caption-medium": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "13", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyCaptionMedium — Inter 13 Medium"
+    },
+    "caption-semibold": {
+      "value": { "fontFamily": "Inter", "fontWeight": "600", "fontSize": "13", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyCaptionSemibold — Inter 13 SemiBold"
+    },
+    "hint": {
+      "value": { "fontFamily": "Inter", "fontWeight": "400", "fontSize": "12", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyHint — Inter 12 Regular"
+    },
+    "hint-medium": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "12", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyHintMedium — Inter 12 Medium"
+    },
+    "section-label": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "11", "lineHeight": "AUTO", "letterSpacing": "0.8" },
+      "type": "typography",
+      "description": "Font.foySectionLabel — Inter 11 Medium, kerning 0.8"
+    },
+    "section-label-semibold": {
+      "value": { "fontFamily": "Inter", "fontWeight": "600", "fontSize": "11", "lineHeight": "AUTO", "letterSpacing": "0.8" },
+      "type": "typography",
+      "description": "Font.foySectionLabelSemibold — Inter 11 SemiBold, kerning 0.8"
+    },
+    "micro": {
+      "value": { "fontFamily": "Inter", "fontWeight": "400", "fontSize": "10", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyMicro — Inter 10 Regular"
+    },
+    "micro-medium": {
+      "value": { "fontFamily": "Inter", "fontWeight": "500", "fontSize": "10", "lineHeight": "AUTO", "letterSpacing": "0" },
+      "type": "typography",
+      "description": "Font.foyMicroMedium — Inter 10 Medium"
+    }
+  }
+}

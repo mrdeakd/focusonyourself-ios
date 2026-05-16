@@ -1,0 +1,33 @@
+{
+  "spacing": {
+    "xxxs": { "value": "4",  "type": "spacing", "description": "Spacing.xxxs" },
+    "xxs":  { "value": "6",  "type": "spacing", "description": "Spacing.xxs" },
+    "xs":   { "value": "8",  "type": "spacing", "description": "Spacing.xs" },
+    "sm":   { "value": "12", "type": "spacing", "description": "Spacing.sm" },
+    "md":   { "value": "16", "type": "spacing", "description": "Spacing.md" },
+    "lg":   { "value": "24", "type": "spacing", "description": "Spacing.lg" },
+    "xl":   { "value": "28", "type": "spacing", "description": "Spacing.xl" },
+    "xxl":  { "value": "32", "type": "spacing", "description": "Spacing.xxl" }
+  },
+  "screen": {
+    "horizontal": { "value": "28", "type": "spacing", "description": "Spacing.screenHorizontal" },
+    "top":        { "value": "40", "type": "spacing", "description": "Spacing.screenTop" },
+    "bottom":     { "value": "48", "type": "spacing", "description": "Spacing.screenBottom" }
+  },
+  "component": {
+    "button-vertical": { "value": "17", "type": "spacing", "description": "Spacing.buttonVertical" },
+    "icon-circle":     { "value": "96", "type": "sizing",  "description": "Spacing.iconCircle" },
+    "icon-image":      { "value": "40", "type": "sizing",  "description": "Spacing.iconImage" },
+    "input-height":    { "value": "56", "type": "sizing",  "description": "Spacing.inputHeight" }
+  },
+  "radius": {
+    "card":         { "value": "12", "type": "borderRadius", "description": "CornerRadius.card" },
+    "input":        { "value": "16", "type": "borderRadius", "description": "CornerRadius.input" },
+    "pill":         { "value": "28", "type": "borderRadius", "description": "CornerRadius.pill" },
+    "streak-badge": { "value": "20", "type": "borderRadius", "description": "CornerRadius.streakBadge" },
+    "category-tag": { "value": "10", "type": "borderRadius", "description": "CornerRadius.categoryTag" },
+    "tab-pill":     { "value": "36", "type": "borderRadius", "description": "CornerRadius.tabPill" },
+    "tab-item":     { "value": "26", "type": "borderRadius", "description": "CornerRadius.tabItem" },
+    "chart-bar":    { "value": "6",  "type": "borderRadius", "description": "CornerRadius.chartBar" }
+  }
+}

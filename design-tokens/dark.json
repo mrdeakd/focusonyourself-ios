@@ -1,0 +1,43 @@
+{
+  "color": {
+    "background":        { "value": "{palette.black.1000}",           "type": "color", "description": "foyBackground dark" },
+    "card":              { "value": "{palette.neutral.dark.900}",      "type": "color", "description": "foyCard dark" },
+    "on-primary":        { "value": "{palette.white.1000}",           "type": "color", "description": "foyOnPrimary (same)" },
+    "scrim":             { "value": "{palette.black.scrim}",          "type": "color", "description": "foyScrim (same)" },
+    "foreground": {
+      "primary":         { "value": "{palette.neutral.dark.100}",     "type": "color", "description": "foyForeground dark" },
+      "secondary":       { "value": "{palette.neutral.dark.500}",     "type": "color", "description": "foyForegroundSecondary dark" },
+      "placeholder":     { "value": "{palette.neutral.dark.600}",     "type": "color", "description": "foyPlaceholder dark" }
+    },
+    "border": {
+      "default":         { "value": "{palette.neutral.dark.800}",     "type": "color", "description": "foyBorder dark" },
+      "detail-stroke":   { "value": "{palette.neutral.dark.700}",     "type": "color", "description": "foyDetailDotStroke dark" }
+    },
+    "action": {
+      "disabled":        { "value": "{palette.neutral.dark.700}",     "type": "color", "description": "foyButtonDisabled dark" }
+    },
+    "brand": {
+      "navy":            { "value": "{palette.navy.300}",             "type": "color", "description": "foyNavy dark" },
+      "navy-tint":       { "value": "{palette.navy.tint-dark}",       "type": "color", "description": "foyNavyTint dark" },
+      "orange":          { "value": "{palette.orange.500}",           "type": "color", "description": "foyOrange (same)" },
+      "orange-tint":     { "value": "{palette.orange.tint-dark}",     "type": "color", "description": "foyOrangeTint dark" },
+      "orange-accent":   { "value": "{palette.orange.400}",           "type": "color", "description": "foyOrangeAccent (same)" },
+      "green":           { "value": "{palette.green.500}",            "type": "color", "description": "foyGreen dark" },
+      "green-tint":      { "value": "{palette.green.tint-dark}",      "type": "color", "description": "foyGreenTint dark" }
+    },
+    "surface": {
+      "mood":            { "value": "{palette.neutral.dark.850}",     "type": "color", "description": "foyMoodBackground dark" },
+      "calendar-skipped":{ "value": "{palette.neutral.dark.850}",     "type": "color", "description": "foyCalendarSkipped dark" }
+    },
+    "detail": {
+      "pencil":          { "value": "{palette.neutral.dark.500}",     "type": "color", "description": "foyDetailPencil dark" },
+      "dot-fill":        { "value": "{palette.neutral.dark.800}",     "type": "color", "description": "foyDetailDotFill dark" }
+    },
+    "upgrade": {
+      "card-bg":         { "value": "{palette.upgrade.card-bg-dark}",     "type": "color", "description": "foyUpgradeCardBg dark" },
+      "card-border":     { "value": "{palette.upgrade.card-border-dark}",  "type": "color", "description": "foyUpgradeCardBorder dark" },
+      "icon-bg":         { "value": "{palette.upgrade.icon-bg-dark}",     "type": "color", "description": "foyUpgradeIconBg dark" },
+      "free-badge":      { "value": "{palette.upgrade.badge-dark}",        "type": "color", "description": "foyFreeBadgeBg dark" }
+    }
+  }
+}

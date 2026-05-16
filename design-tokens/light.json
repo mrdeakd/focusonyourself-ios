@@ -1,0 +1,43 @@
+{
+  "color": {
+    "background":        { "value": "{palette.neutral.50}",          "type": "color", "description": "foyBackground" },
+    "card":              { "value": "{palette.white.1000}",           "type": "color", "description": "foyCard" },
+    "on-primary":        { "value": "{palette.white.1000}",           "type": "color", "description": "foyOnPrimary" },
+    "scrim":             { "value": "{palette.black.scrim}",          "type": "color", "description": "foyScrim" },
+    "foreground": {
+      "primary":         { "value": "{palette.neutral.800}",          "type": "color", "description": "foyForeground" },
+      "secondary":       { "value": "{palette.neutral.600}",          "type": "color", "description": "foyForegroundSecondary" },
+      "placeholder":     { "value": "{palette.neutral.500}",          "type": "color", "description": "foyPlaceholder" }
+    },
+    "border": {
+      "default":         { "value": "{palette.neutral.200}",          "type": "color", "description": "foyBorder" },
+      "detail-stroke":   { "value": "{palette.neutral.350}",          "type": "color", "description": "foyDetailDotStroke" }
+    },
+    "action": {
+      "disabled":        { "value": "{palette.neutral.300}",          "type": "color", "description": "foyButtonDisabled" }
+    },
+    "brand": {
+      "navy":            { "value": "{palette.navy.600}",             "type": "color", "description": "foyNavy" },
+      "navy-tint":       { "value": "{palette.navy.tint-light}",      "type": "color", "description": "foyNavyTint" },
+      "orange":          { "value": "{palette.orange.500}",           "type": "color", "description": "foyOrange" },
+      "orange-tint":     { "value": "{palette.orange.tint-light}",    "type": "color", "description": "foyOrangeTint" },
+      "orange-accent":   { "value": "{palette.orange.400}",           "type": "color", "description": "foyOrangeAccent" },
+      "green":           { "value": "{palette.green.700}",            "type": "color", "description": "foyGreen" },
+      "green-tint":      { "value": "{palette.green.tint-light}",     "type": "color", "description": "foyGreenTint" }
+    },
+    "surface": {
+      "mood":            { "value": "{palette.neutral.100}",          "type": "color", "description": "foyMoodBackground" },
+      "calendar-skipped":{ "value": "{palette.neutral.100}",          "type": "color", "description": "foyCalendarSkipped" }
+    },
+    "detail": {
+      "pencil":          { "value": "{palette.neutral.400}",          "type": "color", "description": "foyDetailPencil" },
+      "dot-fill":        { "value": "{palette.neutral.250}",          "type": "color", "description": "foyDetailDotFill" }
+    },
+    "upgrade": {
+      "card-bg":         { "value": "{palette.upgrade.card-bg-light}",     "type": "color", "description": "foyUpgradeCardBg" },
+      "card-border":     { "value": "{palette.upgrade.card-border-light}",  "type": "color", "description": "foyUpgradeCardBorder" },
+      "icon-bg":         { "value": "{palette.upgrade.icon-bg-light}",     "type": "color", "description": "foyUpgradeIconBg" },
+      "free-badge":      { "value": "{palette.upgrade.badge-light}",        "type": "color", "description": "foyFreeBadgeBg" }
+    }
+  }
+}

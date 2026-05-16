@@ -30,10 +30,18 @@ enum WidgetMood: String, Codable {
     }
 }
 
+struct WidgetCheckInFactors: Codable {
+    let sleepQuality: Int
+    let stressLevel: Int
+    let exercised: Bool
+    let socialQuality: Int
+}
+
 private struct WidgetCheckIn: Codable {
     let dateString: String
     let mood: WidgetMood
     let feelingsDescription: String?
+    let factors: WidgetCheckInFactors?
 
     private static let formatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -47,10 +55,18 @@ private struct WidgetCheckIn: Codable {
 
 private struct WidgetUserProfile: Codable {
     var checkIns: [WidgetCheckIn] = []
+    var onboardingCompleted = false
 }
 
-struct WidgetDataProvider {
+private struct WidgetPendingCheckIn: Codable {
+    let moodRawValue: String
+    let dateString: String
+    let timestamp: Date
+}
+
+enum WidgetDataProvider {
     private static let profileKey = "userProfile"
+    private static let pendingCheckInKey = "pendingWidgetCheckIn"
     private static let suiteName = "group.app.ddworks.FocusOnYourself"
 
     private static func loadProfile() -> WidgetUserProfile {
@@ -83,8 +99,8 @@ struct WidgetDataProvider {
         var prev: Date?
         for checkInDate in sorted {
             if let prevDate = prev,
-               let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
-               expected == checkInDate {
+                let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
+                expected == checkInDate {
                 run += 1
             } else {
                 run = 1
@@ -98,13 +114,56 @@ struct WidgetDataProvider {
 
     static var todaysMood: WidgetMood? {
         let profile = loadProfile()
-        let ds = todayDateString()
-        return profile.checkIns.first { $0.dateString == ds }?.mood
+        let dateString = todayDateString()
+        return profile.checkIns.first { $0.dateString == dateString }?.mood
     }
 
     static var hasCheckedInToday: Bool {
         let profile = loadProfile()
         return profile.checkIns.contains { $0.dateString == todayDateString() }
+    }
+
+    static func logMood(_ rawValue: String) {
+        guard let defaults = UserDefaults(suiteName: suiteName) else { return }
+        var profile = loadProfile()
+        let today = todayDateString()
+        let mood = WidgetMood(rawValue: rawValue) ?? .okay
+        let entry = WidgetCheckIn(dateString: today, mood: mood, feelingsDescription: nil, factors: nil)
+        if let idx = profile.checkIns.firstIndex(where: { $0.dateString == today }) {
+            profile.checkIns[idx] = entry
+        } else {
+            profile.checkIns.append(entry)
+        }
+        if let encoded = try? JSONEncoder().encode(profile) {
+            defaults.set(encoded, forKey: profileKey)
+        }
+        let pending = WidgetPendingCheckIn(moodRawValue: rawValue, dateString: today, timestamp: Date())
+        if let pendingData = try? JSONEncoder().encode(pending) {
+            defaults.set(pendingData, forKey: pendingCheckInKey)
+        }
+    }
+
+    static func pendingCheckIn() -> (moodRawValue: String, dateString: String, timestamp: Date)? {
+        guard
+            let defaults = UserDefaults(suiteName: suiteName),
+            let data = defaults.data(forKey: pendingCheckInKey),
+            let pending = try? JSONDecoder().decode(WidgetPendingCheckIn.self, from: data)
+        else { return nil }
+        return (pending.moodRawValue, pending.dateString, pending.timestamp)
+    }
+
+    static func clearPendingCheckIn() {
+        UserDefaults(suiteName: suiteName)?.removeObject(forKey: pendingCheckInKey)
+    }
+
+    static var todaysFactors: WidgetCheckInFactors? {
+        let profile = loadProfile()
+        let dateString = todayDateString()
+        return profile.checkIns.first { $0.dateString == dateString }?.factors
+    }
+
+    static var isOnboarded: Bool {
+        loadProfile().onboardingCompleted
     }
 
     private static func todayDateString() -> String {

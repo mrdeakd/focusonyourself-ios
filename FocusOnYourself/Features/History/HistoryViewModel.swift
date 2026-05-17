@@ -7,7 +7,7 @@ final class HistoryViewModel {
     @ObservationIgnored @Injected(\.profileService) private var profileService
 
     var streakStats: (current: Int, longest: Int) {
-        profileService.streakStats()
+        !profileService.profile.checkIns.isEmpty ? profileService.streakStats() : (0, 0)
     }
 
     var checkInDateStrings: Set<String> {
@@ -28,7 +28,7 @@ final class HistoryViewModel {
         let cal = Calendar.current
         let today = Date.now
 
-        let startDate = profileService.earliestCheckInDate ?? today
+        let startDate = profileService.profile.checkIns.map { $0.date }.min() ?? today
 
         var comps = cal.dateComponents([.year, .month], from: startDate)
         comps.day = 1

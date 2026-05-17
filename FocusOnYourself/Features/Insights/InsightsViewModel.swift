@@ -10,7 +10,6 @@ final class InsightsViewModel {
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var isPro: Bool { purchaseService.isPro }
-
     var showingPaywall = false
     var selectedFactor: FactorCorrelation?
 

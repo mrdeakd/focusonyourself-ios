@@ -1,8 +1,7 @@
 import SwiftUI
 
-// Pencil design: AccountScreen node gkxdM · FAB node ogtK7
-struct SettingsScreen: View {
-    @State private var viewModel = SettingsViewModel()
+struct AccountScreen: View {
+    @State private var viewModel = AccountViewModel()
 
     var body: some View {
         ZStack {
@@ -43,7 +42,6 @@ struct SettingsScreen: View {
 
     // MARK: - Subviews
 
-    // Pencil design node: JTVCT
     private var settingsFAB: some View {
         Button {
             viewModel.showSettingsSheet = true

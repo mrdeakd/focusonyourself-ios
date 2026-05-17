@@ -11,11 +11,6 @@ final class HomeViewModel {
     var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
     var error: ErrorInfo?
 
-    var hasCheckedIn: Bool { profileService.hasCheckedInToday }
-    var todaysMood: Mood? { profileService.todaysMood }
-    var todaysFactors: CheckInFactors? { profileService.todaysFactors }
-    var hasFactorsToday: Bool { profileService.todaysFactors != nil }
-
     var sleepQuality: Int = 3
     var stressLevel: Int = 3
     var exercised = false
@@ -32,18 +27,25 @@ final class HomeViewModel {
     var selectedArticle: Article?
 
     init() {
-        generatedQuotes = _affirmationService.wrappedValue.cachedBatch() ?? []
+        isGeneratingAffirmation = true
     }
 
-    func loadArticles() async {
-        isLoadingArticles = true
-        defer { isLoadingArticles = false }
-        do {
-            articles = try await articlesService.dailyArticles()
-        } catch {
-            self.error = ErrorInfo(title: "Couldn't Load Articles")
-        }
+    var hasCheckedIn: Bool {
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profileService.profile.checkIns.contains { $0.dateString == dateString }
     }
+
+    var todaysMood: Mood? {
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profileService.profile.checkIns.first { $0.dateString == dateString }?.mood
+    }
+
+    var todaysFactors: CheckInFactors? {
+        let dateString = CheckIn.dateString(for: Date.now)
+        return profileService.profile.checkIns.first { $0.dateString == dateString }?.factors
+    }
+
+    var hasFactorsToday: Bool { todaysFactors != nil }
 
     var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date.now)
@@ -59,12 +61,25 @@ final class HomeViewModel {
     }
 
     var formattedDate: String { Date.now.homeScreenFormatted }
-    var streakCount: Int { profileService.streakStats().current }
+
+    var streakCount: Int {
+        !profileService.profile.checkIns.isEmpty ? profileService.streakStats().current : 0
+    }
 
     var showSleepFactor: Bool { userDefaultsService.getLocalBool(.showSleepFactor, defaultingTo: true) }
     var showStressFactor: Bool { userDefaultsService.getLocalBool(.showStressFactor, defaultingTo: true) }
     var showExerciseFactor: Bool { userDefaultsService.getLocalBool(.showExerciseFactor, defaultingTo: true) }
     var showSocialFactor: Bool { userDefaultsService.getLocalBool(.showSocialFactor, defaultingTo: true) }
+
+    func loadArticles() async {
+        isLoadingArticles = true
+        defer { isLoadingArticles = false }
+        do {
+            articles = try await articlesService.dailyArticles()
+        } catch {
+            self.error = ErrorInfo(title: "Couldn't Load Articles")
+        }
+    }
 
     func selectMood(_ mood: Mood) {
         selectedMood = mood
@@ -85,7 +100,8 @@ final class HomeViewModel {
     }
 
     func loadFactorsFromToday() {
-        let existing = profileService.todaysFactors
+        let dateString = CheckIn.dateString(for: Date.now)
+        let existing = profileService.profile.checkIns.first { $0.dateString == dateString }?.factors
         sleepQuality  = existing?.sleepQuality ?? 3
         stressLevel   = existing?.stressLevel ?? 3
         exercised     = existing?.exercised ?? false
@@ -93,16 +109,18 @@ final class HomeViewModel {
     }
 
     func saveContext() {
-        guard let mood = profileService.todaysMood else { return }
+        let dateString = CheckIn.dateString(for: Date.now)
+        guard let mood = profileService.profile.checkIns.first(where: { $0.dateString == dateString })?.mood else { return }
         let factors = CheckInFactors(
             sleepQuality: sleepQuality,
             stressLevel: stressLevel,
             exercised: exercised,
             socialQuality: socialQuality
         )
+        let feelingsDescription = profileService.profile.checkIns.first { $0.dateString == dateString }?.feelingsDescription
         profileService.recordCheckIn(
             mood: mood,
-            feelingsDescription: profileService.todaysFeelingsDescription,
+            feelingsDescription: feelingsDescription,
             factors: factors
         )
         if #available(iOS 18, *) {
@@ -115,9 +133,7 @@ final class HomeViewModel {
 
     @available(iOS 18, *)
     private func writeToHealthKit(mood: Mood, factors: CheckInFactors?) async {
-        let service = Container.shared.healthKitService()
-        await service.requestAuthorizationIfNeeded()
-        service.writeStateOfMind(mood: mood, factors: factors)
+        await Container.shared.healthKitService().save(mood: mood, factors: factors)
     }
 
     func generateAffirmationIfNeeded() async {
@@ -133,7 +149,6 @@ final class HomeViewModel {
                 useAppleIntelligence: profileService.profile.isAppleIntelligenceActive && purchaseService.isPro
             )
             generatedQuotes = pairs
-            affirmationService.cacheBatch(pairs)
         } catch {
             self.error = ErrorInfo(title: "Couldn't Load Affirmations")
         }

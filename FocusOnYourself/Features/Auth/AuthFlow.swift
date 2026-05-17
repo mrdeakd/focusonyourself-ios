@@ -1,11 +1,9 @@
-import Factory
 import SwiftUI
 
 struct AuthFlow: View {
+    @Environment(\.dismiss) private var dismissAction
     @State private var viewModel = AuthViewModel()
     @State private var tab: Tab = .signIn
-
-    @ObservationIgnored @Injected(\.authService) private var authService
 
     private enum Tab { case signIn, createAccount }
 
@@ -19,10 +17,9 @@ struct AuthFlow: View {
                 SignUpScreen(viewModel: viewModel, onSwitchToSignIn: { tab = .signIn })
             }
         }
-        .onChange(of: authService.isAuthenticated) { _, isAuth in
+        .onChange(of: viewModel.isAuthenticated) { _, isAuth in
             if isAuth { dismissAction() }
         }
+        .onChange(of: tab) { viewModel.error = nil }
     }
-
-    @Environment(\.dismiss) private var dismissAction
 }

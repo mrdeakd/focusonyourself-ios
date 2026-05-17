@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsAppearanceSection: View {
-    let viewModel: SettingsViewModel
+    let viewModel: AccountViewModel
 
     private var selectedAppearanceOption: String {
         switch viewModel.appearanceOverride {

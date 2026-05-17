@@ -1,4 +1,4 @@
-import CoreFoundation
+import Foundation
 
 enum CornerRadius {
     static let card: CGFloat = 12   // category rows

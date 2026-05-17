@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 enum MeditationCategory: String, CaseIterable, Codable {
     case morning

@@ -7,6 +7,7 @@ final class AuthViewModel {
     var password = ""
     var confirmPassword = ""
     var isLoading = false
+    var isAuthenticated = false
     var error: ErrorInfo?
 
     @ObservationIgnored @Injected(\.authService) private var authService
@@ -17,6 +18,7 @@ final class AuthViewModel {
         error = nil
         do {
             try await authService.signIn(email: email, password: password)
+            isAuthenticated = true
         } catch let networkError as NetworkError {
             if case .badResponse(let code) = networkError, code == 401 {
                 error = ErrorInfo(title: "Incorrect email or password")
@@ -38,6 +40,7 @@ final class AuthViewModel {
         error = nil
         do {
             try await authService.register(email: email, password: password)
+            isAuthenticated = true
         } catch let networkError as NetworkError {
             if case .badResponse(let code) = networkError, code == 409 {
                 error = ErrorInfo(title: "Email already in use")

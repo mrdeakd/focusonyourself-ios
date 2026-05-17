@@ -1,14 +1,14 @@
 import SwiftUI
 
-struct SettingsDailyContextSection: View {
-    let viewModel: SettingsViewModel
+struct SettingsCategoriesSection: View {
+    let viewModel: AccountViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("DAILY CONTEXT")
+            SectionLabel("AFFIRMATION CATEGORIES")
             VStack(spacing: 0) {
                 HStack {
-                    Text(viewModel.activeFactorSummary)
+                    Text(viewModel.currentCategoriesSummary)
                         .font(.foyHint)
                         .foregroundStyle(Color.foyForegroundSecondary)
                     Spacer()
@@ -21,10 +21,10 @@ struct SettingsDailyContextSection: View {
                     .frame(height: 1)
 
                 Button {
-                    viewModel.showDailyContextSheet = true
+                    viewModel.showChangeCategoriesSheet = true
                 } label: {
                     HStack {
-                        Text("Manage factors")
+                        Text("Change categories")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
                         Spacer()

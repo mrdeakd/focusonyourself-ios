@@ -54,6 +54,10 @@ struct SignUpScreen: View {
 
     private var formBlock: some View {
         VStack(spacing: Spacing.sm) {
+            if let error = viewModel.error {
+                InlineErrorView(error: error)
+            }
+
             TextField("Email", text: $viewModel.email)
                 .font(.foyInputText)
                 .foregroundStyle(Color.foyForeground)
@@ -85,10 +89,6 @@ struct SignUpScreen: View {
                 .background(Color.foyCard)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.input))
                 .overlay { RoundedRectangle(cornerRadius: CornerRadius.input).stroke(Color.foyBorder, lineWidth: 1) }
-
-            if let error = viewModel.error {
-                InlineErrorView(error: error)
-            }
         }
     }
 

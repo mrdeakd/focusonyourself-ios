@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ChangeNameSheet: View {
-    var viewModel: SettingsViewModel
+    var viewModel: AccountViewModel
 
     @Environment(\.dismiss) private var dismiss
     @State private var newName: String = ""
@@ -40,7 +40,7 @@ struct ChangeNameSheet: View {
 // MARK: - ChangeNameCurrentSection
 
 struct ChangeNameCurrentSection: View {
-    let viewModel: SettingsViewModel
+    let viewModel: AccountViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {

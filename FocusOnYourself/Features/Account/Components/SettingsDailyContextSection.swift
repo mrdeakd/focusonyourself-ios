@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct SettingsNameSection: View {
-    let viewModel: SettingsViewModel
+struct SettingsDailyContextSection: View {
+    let viewModel: AccountViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("YOUR NAME")
+            SectionLabel("DAILY CONTEXT")
             VStack(spacing: 0) {
                 HStack {
-                    Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
-                        .font(.foyBody)
-                        .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
+                    Text(viewModel.activeFactorSummary)
+                        .font(.foyHint)
+                        .foregroundStyle(Color.foyForegroundSecondary)
                     Spacer()
                 }
                 .padding(.horizontal, Spacing.md)
@@ -21,10 +21,10 @@ struct SettingsNameSection: View {
                     .frame(height: 1)
 
                 Button {
-                    viewModel.showChangeNameSheet = true
+                    viewModel.showDailyContextSheet = true
                 } label: {
                     HStack {
-                        Text("Change name")
+                        Text("Manage factors")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
                         Spacer()

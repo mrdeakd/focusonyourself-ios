@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(ProfileService.self) private var profileService
+    var onboardingCompleted: Bool
 
     var body: some View {
-        if profileService.profile.onboardingCompleted {
+        if onboardingCompleted {
             MainTabView()
         } else {
             OnboardingFlow()
@@ -13,6 +13,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
-        .environment(ProfileService())
+    ContentView(onboardingCompleted: true)
 }

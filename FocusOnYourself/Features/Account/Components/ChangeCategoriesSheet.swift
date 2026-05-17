@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ChangeCategoriesSheet: View {
-    var viewModel: SettingsViewModel
+    var viewModel: AccountViewModel
 
     @Environment(\.dismiss) private var dismiss
     @State private var draftCategories: Set<AffirmationCategory> = []
@@ -42,7 +42,7 @@ struct ChangeCategoriesSheet: View {
 // MARK: - ChangeCategoriesContent
 
 struct ChangeCategoriesContent: View {
-    let viewModel: SettingsViewModel
+    let viewModel: AccountViewModel
     @Binding var draftCategories: Set<AffirmationCategory>
     @Binding var showPaywall: Bool
 

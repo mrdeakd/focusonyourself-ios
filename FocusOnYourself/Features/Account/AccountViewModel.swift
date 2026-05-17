@@ -4,20 +4,41 @@ import FoundationModels
 import Observation
 
 @Observable @MainActor
-final class SettingsViewModel {
+final class AccountViewModel {
     @ObservationIgnored @Injected(\.profileService) private var profileService
     @ObservationIgnored @Injected(\.notificationService) private var notificationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
     @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
     @ObservationIgnored @Injected(\.authService) private var authService
+    @ObservationIgnored @Injected(\.keychainService) private var keychain
 
-    var isAuthenticated: Bool { authService.isAuthenticated }
-    var accountEmail: String? { authService.userEmail }
+    var isAuthenticated: Bool
+    var isRefreshing = false
+    var accountEmail: String?
     var showAuthFlow = false
     var showSettingsSheet = false
+    var isPro: Bool { purchaseService.isPro }
+
+    init() {
+        let token = _keychain.wrappedValue.load(key: KeychainService.accessTokenKey)
+        isAuthenticated = token.map { !$0.isEmpty } ?? false
+        accountEmail = _keychain.wrappedValue.load(key: KeychainService.userEmailKey)
+    }
 
     func signOut() async {
         await authService.signOut()
+        isAuthenticated = false
+        accountEmail = nil
+    }
+
+    func refreshAuthState() async {
+        let token = keychain.load(key: KeychainService.accessTokenKey)
+        guard token.map({ !$0.isEmpty }) ?? false, !isAuthenticated else { return }
+        isRefreshing = true
+        try? await Task.sleep(for: .milliseconds(350))
+        isAuthenticated = true
+        accountEmail = keychain.load(key: KeychainService.userEmailKey)
+        isRefreshing = false
     }
 
     var currentName: String {
@@ -31,9 +52,9 @@ final class SettingsViewModel {
     var currentNotifications: Bool {
         get { profileService.profile.notificationsEnabled }
         set {
-            var profile = profileService.profile
-            profile.notificationsEnabled = newValue
-            profileService.updateProfile(profile)
+            var updated = profileService.profile
+            updated.notificationsEnabled = newValue
+            profileService.updateProfile(updated)
             if newValue {
                 notificationService.schedule(name: profileService.profile.name)
             } else {
@@ -45,37 +66,35 @@ final class SettingsViewModel {
     var appearanceOverride: String? {
         get { profileService.profile.appearanceOverride }
         set {
-            var profile = profileService.profile
-            profile.appearanceOverride = newValue
-            profileService.updateProfile(profile)
+            var updated = profileService.profile
+            updated.appearanceOverride = newValue
+            profileService.updateProfile(updated)
         }
     }
 
     var currentAppleIntelligence: Bool {
         get { profileService.profile.appleIntelligenceEnabled }
         set {
-            var profile = profileService.profile
-            profile.appleIntelligenceEnabled = newValue
-            profileService.updateProfile(profile)
+            var updated = profileService.profile
+            updated.appleIntelligenceEnabled = newValue
+            profileService.updateProfile(updated)
         }
     }
-
-    var isPro: Bool { purchaseService.isPro }
 
     var isAppleIntelligenceAvailable: Bool {
         SystemLanguageModel.default.isAvailable
     }
 
     func updateName(_ name: String) {
-        var profile = profileService.profile
-        profile.name = name
-        profileService.updateProfile(profile)
+        var updated = profileService.profile
+        updated.name = name
+        profileService.updateProfile(updated)
     }
 
     func updateCategories(_ categories: Set<AffirmationCategory>) {
-        var profile = profileService.profile
-        profile.selectedCategories = Array(categories)
-        profileService.updateProfile(profile)
+        var updated = profileService.profile
+        updated.selectedCategories = Array(categories)
+        profileService.updateProfile(updated)
     }
 
     var showChangeNameSheet = false
@@ -92,8 +111,18 @@ final class SettingsViewModel {
         currentCategories.map(\.displayName).sorted().joined(separator: ", ")
     }
 
-    func resetAllData() {
+    func resetAllData() async {
         profileService.resetAllData()
+        notificationService.cancel()
+        userDefaultsService.setLocalBool(.showSleepFactor, value: true)
+        userDefaultsService.setLocalBool(.showStressFactor, value: true)
+        userDefaultsService.setLocalBool(.showExerciseFactor, value: true)
+        userDefaultsService.setLocalBool(.showSocialFactor, value: true)
+        userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
+        await authService.signOut()
+        await purchaseService.refreshEntitlements()
+        isAuthenticated = false
+        accountEmail = nil
     }
 
     var showSleepFactor: Bool {

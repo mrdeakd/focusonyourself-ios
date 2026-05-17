@@ -1,42 +1,27 @@
 import Factory
 import Foundation
+import Observation
 import WidgetKit
 
-private struct PendingWidgetCheckIn: Codable {
-    let moodRawValue: String
-    let dateString: String
-    let timestamp: Date
-}
-
+@Observable
 final class ProfileService: ProfileServiceProtocol {
     private(set) var profile = UserProfile()
 
-    @Injected(\.userDefaultsService) private var userDefaultsService
-    @Injected(\.networkClient) private var networkClient
-    @Injected(\.keychainService) private var keychainService
-
-    private var profileContinuations: [UUID: AsyncStream<UserProfile>.Continuation] = [:]
+    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
+    @ObservationIgnored @Injected(\.checkinsService) private var checkinsService
 
     init() {
-        if let data = userDefaultsService.getData(.userProfile) {
-            do {
-                self.profile = try JSONDecoder().decode(UserProfile.self, from: data)
-            } catch {
-                assertionFailure("Failed to decode UserProfile: \(error)")
-            }
-        }
+        profile = userDefaultsService.getData(.userProfile)
+            .flatMap { try? JSONDecoder().decode(UserProfile.self, from: $0) }
+            ?? UserProfile()
     }
 
     func updateProfile(_ profile: UserProfile) {
         self.profile = profile
-        do {
-            let data = try JSONEncoder().encode(profile)
+        if let data = try? JSONEncoder().encode(profile) {
             userDefaultsService.setData(.userProfile, value: data)
-        } catch {
-            assertionFailure("Failed to encode UserProfile: \(error)")
         }
         WidgetCenter.shared.reloadAllTimelines()
-        notifyAll()
     }
 
     func recordCheckIn(mood: Mood, feelingsDescription: String?, factors: CheckInFactors? = nil) {
@@ -49,14 +34,10 @@ final class ProfileService: ProfileServiceProtocol {
             updatedProfile.checkIns.append(entry)
         }
         updateProfile(updatedProfile)
-        WidgetCenter.shared.reloadAllTimelines()
 
-        if keychainService.load(key: KeychainService.accessTokenKey) != nil {
-            let body = entry.toBackendModel()
-            Task { [weak self] in
-                guard let self else { return }
-                _ = try? await self.networkClient.post("/api/checkins", body: body) as EmptyResponse
-            }
+        Task { [weak self] in
+            guard let self else { return }
+            try? await self.checkinsService.post(entry)
         }
     }
 
@@ -131,7 +112,6 @@ final class ProfileService: ProfileServiceProtocol {
         userDefaultsService.setData(.affirmationCacheDate, value: nil)
         profile = UserProfile()
         WidgetCenter.shared.reloadAllTimelines()
-        notifyAll()
     }
 
     func mergeWidgetCheckIn() {
@@ -161,28 +141,5 @@ final class ProfileService: ProfileServiceProtocol {
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day
         }
         return start
-    }
-}
-
-// MARK: - State Stream
-
-extension ProfileService {
-    func profileUpdates() -> AsyncStream<UserProfile> {
-        let id = UUID()
-        return AsyncStream { [weak self] continuation in
-            self?.profileContinuations[id] = continuation
-            if let profile = self?.profile {
-                continuation.yield(profile)
-            }
-            continuation.onTermination = { @Sendable [weak self] _ in
-                Task { @MainActor [weak self] in
-                    self?.profileContinuations.removeValue(forKey: id)
-                }
-            }
-        }
-    }
-
-    private func notifyAll() {
-        profileContinuations.values.forEach { $0.yield(profile) }
     }
 }

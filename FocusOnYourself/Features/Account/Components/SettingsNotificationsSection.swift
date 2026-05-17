@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsNotificationsSection: View {
-    let viewModel: SettingsViewModel
+    let viewModel: AccountViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {

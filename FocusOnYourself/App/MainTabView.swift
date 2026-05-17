@@ -14,7 +14,7 @@ struct MainTabView: View {
                 case .historyInsights:
                     HistoryInsightsScreen()
                 case .settings:
-                    SettingsScreen()
+                    AccountScreen()
                 }
             }
             .frame(maxHeight: .infinity)

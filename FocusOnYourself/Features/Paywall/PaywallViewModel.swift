@@ -13,23 +13,21 @@ final class PaywallViewModel {
     var error: ErrorInfo?
     var shouldDismiss = false
     var showSuccess = false
+    var isPro: Bool { purchaseService.isPro }
+    var products: [Product]
 
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
 
     var monthlyProduct: Product? {
-        purchaseService.products.first { $0.id == purchaseService.productMonthly }
+        products.first { $0.id == ProductID.monthly }
     }
 
     var annualProduct: Product? {
-        purchaseService.products.first { $0.id == purchaseService.productAnnual }
+        products.first { $0.id == ProductID.annual }
     }
 
     var selectedProduct: Product? {
         selectedPlan == .monthly ? monthlyProduct : annualProduct
-    }
-
-    var isPro: Bool {
-        purchaseService.isPro
     }
 
     var ctaDisabled: Bool {
@@ -48,8 +46,14 @@ final class PaywallViewModel {
         return "Start Free Trial"
     }
 
+    init() {
+        products = []
+    }
+
     func onAppear() async {
+        async let loadedProducts = purchaseService.loadProducts()
         await purchaseService.refreshEntitlements()
+        products = await loadedProducts
     }
 
     func purchase() {
@@ -97,7 +101,6 @@ final class PaywallViewModel {
 
     func restore() {
         error = nil
-
         isLoading = true
 
         Task {

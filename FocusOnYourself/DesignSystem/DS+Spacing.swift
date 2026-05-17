@@ -1,4 +1,4 @@
-import CoreFoundation
+import Foundation
 
 enum Spacing {
     // Base scale

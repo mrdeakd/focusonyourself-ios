@@ -1,29 +1,17 @@
 import Factory
 import Foundation
+import Observation
 import StoreKit
 
+@Observable
 final class PurchaseService: PurchaseServiceProtocol {
-    let productMonthly = "com.focusonyourself.pro.monthly.renewal"
-    let productAnnual  = "com.focusonyourself.pro.annual.renewal"
+    private(set) var isPro = false
 
-    @Injected(\.userDefaultsService) private var userDefaultsService
-
-    private var _isPro = false
-
-    var isPro: Bool {
-        #if DEBUG
-        if userDefaultsService.getBool(.isProDebugOverride) {
-            return true
-        }
-        #endif
-        return _isPro
-    }
-
-    private var updatesTask: Task<Void, Never>?
-    private var isProContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
+    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
+    @ObservationIgnored private var updatesTask: Task<Void, Never>?
 
     init() {
-        _isPro = _userDefaultsService.wrappedValue.getBool(.isPro)
+        isPro = userDefaultsService.getBool(.isPro)
         Task { await refreshEntitlements() }
         updatesTask = Task {
             for await _ in Transaction.updates {
@@ -34,7 +22,7 @@ final class PurchaseService: PurchaseServiceProtocol {
 
     func loadProducts() async -> [Product] {
         do {
-            return try await Product.products(for: [productMonthly, productAnnual])
+            return try await Product.products(for: [ProductID.monthly, ProductID.annual])
         } catch {
             return []
         }
@@ -76,35 +64,13 @@ final class PurchaseService: PurchaseServiceProtocol {
         var hasEntitlement = false
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
-                transaction.productID == productMonthly || transaction.productID == productAnnual,
+                transaction.productID == ProductID.monthly || transaction.productID == ProductID.annual,
                 transaction.revocationDate == nil {
                 hasEntitlement = true
                 break
             }
         }
-        _isPro = hasEntitlement
+        isPro = hasEntitlement
         userDefaultsService.setBool(.isPro, value: hasEntitlement)
-        notifyAll()
-    }
-}
-
-// MARK: - State Stream
-
-extension PurchaseService {
-    func isProUpdates() -> AsyncStream<Bool> {
-        let id = UUID()
-        return AsyncStream { [weak self] continuation in
-            self?.isProContinuations[id] = continuation
-            continuation.yield(self?.isPro ?? false)
-            continuation.onTermination = { @Sendable [weak self] _ in
-                Task { @MainActor [weak self] in
-                    self?.isProContinuations.removeValue(forKey: id)
-                }
-            }
-        }
-    }
-
-    private func notifyAll() {
-        isProContinuations.values.forEach { $0.yield(isPro) }
     }
 }

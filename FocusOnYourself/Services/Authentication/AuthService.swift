@@ -5,6 +5,7 @@ final class AuthService: AuthServiceProtocol {
     @Injected(\.keychainService) private var keychain
     @Injected(\.networkClient) private var networkClient
     @Injected(\.profileService) private var profileService
+    @Injected(\.checkinsService) private var checkinsService
 
     func register(email: String, password: String) async throws {
         let response: AuthResponse = try await networkClient.post(
@@ -33,7 +34,9 @@ final class AuthService: AuthServiceProtocol {
 
     func refreshTokenIfNeeded() async {
         guard let accessToken = keychain.load(key: KeychainService.accessTokenKey),
-            jwtIsNearExpiry(accessToken) else { return }
+              jwtIsNearExpiry(accessToken) else {
+            return
+        }
 
         guard let refresh = keychain.load(key: KeychainService.refreshTokenKey) else {
             keychain.clearAuthTokens()
@@ -57,17 +60,13 @@ final class AuthService: AuthServiceProtocol {
 
 private extension AuthService {
     func uploadLocalCheckIns() async {
-        let items = profileService.profile.checkIns.map { $0.toBackendModel() }
-        guard !items.isEmpty else { return }
-        _ = try? await networkClient.post(
-            "/api/checkins/import",
-            body: ImportCheckInsBody(checkIns: items)
-        ) as EmptyResponse
+        let checkIns = profileService.profile.checkIns
+        guard !checkIns.isEmpty else { return }
+        try? await checkinsService.importAll(checkIns)
     }
 
     func downloadAndReplaceCheckIns() async {
-        guard let backends: [BackendCheckIn] = try? await networkClient.get("/api/checkins") else { return }
-        let checkIns = backends.compactMap { $0.toDomainModel() }
+        guard let checkIns = try? await checkinsService.fetch() else { return }
         await MainActor.run { profileService.replaceCheckIns(checkIns) }
     }
 }

@@ -1,22 +1,30 @@
 import SwiftUI
 
-// Pencil design: signed-out node zDSjd · signed-in node hEerR
 struct SettingsAccountSection: View {
-    var viewModel: SettingsViewModel
+    var viewModel: AccountViewModel
 
     private let cardRadius: CGFloat = 20
 
     var body: some View {
         Group {
-            if viewModel.isAuthenticated {
+            if viewModel.isRefreshing {
+                SkeletonAccountCard()
+                    .transition(.opacity)
+            } else if viewModel.isAuthenticated {
                 signedInCard
+                    .transition(.opacity)
             } else {
                 signedOutCard
+                    .transition(.opacity)
             }
         }
-        .fullScreenCover(isPresented: Bindable(viewModel).showAuthFlow) {
-            AuthFlow()
-        }
+        .animation(.easeInOut(duration: 0.25), value: viewModel.isRefreshing)
+        .animation(.easeInOut(duration: 0.25), value: viewModel.isAuthenticated)
+        .fullScreenCover(
+            isPresented: Bindable(viewModel).showAuthFlow,
+            onDismiss: { Task { await viewModel.refreshAuthState() } },
+            content: { AuthFlow() }
+        )
     }
 
     // MARK: - Signed out: navy CTA card

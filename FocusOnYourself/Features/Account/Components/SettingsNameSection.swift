@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct SettingsCategoriesSection: View {
-    let viewModel: SettingsViewModel
+struct SettingsNameSection: View {
+    let viewModel: AccountViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("AFFIRMATION CATEGORIES")
+            SectionLabel("YOUR NAME")
             VStack(spacing: 0) {
                 HStack {
-                    Text(viewModel.currentCategoriesSummary)
-                        .font(.foyHint)
-                        .foregroundStyle(Color.foyForegroundSecondary)
+                    Text(viewModel.currentName.isEmpty ? "Your name" : viewModel.currentName)
+                        .font(.foyBody)
+                        .foregroundStyle(viewModel.currentName.isEmpty ? Color.foyPlaceholder : Color.foyForeground)
                     Spacer()
                 }
                 .padding(.horizontal, Spacing.md)
@@ -21,10 +21,10 @@ struct SettingsCategoriesSection: View {
                     .frame(height: 1)
 
                 Button {
-                    viewModel.showChangeCategoriesSheet = true
+                    viewModel.showChangeNameSheet = true
                 } label: {
                     HStack {
-                        Text("Change categories")
+                        Text("Change name")
                             .font(.foyCaptionMedium)
                             .foregroundStyle(Color.foyNavy)
                         Spacer()

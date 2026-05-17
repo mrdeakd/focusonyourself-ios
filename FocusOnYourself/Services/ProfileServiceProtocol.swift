@@ -6,7 +6,6 @@ protocol ProfileServiceProtocol: AnyObject {
     func updateProfile(_ profile: UserProfile)
     func recordCheckIn(mood: Mood, feelingsDescription: String?, factors: CheckInFactors?)
     func streakStats() -> (current: Int, longest: Int)
-    func profileUpdates() -> AsyncStream<UserProfile>
 
     var streakStartDate: Date? { get }
     var earliestCheckInDate: Date? { get }

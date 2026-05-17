@@ -23,9 +23,6 @@ struct SettingsSheet: View {
                         if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
                             SettingsAppleIntelligenceSection(viewModel: viewModel)
                         }
-                        #if DEBUG
-                        debugSection
-                        #endif
                     }
                     .padding(.horizontal, Spacing.screenHorizontal)
                     .padding(.top, Spacing.lg)
@@ -52,26 +49,11 @@ struct SettingsSheet: View {
             titleVisibility: .visible
         ) { // swiftlint:enable vertical_parameter_alignment_on_call
             Button("Reset Everything", role: .destructive) {
-                viewModel.resetAllData()
+                Task { await viewModel.resetAllData() }
             }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This will permanently delete all your check-ins, streaks, and settings. This cannot be undone.")
         }
     }
-
-    #if DEBUG
-    private var debugSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            SectionLabel("DEBUG")
-            Toggle("Force Pro (debug)", isOn: Bindable(viewModel).isProDebugOverride)
-                .font(.foyBody)
-                .foregroundStyle(Color.foyForeground)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.sm)
-                .background(Color.foyCard)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
-        }
-    }
-    #endif
 }

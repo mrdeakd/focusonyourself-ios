@@ -45,23 +45,31 @@ Key limits: line length 130 (error), file length 400/500, function body 75 lines
 |-------|----------|------|
 | Screens | `Features/*/` | Only a `@State private var viewModel = …ViewModel()` — no state, no logic |
 | ViewModels | `Features/*/` | `@Observable @MainActor final class` — all state, all logic, calls services via Task |
-| Services | `Services/` | `@Observable @MainActor` singletons registered in `Container+App.swift` |
+| Services | `Services/` | Plain `@MainActor` singletons registered in `Container+App.swift` — NOT `@Observable` |
 | Models | `Models/` | Plain `Codable` structs/enums, no logic |
 | Design System | `DesignSystem/` | Tokens only — `DS+Colors.swift`, `DS+Spacing.swift`, `DS+Typography.swift`, etc. |
 | Components | `Features/*/Components/` or `DesignSystem/Components/` | Reusable views in their own files |
 
 ### Dependency Injection (Factory)
 
-All services are registered as singletons in `Container+App.swift`. ViewModels inject via default parameters:
+All services are registered as singletons in `Container+App.swift` using their **protocol type** — never the concrete class. This enforces the protocol boundary so callers can't reach internal implementation details (e.g. `notifyAll()`):
+
+```swift
+var profileService: Factory<ProfileServiceProtocol> {
+    self { @MainActor in ProfileService() }.singleton
+}
+```
+
+ViewModels inject via `@ObservationIgnored @Injected`:
 
 ```swift
 @Observable @MainActor final class HomeViewModel {
-    @Injected(\.profileService) private var profileService
-    @Injected(\.affirmationService) private var affirmationService
+    @ObservationIgnored @Injected(\.profileService) private var profileService
 }
 ```
 
 Views **never** call `Container.shared.resolve()`. Services are never accessed as singletons from views.
+
 
 ### Data Persistence
 
@@ -73,9 +81,13 @@ Views **never** call `Container.shared.resolve()`. Services are never accessed a
 
 The root model is `UserProfile` (contains `[CheckIn]`). `ProfileService` owns all read/write operations on it.
 
+### State Propagation
+
+`ProfileService` and `PurchaseService` are `@Observable`. ViewModels expose their reactive state as computed properties that read from the service directly (e.g. `var greeting: String { profileService.profile.name }`). SwiftUI's observation system tracks these reads transitively — when a service property changes, any view that accessed it re-renders automatically. No subscription methods, no local copies, no `.task` wiring needed for state observation. Pure request-response services remain plain `final class`.
+
 ### Navigation
 
-- Root (`ContentView`) switches between `OnboardingFlowView` and `MainTabView` based on `profileService.profile.onboardingCompleted`.
+- Root (`ContentView`) switches between `OnboardingFlow` and `MainTabView` based on `AppRootViewModel.onboardingCompleted` (computed from `ProfileService.profile`).
 - `MainTabView` has 4 tabs driven by `AppTab` enum: Check-In, Meditate, History/Insights, Settings. (enum cases: `.checkin`, `.meditate`, `.historyInsights`, `.settings`)
 - Use `NavigationStack` with typed route enums per feature. Never use `NavigationView`.
 
@@ -103,7 +115,8 @@ Always add `.scrollIndicators(.hidden)` to every `ScrollView`.
 - `App/Container+App.swift` — all service registrations; add new services here
 - `Services/ProfileService.swift` — source of truth for user data, streaks, check-ins
 - `Services/UserDefaultsService.swift` — all persistence reads/writes
-- `Models/UserProfile.swift` + `Models/CheckIn.swift` — core Codable models
+- `Models/UserProfile.swift` + `Models/CheckIn.swift` — core Codable models (domain/persistence)
+- `Networking/Models/Article.swift` + `Networking/Models/MeditationSession.swift` — API response models
 - `DesignSystem/DS+Colors.swift` — full color token list
 - `DesignSystem/DS+Spacing.swift` — spacing scale
 - `FocusOnYourselfWidgets/WidgetDataProvider.swift` — widget data layer (keep in sync with main models)
@@ -243,14 +256,69 @@ final class MyViewModel {
 
 ### Services
 
+Every service has two files: `XxxServiceProtocol.swift` (the interface) and `XxxService.swift` (the implementation). Services are plain `final class` — no `@Observable`, no `@MainActor`, no `@ObservationIgnored`. All dependencies are injected via `@Injected`:
+
 ```swift
-// Container+App.swift
-var myService: Factory<MyServiceProtocol> {
-    self { @MainActor in MyService() }.singleton
+// XxxServiceProtocol.swift
+protocol XxxServiceProtocol {
+    func methodName() async throws -> ReturnType
+}
+
+// XxxService.swift
+import Factory
+
+final class XxxService: XxxServiceProtocol {
+    @Injected(\.networkClient) private var networkClient
+    @Injected(\.userDefaultsService) private var userDefaultsService
+
+    func methodName() async throws -> ReturnType {
+        try await networkClient.get("/api/path")
+    }
 }
 ```
 
-Mark internal non-UI state with `@ObservationIgnored`. Services never accessed directly from views.
+**Container registration** (always via protocol type, no init parameters):
+```swift
+var myService: Factory<MyServiceProtocol> {
+    self { MyService() }.singleton
+}
+```
+
+**Exception — `ProfileService` and `PurchaseService`**: Both are `@Observable final class` registered with their concrete type (`Factory<ProfileService>` / `Factory<PurchaseService>`). `ProfileService` is passed into the SwiftUI view tree via `.environment()`; `PurchaseService` is injected via `@Injected` but observed transitively through ViewModels. Their `@Injected` dependencies must use `@ObservationIgnored` to prevent a backing-storage name collision with the `@Observable` macro. When mutating `@Observable`-tracked properties from inside the class, always assign to `self.property` — never to the synthesized `_property` backing store, which bypasses the observation system.
+
+**Never use `NotificationCenter`** for propagating state changes between services and views — use `@Observable` or async sequences instead.
+
+**Model placement:**
+- API request/response models → `Networking/Models/`
+- Domain and persistence models → `Models/`
+- No `import SwiftUI` in model files. UI-specific properties (colors, tints) go in a `ModelType+UI.swift` extension placed near the views that consume them.
+
+**Model conversion (domain ↔ backend):** When a domain model needs to be serialised for the API (or deserialised from it), add two extensions — both in the backend model file (`Networking/Models/BackendModel.swift`), not split across files:
+
+```swift
+extension CheckIn {
+    func toBackendModel() -> BackendCheckIn { … }   // outbound: domain → API
+}
+
+extension BackendCheckIn {
+    func toDomainModel() -> CheckIn? { … }          // inbound: API → domain (optional = validation can fail)
+}
+```
+
+Rules:
+- Naming: always `toBackendModel()` and `toDomainModel()`.
+- `toDomainModel()` returns an optional when any field requires validation (e.g. `guard let mood = Mood(rawValue: mood)`). Use `compactMap` at call sites to filter invalid entries.
+- Enum conversion: `.rawValue` outbound; guarded `Enum(rawValue:)` inbound.
+- Optional sub-model groups: collect multiple optional fields into an optional struct using an inline closure:
+  ```swift
+  let factors: CheckInFactors? = {
+      guard let sleepQuality, let stressLevel,
+            let exercised, let socialQuality else { return nil }
+      return CheckInFactors(…)
+  }()
+  ```
+
+**Views must never access services directly.** No `@Injected` or `Container.shared` in a view struct. All service interaction goes through a ViewModel. The only exception is `ProfileService` accessed via `@Environment(ProfileService.self)` — that is the established SwiftUI observation pattern for the root routing layer.
 
 ### Swift Concurrency
 
@@ -269,6 +337,16 @@ func load() {
 - Never `try?` to suppress errors — always catch and surface
 - Cancel superseded tasks: store as `private var loadTask: Task<Void, Never>?`, cancel before re-launching
 
+**Best-effort fire-and-forget pattern** (use sparingly): For non-critical background sync where local state is already saved and a network failure has no user-visible consequence, a silent Task is permitted:
+```swift
+// Local state is already persisted above — network sync is advisory only
+Task { [weak self] in
+    guard let self else { return }
+    _ = try? await networkClient.post(path, body: body) as EmptyResponse
+}
+```
+Only allowed when all three conditions hold: (1) data is already persisted locally, (2) failure has no user-visible consequence, (3) a comment explains why silent failure is acceptable.
+
 ### Error Handling
 
 ```swift
@@ -285,6 +363,14 @@ ViewModels expose `var error: ErrorInfo?`. Views display with `InlineErrorView(e
 
 Always `NavigationStack` — never `NavigationView`. Route enums per feature (`FeatureRoute.swift`). Navigation state owned by root screen `@State` or parent ViewModel.
 
+### Comments
+
+Never write comments. The only exceptions are:
+- `// MARK: -` section dividers
+- A comment that explains a non-obvious *why* — a hidden constraint, a workaround for a specific bug, or behavior that would surprise a reader
+
+Never write comments that describe what the code does, reference design tools (Pencil, Figma node IDs), name callers, or document current tasks.
+
 ### Swift Idioms
 
 - Prefer `Date.now` over `Date()` for clarity.
@@ -293,4 +379,4 @@ Always `NavigationStack` — never `NavigationView`. Route enums per feature (`F
 
 ### Widget Model Sync
 
-When modifying `CheckIn`, `Mood`, or `UserProfile`, manually update `FocusOnYourselfWidgets/WidgetDataProvider.swift`.
+When modifying `CheckIn`, `Mood`, `UserProfile`, or `PendingWidgetCheckIn`, manually update `FocusOnYourselfWidgets/WidgetDataProvider.swift`. The widget target cannot import the main app, so `WidgetDataProvider.swift` contains mirror copies (`WidgetPendingCheckIn`, etc.) that must be kept field-for-field identical — same property names, same types, same order — because both sides encode/decode the same `UserDefaults` data.

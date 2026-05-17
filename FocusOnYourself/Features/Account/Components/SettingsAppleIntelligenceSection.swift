@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsAppleIntelligenceSection: View {
-    @Bindable var viewModel: SettingsViewModel
+    @Bindable var viewModel: AccountViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {

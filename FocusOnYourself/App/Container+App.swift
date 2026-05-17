@@ -5,13 +5,14 @@ extension Container {
     var userDefaultsService: Factory<UserDefaultsServiceProtocol> {
         self { @MainActor in UserDefaultsService() }.singleton
     }
-    // Registered as concrete type: ProfileService is injected via SwiftUI .environment(),
-    // which requires @Observable — protocols can't satisfy that constraint.
-    var profileService: Factory<ProfileService> {
+    var profileService: Factory<ProfileServiceProtocol> {
         self { @MainActor in ProfileService() }.singleton
     }
     var notificationService: Factory<NotificationServiceProtocol> {
         self { @MainActor in NotificationService() }.singleton
+    }
+    var appleIntelligenceService: Factory<AppleIntelligenceServiceProtocol> {
+        self { @MainActor in AppleIntelligenceService() }.singleton
     }
     var affirmationService: Factory<AffirmationServiceProtocol> {
         self { @MainActor in AffirmationService() }.singleton
@@ -19,11 +20,14 @@ extension Container {
     var purchaseService: Factory<PurchaseServiceProtocol> {
         self { @MainActor in PurchaseService() }.singleton
     }
-    var keychainService: Factory<KeychainService> {
+    var keychainService: Factory<KeychainServiceProtocol> {
         self { @MainActor in KeychainService() }.singleton
     }
     var authService: Factory<AuthServiceProtocol> {
         self { @MainActor in AuthService() }.singleton
+    }
+    var checkinsService: Factory<CheckinsServiceProtocol> {
+        self { CheckinsService() }.singleton
     }
     var networkClient: Factory<NetworkClientProtocol> {
         self { @MainActor in  URLSessionNetworkClient(keychain: self.keychainService()) }.singleton
@@ -37,7 +41,6 @@ extension Container {
     var meditationAudioService: Factory<MeditationAudioServiceProtocol> {
         self { @MainActor in MeditationAudioService() }.singleton
     }
-    @available(iOS 18, *)
     var healthKitService: Factory<HealthKitServiceProtocol> {
         self { @MainActor in HealthKitService() }.singleton
     }

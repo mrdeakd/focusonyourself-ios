@@ -3,20 +3,6 @@ import Foundation
 final class UserDefaultsService: UserDefaultsServiceProtocol {
     private let appGroupDefaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
 
-    init() {
-        migrateFromKVSIfNeeded()
-    }
-
-    // One-time migration: copy userProfile from iCloud KVS to local defaults on upgrade
-    private func migrateFromKVSIfNeeded() {
-        let kvs = NSUbiquitousKeyValueStore.default
-        kvs.synchronize()
-        let key = UserDefaultsKey.userProfile.rawValue
-        if appGroupDefaults.data(forKey: key) == nil, let kvsData = kvs.data(forKey: key) {
-            appGroupDefaults.set(kvsData, forKey: key)
-        }
-    }
-
     func getData(_ key: UserDefaultsKey) -> Data? {
         appGroupDefaults.data(forKey: key.rawValue)
     }

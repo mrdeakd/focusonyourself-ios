@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DailyContextSheet: View {
-    var viewModel: SettingsViewModel
+    var viewModel: AccountViewModel
 
     @Environment(\.dismiss) private var dismiss
 

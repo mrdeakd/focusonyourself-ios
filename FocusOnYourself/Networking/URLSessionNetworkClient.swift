@@ -2,9 +2,9 @@ import Foundation
 
 struct URLSessionNetworkClient: NetworkClientProtocol {
     private let baseURL = URL(string: "https://focusonyourself-backend.onrender.com")!
-    private let keychain: KeychainService
+    private let keychain: KeychainServiceProtocol
 
-    init(keychain: KeychainService) {
+    init(keychain: KeychainServiceProtocol) {
         self.keychain = keychain
     }
 

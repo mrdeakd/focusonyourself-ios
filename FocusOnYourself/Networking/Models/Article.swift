@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 enum ArticleTopic: String, CaseIterable, Codable {
     case sleep
@@ -13,24 +13,6 @@ enum ArticleTopic: String, CaseIterable, Codable {
         case .mentalHealth: return "Mental Health"
         case .nutrition:    return "Nutrition & Gut Health"
         case .movement:     return "Movement & Exercise"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .sleep:        return .foyNavy
-        case .mentalHealth: return .foyOrange
-        case .nutrition:    return .foyGreen
-        case .movement:     return .foyOrangeAccent
-        }
-    }
-
-    var tintColor: Color {
-        switch self {
-        case .sleep:        return .foyNavyTint
-        case .mentalHealth: return .foyOrangeTint
-        case .nutrition:    return .foyGreenTint
-        case .movement:     return .foyOrangeTint
         }
     }
 

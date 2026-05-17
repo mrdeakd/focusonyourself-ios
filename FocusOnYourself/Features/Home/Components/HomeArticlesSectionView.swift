@@ -14,7 +14,6 @@ struct HomeArticlesSectionView: View {
                     ForEach(0..<4, id: \.self) { _ in
                         ArticleCardView(article: .placeholder)
                             .redacted(reason: .placeholder)
-                            .shimmer()
                     }
                 } else {
                     ForEach(articles.prefix(4)) { article in

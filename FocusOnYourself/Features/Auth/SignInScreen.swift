@@ -7,23 +7,26 @@ struct SignInScreen: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                titleBlock
-                formBlock
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    titleBlock
+                    formBlock
+                }
+                .padding(.top, Spacing.lg)
+                .padding(.horizontal, Spacing.screenHorizontal)
+                .padding(.bottom, Spacing.sm)
             }
-            .padding(.top, Spacing.lg)
-            .padding(.horizontal, Spacing.screenHorizontal)
-            .padding(.bottom, Spacing.sm)
-        }
-        .scrollIndicators(.hidden)
-        .scrollDismissesKeyboard(.interactively)
-        .safeAreaInset(edge: .bottom) {
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+
             bottomBlock
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.screenBottom)
+                .padding(.top, Spacing.sm)
                 .background(Color.foyBackground)
         }
+        .ignoresSafeArea(.keyboard)
     }
 
     private var titleBlock: some View {

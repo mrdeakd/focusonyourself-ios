@@ -1,6 +1,5 @@
 import Factory
 import Foundation
-import Observation
 import WidgetKit
 
 private struct PendingWidgetCheckIn: Codable {
@@ -9,41 +8,22 @@ private struct PendingWidgetCheckIn: Codable {
     let timestamp: Date
 }
 
-@Observable
 final class ProfileService: ProfileServiceProtocol {
-    private(set) var profile: UserProfile
+    private(set) var profile = UserProfile()
 
-    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
-    private var externalChangeObserver: NSObjectProtocol?
+    @Injected(\.userDefaultsService) private var userDefaultsService
+    @Injected(\.networkClient) private var networkClient
+    @Injected(\.keychainService) private var keychainService
+
+    private var profileContinuations: [UUID: AsyncStream<UserProfile>.Continuation] = [:]
 
     init() {
-        self.profile = UserProfile()
         if let data = userDefaultsService.getData(.userProfile) {
             do {
                 self.profile = try JSONDecoder().decode(UserProfile.self, from: data)
             } catch {
                 assertionFailure("Failed to decode UserProfile: \(error)")
             }
-        }
-        observeExternalChanges()
-    }
-
-    private func observeExternalChanges() {
-        externalChangeObserver = NotificationCenter.default.addObserver(
-            forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-            object: NSUbiquitousKeyValueStore.default,
-            queue: .main
-        ) { [weak self] _ in
-            self?.reloadProfile()
-        }
-    }
-
-    private func reloadProfile() {
-        guard let data = userDefaultsService.getData(.userProfile) else { return }
-        do {
-            self.profile = try JSONDecoder().decode(UserProfile.self, from: data)
-        } catch {
-            assertionFailure("Failed to decode UserProfile from external change: \(error)")
         }
     }
 
@@ -56,6 +36,7 @@ final class ProfileService: ProfileServiceProtocol {
             assertionFailure("Failed to encode UserProfile: \(error)")
         }
         WidgetCenter.shared.reloadAllTimelines()
+        notifyAll()
     }
 
     func recordCheckIn(mood: Mood, feelingsDescription: String?, factors: CheckInFactors? = nil) {
@@ -69,6 +50,20 @@ final class ProfileService: ProfileServiceProtocol {
         }
         updateProfile(updatedProfile)
         WidgetCenter.shared.reloadAllTimelines()
+
+        if keychainService.load(key: KeychainService.accessTokenKey) != nil {
+            let body = entry.toBackendModel()
+            Task { [weak self] in
+                guard let self else { return }
+                _ = try? await self.networkClient.post("/api/checkins", body: body) as EmptyResponse
+            }
+        }
+    }
+
+    func replaceCheckIns(_ checkIns: [CheckIn]) {
+        var updated = profile
+        updated.checkIns = checkIns
+        updateProfile(updated)
     }
 
     func streakStats() -> (current: Int, longest: Int) {
@@ -78,7 +73,6 @@ final class ProfileService: ProfileServiceProtocol {
         // Current streak: walk backward from today
         var current = 0
         var day = cal.startOfDay(for: Date.now)
-        // If today has no check-in, try from yesterday
         if !checkInDates.contains(day) {
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day
         }
@@ -137,6 +131,7 @@ final class ProfileService: ProfileServiceProtocol {
         userDefaultsService.setData(.affirmationCacheDate, value: nil)
         profile = UserProfile()
         WidgetCenter.shared.reloadAllTimelines()
+        notifyAll()
     }
 
     func mergeWidgetCheckIn() {
@@ -166,5 +161,28 @@ final class ProfileService: ProfileServiceProtocol {
             day = cal.date(byAdding: .day, value: -1, to: day) ?? day
         }
         return start
+    }
+}
+
+// MARK: - State Stream
+
+extension ProfileService {
+    func profileUpdates() -> AsyncStream<UserProfile> {
+        let id = UUID()
+        return AsyncStream { [weak self] continuation in
+            self?.profileContinuations[id] = continuation
+            if let profile = self?.profile {
+                continuation.yield(profile)
+            }
+            continuation.onTermination = { @Sendable [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.profileContinuations.removeValue(forKey: id)
+                }
+            }
+        }
+    }
+
+    private func notifyAll() {
+        profileContinuations.values.forEach { $0.yield(profile) }
     }
 }

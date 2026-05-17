@@ -1,27 +1,18 @@
 import Factory
 import Foundation
-import Observation
 
 final class AuthService: AuthServiceProtocol {
-    private(set) var isAuthenticated = false
-    private(set) var userEmail: String?
-
     @Injected(\.keychainService) private var keychain
     @Injected(\.networkClient) private var networkClient
-
-    init() {
-        if let token = _keychain.wrappedValue.load(key: KeychainService.accessTokenKey), !token.isEmpty {
-            isAuthenticated = true
-            userEmail = _keychain.wrappedValue.load(key: KeychainService.userEmailKey)
-        }
-    }
+    @Injected(\.profileService) private var profileService
 
     func register(email: String, password: String) async throws {
         let response: AuthResponse = try await networkClient.post(
             "/api/auth/register",
             body: LoginBody(email: email, password: password)
         )
-        storeTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
+        keychain.saveAuthTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
+        await uploadLocalCheckIns()
     }
 
     func signIn(email: String, password: String) async throws {
@@ -29,14 +20,15 @@ final class AuthService: AuthServiceProtocol {
             "/api/auth/login",
             body: LoginBody(email: email, password: password)
         )
-        storeTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
+        keychain.saveAuthTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
+        await downloadAndReplaceCheckIns()
     }
 
     func signOut() async {
         if let refresh = keychain.load(key: KeychainService.refreshTokenKey) {
             _ = try? await networkClient.post("/api/auth/logout", body: RefreshBody(refreshToken: refresh)) as EmptyResponse
         }
-        clearTokens()
+        keychain.clearAuthTokens()
     }
 
     func refreshTokenIfNeeded() async {
@@ -44,7 +36,7 @@ final class AuthService: AuthServiceProtocol {
             jwtIsNearExpiry(accessToken) else { return }
 
         guard let refresh = keychain.load(key: KeychainService.refreshTokenKey) else {
-            clearTokens()
+            keychain.clearAuthTokens()
             return
         }
 
@@ -56,24 +48,33 @@ final class AuthService: AuthServiceProtocol {
             try? keychain.save(key: KeychainService.accessTokenKey, value: response.accessToken)
             try? keychain.save(key: KeychainService.refreshTokenKey, value: response.refreshToken)
         } catch {
-            clearTokens()
+            keychain.clearAuthTokens()
         }
     }
 }
 
+// MARK: - Check-in sync
+
+private extension AuthService {
+    func uploadLocalCheckIns() async {
+        let items = profileService.profile.checkIns.map { $0.toBackendModel() }
+        guard !items.isEmpty else { return }
+        _ = try? await networkClient.post(
+            "/api/checkins/import",
+            body: ImportCheckInsBody(checkIns: items)
+        ) as EmptyResponse
+    }
+
+    func downloadAndReplaceCheckIns() async {
+        guard let backends: [BackendCheckIn] = try? await networkClient.get("/api/checkins") else { return }
+        let checkIns = backends.compactMap { $0.toDomainModel() }
+        await MainActor.run { profileService.replaceCheckIns(checkIns) }
+    }
+}
+
+// MARK: - JWT helper
+
 extension AuthService {
-    private func storeTokens(access: String, refresh: String, email: String) {
-        keychain.saveAuthTokens(access: access, refresh: refresh, email: email)
-        isAuthenticated = true
-        userEmail = email
-    }
-
-    private func clearTokens() {
-        keychain.clearAuthTokens()
-        isAuthenticated = false
-        userEmail = nil
-    }
-
     private func jwtIsNearExpiry(_ token: String) -> Bool {
         let parts = token.split(separator: ".").map(String.init)
         guard parts.count == 3 else { return true }

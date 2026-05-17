@@ -1,0 +1,11 @@
+import Factory
+import Foundation
+
+final class MeditationService: MeditationServiceProtocol {
+    @Injected(\.networkClient) private var networkClient
+
+    func sessions(for category: MeditationCategory?) async throws -> [MeditationSession] {
+        let path = category.map { "/api/meditations?category=\($0.rawValue)" } ?? "/api/meditations"
+        return try await networkClient.get(path)
+    }
+}

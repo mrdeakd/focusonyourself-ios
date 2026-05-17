@@ -14,6 +14,7 @@ final class SettingsViewModel {
     var isAuthenticated: Bool { authService.isAuthenticated }
     var accountEmail: String? { authService.userEmail }
     var showAuthFlow = false
+    var showSettingsSheet = false
 
     func signOut() async {
         await authService.signOut()

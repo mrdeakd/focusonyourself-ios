@@ -17,8 +17,14 @@ extension Container {
     var purchaseService: Factory<PurchaseServiceProtocol> {
         self { @MainActor in PurchaseService(userDefaultsService: self.userDefaultsService()) }.singleton
     }
+    var keychainService: Factory<KeychainService> {
+        self { KeychainService() }.singleton
+    }
+    var authService: Factory<AuthServiceProtocol> {
+        self { @MainActor in AuthService(keychain: self.keychainService(), networkClient: self.networkClient()) }.singleton
+    }
     var networkClient: Factory<NetworkClientProtocol> {
-        self { URLSessionNetworkClient() }.singleton
+        self { URLSessionNetworkClient(keychain: self.keychainService()) }.singleton
     }
     var articlesService: Factory<ArticlesServiceProtocol> {
         self { ArticlesService(networkClient: self.networkClient()) }.singleton

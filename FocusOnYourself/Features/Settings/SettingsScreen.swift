@@ -20,6 +20,7 @@ struct SettingsScreen: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.lg) {
+                        SettingsAccountSection(viewModel: viewModel)
                         if !viewModel.isPro {
                             SettingsSubscriptionSection(showPaywall: Bindable(viewModel).showPaywall)
                         }

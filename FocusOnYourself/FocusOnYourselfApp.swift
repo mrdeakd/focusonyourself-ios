@@ -29,6 +29,7 @@ private struct AppRootView: View {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     profileService.mergeWidgetCheckIn()
+                    Task { await Container.shared.authService().refreshTokenIfNeeded() }
                 }
             }
     }

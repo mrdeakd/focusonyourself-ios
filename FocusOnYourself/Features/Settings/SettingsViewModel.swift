@@ -9,6 +9,15 @@ final class SettingsViewModel {
     @ObservationIgnored @Injected(\.notificationService) private var notificationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
     @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
+    @ObservationIgnored @Injected(\.authService) private var authService
+
+    var isAuthenticated: Bool { authService.isAuthenticated }
+    var accountEmail: String? { authService.userEmail }
+    var showAuthFlow = false
+
+    func signOut() async {
+        await authService.signOut()
+    }
 
     var currentName: String {
         profileService.profile.name

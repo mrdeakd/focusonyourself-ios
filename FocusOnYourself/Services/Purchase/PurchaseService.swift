@@ -8,19 +8,22 @@ final class PurchaseService: PurchaseServiceProtocol {
 
     @Injected(\.userDefaultsService) private var userDefaultsService
 
+    private var _isPro = false
+
     var isPro: Bool {
         #if DEBUG
         if userDefaultsService.getBool(.isProDebugOverride) {
             return true
         }
         #endif
-        return userDefaultsService.getBool(.isPro)
+        return _isPro
     }
 
     private var updatesTask: Task<Void, Never>?
     private var isProContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
 
     init() {
+        _isPro = _userDefaultsService.wrappedValue.getBool(.isPro)
         Task { await refreshEntitlements() }
         updatesTask = Task {
             for await _ in Transaction.updates {
@@ -79,6 +82,7 @@ final class PurchaseService: PurchaseServiceProtocol {
                 break
             }
         }
+        _isPro = hasEntitlement
         userDefaultsService.setBool(.isPro, value: hasEntitlement)
         notifyAll()
     }

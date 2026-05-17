@@ -66,17 +66,13 @@ final class AuthService: AuthServiceProtocol {
     // MARK: - Private
 
     private func storeTokens(access: String, refresh: String, email: String) {
-        try? keychain.save(key: KeychainService.accessTokenKey, value: access)
-        try? keychain.save(key: KeychainService.refreshTokenKey, value: refresh)
-        try? keychain.save(key: KeychainService.userEmailKey, value: email)
+        keychain.saveAuthTokens(access: access, refresh: refresh, email: email)
         isAuthenticated = true
         userEmail = email
     }
 
     private func clearTokens() {
-        keychain.delete(key: KeychainService.accessTokenKey)
-        keychain.delete(key: KeychainService.refreshTokenKey)
-        keychain.delete(key: KeychainService.userEmailKey)
+        keychain.clearAuthTokens()
         isAuthenticated = false
         userEmail = nil
     }

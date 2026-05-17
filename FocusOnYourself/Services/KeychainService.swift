@@ -52,6 +52,20 @@ final class KeychainService {
         ]
         SecItemDelete(query as CFDictionary)
     }
+
+    // MARK: - Auth token convenience
+
+    func saveAuthTokens(access: String, refresh: String, email: String) {
+        try? save(key: Self.accessTokenKey, value: access)
+        try? save(key: Self.refreshTokenKey, value: refresh)
+        try? save(key: Self.userEmailKey, value: email)
+    }
+
+    func clearAuthTokens() {
+        delete(key: Self.accessTokenKey)
+        delete(key: Self.refreshTokenKey)
+        delete(key: Self.userEmailKey)
+    }
 }
 
 enum KeychainError: Error {

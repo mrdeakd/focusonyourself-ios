@@ -22,7 +22,7 @@ struct MeditateScreen: View {
                 ScrollView {
                     LazyVStack(spacing: Spacing.sm) {
                         if viewModel.isLoading {
-                            ForEach(0..<5, id: \.self) { _ in
+                            ForEach(0..<8, id: \.self) { _ in
                                 SessionCardView(session: .placeholder, isPro: false)
                                     .redacted(reason: .placeholder)
                             }

@@ -27,9 +27,9 @@ private struct ShimmerModifier: ViewModifier {
             .overlay {
                 LinearGradient(
                     stops: [
-                        .init(color: .clear, location: max(0, phase - 0.3)),
-                        .init(color: .white.opacity(0.45), location: phase),
-                        .init(color: .clear, location: min(1, phase + 0.3))
+                        .init(color: .clear,               location: max(0, min(1, phase - 0.3))),
+                        .init(color: .white.opacity(0.45), location: max(0, min(1, phase))),
+                        .init(color: .clear,               location: max(0, min(1, phase + 0.3))),
                     ],
                     startPoint: .leading,
                     endPoint: .trailing

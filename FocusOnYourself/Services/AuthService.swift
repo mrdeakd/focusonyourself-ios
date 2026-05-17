@@ -2,31 +2,6 @@ import Factory
 import Foundation
 import Observation
 
-private struct AuthResponse: Decodable {
-    let accessToken: String
-    let refreshToken: String
-    let user: AuthUser
-}
-
-private struct AuthUser: Decodable {
-    let id: String
-    let email: String
-}
-
-private struct RefreshResponse: Decodable {
-    let accessToken: String
-    let refreshToken: String
-}
-
-private struct LoginBody: Encodable {
-    let email: String
-    let password: String
-}
-
-private struct RefreshBody: Encodable {
-    let refreshToken: String
-}
-
 @Observable @MainActor
 final class AuthService: AuthServiceProtocol {
     private(set) var isAuthenticated = false
@@ -118,9 +93,6 @@ final class AuthService: AuthServiceProtocol {
         return exp - Date().timeIntervalSince1970 < 60
     }
 }
-
-// Minimal Codable helpers
-private struct EmptyResponse: Decodable {}
 
 private struct AnyCodable: Decodable {
     let doubleValue: Double?

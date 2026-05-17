@@ -2,20 +2,17 @@ import Factory
 import Foundation
 import Observation
 
-@Observable @MainActor
 final class AuthService: AuthServiceProtocol {
     private(set) var isAuthenticated = false
     private(set) var userEmail: String?
 
-    @ObservationIgnored private let keychain: KeychainService
-    @ObservationIgnored private let networkClient: NetworkClientProtocol
+    @Injected(\.keychainService) private var keychain
+    @Injected(\.networkClient) private var networkClient
 
-    init(keychain: KeychainService, networkClient: NetworkClientProtocol) {
-        self.keychain = keychain
-        self.networkClient = networkClient
-        if let token = keychain.load(key: KeychainService.accessTokenKey), !token.isEmpty {
+    init() {
+        if let token = _keychain.wrappedValue.load(key: KeychainService.accessTokenKey), !token.isEmpty {
             isAuthenticated = true
-            userEmail = keychain.load(key: KeychainService.userEmailKey)
+            userEmail = _keychain.wrappedValue.load(key: KeychainService.userEmailKey)
         }
     }
 
@@ -62,9 +59,9 @@ final class AuthService: AuthServiceProtocol {
             clearTokens()
         }
     }
+}
 
-    // MARK: - Private
-
+extension AuthService {
     private func storeTokens(access: String, refresh: String, email: String) {
         keychain.saveAuthTokens(access: access, refresh: refresh, email: email)
         isAuthenticated = true
@@ -87,8 +84,8 @@ final class AuthService: AuthServiceProtocol {
             let jwt = try? JSONDecoder().decode(JWTPayload.self, from: data) else { return true }
         return jwt.exp - Date().timeIntervalSince1970 < 60
     }
-}
 
-private struct JWTPayload: Decodable {
-    let exp: Double
+    private struct JWTPayload: Decodable {
+        let exp: Double
+    }
 }

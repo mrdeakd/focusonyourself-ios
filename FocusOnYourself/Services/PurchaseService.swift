@@ -25,7 +25,7 @@ final class PurchaseService: PurchaseServiceProtocol {
     let productMonthly = kProductMonthlyID
     let productAnnual  = kProductAnnualID
 
-    private let userDefaultsService: UserDefaultsServiceProtocol
+    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
 
     var isPro: Bool {
         didSet { userDefaultsService.setBool(.isPro, value: isPro) }
@@ -34,8 +34,8 @@ final class PurchaseService: PurchaseServiceProtocol {
 
     private var updatesTask: Task<Void, Never>?
 
-    init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
-        self.userDefaultsService = userDefaultsService
+    init() {
+        isPro = false
         isPro = userDefaultsService.getBool(.isPro)
         Task {
             await loadProducts()

@@ -13,20 +13,17 @@ private struct PendingWidgetCheckIn: Codable {
 final class ProfileService: ProfileServiceProtocol {
     private(set) var profile: UserProfile
 
-    private let userDefaultsService: UserDefaultsServiceProtocol
+    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
     private var externalChangeObserver: NSObjectProtocol?
 
-    init(userDefaultsService: UserDefaultsServiceProtocol = Container.shared.userDefaultsService()) {
-        self.userDefaultsService = userDefaultsService
+    init() {
+        self.profile = UserProfile()
         if let data = userDefaultsService.getData(.userProfile) {
             do {
                 self.profile = try JSONDecoder().decode(UserProfile.self, from: data)
             } catch {
                 assertionFailure("Failed to decode UserProfile: \(error)")
-                self.profile = UserProfile()
             }
-        } else {
-            self.profile = UserProfile()
         }
         observeExternalChanges()
     }

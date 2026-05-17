@@ -5,6 +5,8 @@ struct CheckedInCardView: View {
     let streakCount: Int
     var viewModel: HomeViewModel
 
+    private let iconSize: CGFloat = 18
+
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: Spacing.md) {
@@ -18,14 +20,13 @@ struct CheckedInCardView: View {
                 .frame(height: 1)
 
             contextRow
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.sm)
+                .padding(Spacing.md)
         }
         .foyCardStyle()
     }
 
     private var successRow: some View {
-        HStack(spacing: Spacing.xs) {
+        HStack {
             Text("Check-in complete for today!")
                 .font(.foyCaptionMedium)
                 .foregroundStyle(Color.foyForeground)
@@ -34,7 +35,7 @@ struct CheckedInCardView: View {
     }
 
     private var moodSummaryRow: some View {
-        HStack(spacing: Spacing.sm) {
+        HStack {
             Text("Your mood today")
                 .font(.foyHint)
                 .foregroundStyle(Color.foyPlaceholder)
@@ -57,23 +58,39 @@ struct CheckedInCardView: View {
                 .clipShape(Capsule())
             }
         }
-        .alignmentGuide(.firstTextBaseline) { dims in dims[.firstTextBaseline] }
     }
 
-    private var contextRow: some View {
-        HStack {
-            if let factors = viewModel.todaysFactors {
+    @ViewBuilder private var contextRow: some View {
+        if let factors = viewModel.todaysFactors {
+            HStack {
                 Text(factorSummary(factors))
                     .font(.foyHint)
                     .foregroundStyle(Color.foyForegroundSecondary)
-            } else {
-                Button("Log today") {
-                    viewModel.showingContextSheet = true
-                }
-                .font(.foyHintMedium)
-                .foregroundStyle(Color.foyNavy)
+                Spacer()
             }
-            Spacer()
+        } else {
+            Button {
+                viewModel.showingContextSheet = true
+            } label: {
+                HStack {
+                    HStack(spacing: Spacing.xs) {
+                        Image(systemName: "slider.horizontal.3")
+                            .resizable()
+                            .frame(width: iconSize, height: iconSize)
+                            .foregroundStyle(Color.foyNavy)
+                        Text("Log today's factors")
+                            .font(.foyCaptionMedium)
+                            .foregroundStyle(Color.foyNavy)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: iconSize, height: iconSize)
+                        .foregroundStyle(Color.foyNavy)
+                }
+            }
+            .buttonStyle(.plain)
         }
     }
 

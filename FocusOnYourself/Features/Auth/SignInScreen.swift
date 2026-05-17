@@ -1,26 +1,23 @@
 import SwiftUI
 
-// Pencil design node: SuXuE
 struct SignInScreen: View {
     @Bindable var viewModel: AuthViewModel
     let onSwitchToSignUp: () -> Void
 
     var body: some View {
-        ZStack {
-            Color.foyBackground.ignoresSafeArea()
-            VStack(spacing: 0) {
-                VStack(spacing: Spacing.lg) {
-                    titleBlock
-                    formBlock
-                }
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(.top, Spacing.screenTop)
-
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.lg) {
+                titleBlock
+                formBlock
+                Spacer(minLength: Spacing.xxl)
                 bottomBlock
-                    .padding(.bottom, Spacing.screenBottom)
             }
+            .padding(.top, Spacing.lg)
             .padding(.horizontal, Spacing.screenHorizontal)
+            .padding(.bottom, Spacing.screenBottom)
         }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.interactively)
     }
 
     private var titleBlock: some View {
@@ -32,7 +29,6 @@ struct SignInScreen: View {
                 .foyBodyStyle()
                 .foregroundStyle(Color.foyForegroundSecondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var formBlock: some View {

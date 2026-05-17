@@ -14,7 +14,7 @@ struct SettingsAccountSection: View {
                 signedOutCard
             }
         }
-        .sheet(isPresented: Bindable(viewModel).showAuthFlow) {
+        .fullScreenCover(isPresented: Bindable(viewModel).showAuthFlow) {
             AuthFlow()
         }
     }

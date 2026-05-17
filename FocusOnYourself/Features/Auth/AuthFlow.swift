@@ -1,7 +1,6 @@
 import Factory
 import SwiftUI
 
-// Pencil design node: itjn7
 struct AuthFlow: View {
     @State private var viewModel = AuthViewModel()
     @State private var tab: Tab = .signIn
@@ -15,10 +14,10 @@ struct AuthFlow: View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
             VStack(spacing: 0) {
-                SheetDragHandle()
+                topBar
                 tabPicker
                     .padding(.horizontal, Spacing.screenHorizontal)
-                    .padding(.top, Spacing.sm)
+                    .padding(.vertical, Spacing.sm)
 
                 switch tab {
                 case .signIn:
@@ -28,11 +27,28 @@ struct AuthFlow: View {
                 }
             }
         }
-        .presentationBackground(Color.foyBackground)
-        .presentationDragIndicator(.hidden)
         .onChange(of: authService.isAuthenticated) { _, isAuth in
             if isAuth { dismiss() }
         }
+    }
+
+    private var topBar: some View {
+        HStack {
+            Spacer()
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.foyBodyMedium)
+                    .foregroundStyle(Color.foyForeground)
+                    .frame(width: 32, height: 32)
+                    .background(Color.foyCard)
+                    .clipShape(Circle())
+            }
+            .accessibilityLabel("Close")
+        }
+        .padding(.horizontal, Spacing.screenHorizontal)
+        .padding(.top, Spacing.md)
     }
 
     private var tabPicker: some View {

@@ -84,17 +84,11 @@ final class AuthService: AuthServiceProtocol {
         let remainder = payload.count % 4
         if remainder != 0 { payload += String(repeating: "=", count: 4 - remainder) }
         guard let data = Data(base64Encoded: payload),
-            let json = try? JSONDecoder().decode([String: AnyCodable].self, from: data),
-            let exp = json["exp"]?.doubleValue else { return true }
-        return exp - Date().timeIntervalSince1970 < 60
+            let jwt = try? JSONDecoder().decode(JWTPayload.self, from: data) else { return true }
+        return jwt.exp - Date().timeIntervalSince1970 < 60
     }
 }
 
-private struct AnyCodable: Decodable {
-    let doubleValue: Double?
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        doubleValue = try? container.decode(Double.self)
-    }
+private struct JWTPayload: Decodable {
+    let exp: Double
 }

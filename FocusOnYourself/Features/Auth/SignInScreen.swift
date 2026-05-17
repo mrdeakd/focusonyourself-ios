@@ -11,15 +11,19 @@ struct SignInScreen: View {
             VStack(alignment: .leading, spacing: Spacing.lg) {
                 titleBlock
                 formBlock
-                Spacer(minLength: Spacing.xxl)
-                bottomBlock
             }
             .padding(.top, Spacing.lg)
             .padding(.horizontal, Spacing.screenHorizontal)
-            .padding(.bottom, Spacing.screenBottom)
+            .padding(.bottom, Spacing.sm)
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.interactively)
+        .safeAreaInset(edge: .bottom) {
+            bottomBlock
+                .padding(.horizontal, Spacing.screenHorizontal)
+                .padding(.bottom, Spacing.screenBottom)
+                .background(Color.foyBackground)
+        }
     }
 
     private var titleBlock: some View {

@@ -6,17 +6,44 @@ struct FocusOnYourselfApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
-                .environment(Container.shared.profileService())
+        }
+    }
+}
+
+@Observable
+@MainActor
+private final class AppRootViewModel {
+    @ObservationIgnored @Injected(\.authService) private var authService
+    @ObservationIgnored @Injected(\.profileService) private var profileService
+
+    var onboardingCompleted: Bool
+    var appearanceOverride: String?
+
+    init() {
+        let profile = _profileService.wrappedValue.profile
+        onboardingCompleted = profile.onboardingCompleted
+        appearanceOverride = profile.appearanceOverride
+    }
+
+    func onSceneActive() async {
+        profileService.mergeWidgetCheckIn()
+        await authService.refreshTokenIfNeeded()
+    }
+
+    func observeProfile() async {
+        for await profile in profileService.profileUpdates() {
+            onboardingCompleted = profile.onboardingCompleted
+            appearanceOverride = profile.appearanceOverride
         }
     }
 }
 
 private struct AppRootView: View {
-    @Environment(ProfileService.self) private var profileService
+    @State private var viewModel = AppRootViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
     private var preferredColorScheme: ColorScheme? {
-        switch profileService.profile.appearanceOverride {
+        switch viewModel.appearanceOverride {
         case "light": return .light
         case "dark": return .dark
         default: return nil
@@ -24,13 +51,13 @@ private struct AppRootView: View {
     }
 
     var body: some View {
-        ContentView()
+        ContentView(onboardingCompleted: viewModel.onboardingCompleted)
             .preferredColorScheme(preferredColorScheme)
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
-                    profileService.mergeWidgetCheckIn()
-                    Task { await Container.shared.authService().refreshTokenIfNeeded() }
+                    Task { await viewModel.onSceneActive() }
                 }
             }
+            .task { await viewModel.observeProfile() }
     }
 }

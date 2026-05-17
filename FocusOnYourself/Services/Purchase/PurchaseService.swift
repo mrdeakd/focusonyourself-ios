@@ -2,29 +2,23 @@ import Factory
 import Foundation
 import StoreKit
 
-enum PurchaseError: Error, Equatable {
-    case purchaseFailed
-    case verificationFailed
-    case userCancelled
-
-    var defaultDescription: String {
-        switch self {
-        case .purchaseFailed:      return "The purchase could not be completed."
-        case .verificationFailed:  return "Transaction verification failed."
-        case .userCancelled:       return "The purchase was cancelled."
-        }
-    }
-}
-
 final class PurchaseService: PurchaseServiceProtocol {
     let productMonthly = "com.focusonyourself.pro.monthly.renewal"
     let productAnnual  = "com.focusonyourself.pro.annual.renewal"
 
     @Injected(\.userDefaultsService) private var userDefaultsService
 
-    var isPro: Bool { userDefaultsService.getBool(.isPro) }
+    var isPro: Bool {
+        #if DEBUG
+        if userDefaultsService.getBool(.isProDebugOverride) {
+            return true
+        }
+        #endif
+        return userDefaultsService.getBool(.isPro)
+    }
 
     private var updatesTask: Task<Void, Never>?
+    private var isProContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
 
     init() {
         Task { await refreshEntitlements() }
@@ -86,5 +80,27 @@ final class PurchaseService: PurchaseServiceProtocol {
             }
         }
         userDefaultsService.setBool(.isPro, value: hasEntitlement)
+        notifyAll()
+    }
+}
+
+// MARK: - State Stream
+
+extension PurchaseService {
+    func isProUpdates() -> AsyncStream<Bool> {
+        let id = UUID()
+        return AsyncStream { [weak self] continuation in
+            self?.isProContinuations[id] = continuation
+            continuation.yield(self?.isPro ?? false)
+            continuation.onTermination = { @Sendable [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.isProContinuations.removeValue(forKey: id)
+                }
+            }
+        }
+    }
+
+    private func notifyAll() {
+        isProContinuations.values.forEach { $0.yield(isPro) }
     }
 }

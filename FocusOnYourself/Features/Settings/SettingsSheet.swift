@@ -1,8 +1,7 @@
 import SwiftUI
 
-// Pencil design node: DDyR8
 struct SettingsSheet: View {
-    var viewModel: SettingsViewModel
+    var viewModel: AccountViewModel
 
     @Environment(\.dismiss) private var dismiss
 
@@ -24,6 +23,9 @@ struct SettingsSheet: View {
                         if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
                             SettingsAppleIntelligenceSection(viewModel: viewModel)
                         }
+                        #if DEBUG
+                        debugSection
+                        #endif
                     }
                     .padding(.horizontal, Spacing.screenHorizontal)
                     .padding(.top, Spacing.lg)
@@ -57,4 +59,19 @@ struct SettingsSheet: View {
             Text("This will permanently delete all your check-ins, streaks, and settings. This cannot be undone.")
         }
     }
+
+    #if DEBUG
+    private var debugSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            SectionLabel("DEBUG")
+            Toggle("Force Pro (debug)", isOn: Bindable(viewModel).isProDebugOverride)
+                .font(.foyBody)
+                .foregroundStyle(Color.foyForeground)
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.sm)
+                .background(Color.foyCard)
+                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
+        }
+    }
+    #endif
 }

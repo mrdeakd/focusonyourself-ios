@@ -8,15 +8,7 @@ struct SettingsScreen: View {
             Color.foyBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                ScreenHeaderView(title: "Settings") {
-                    Text(viewModel.isPro ? "PRO" : "FREE")
-                        .font(.foySectionLabelSemibold)
-                        .foregroundStyle(viewModel.isPro ? Color.foyOrangeAccent : Color.foyNavy)
-                        .padding(.horizontal, Spacing.badgeHorizontal)
-                        .padding(.vertical, Spacing.xxxs)
-                        .background(viewModel.isPro ? Color.foyOrangeAccent.opacity(0.15) : Color.foyFreeBadgeBg)
-                        .clipShape(Capsule())
-                }
+                ScreenHeaderView(title: "Account")
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.lg) {
@@ -32,6 +24,9 @@ struct SettingsScreen: View {
                         SettingsResetSection(viewModel: viewModel)
                         if viewModel.isAppleIntelligenceAvailable && viewModel.isPro {
                             SettingsAppleIntelligenceSection(viewModel: viewModel)
+                        }
+                        if viewModel.isAuthenticated {
+                            signOutSection
                         }
                     }
                     .padding(.horizontal, Spacing.screenHorizontal)
@@ -64,6 +59,26 @@ struct SettingsScreen: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This will permanently delete all your check-ins, streaks, and settings. This cannot be undone.")
+        }
+    }
+
+    private var signOutSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            SectionLabel("ACCOUNT")
+            Button {
+                Task { await viewModel.signOut() }
+            } label: {
+                HStack {
+                    Text("Sign Out")
+                        .font(.foyBody)
+                        .foregroundStyle(.red)
+                    Spacer()
+                }
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.md)
+            }
+            .background(Color.foyCard)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
         }
     }
 }

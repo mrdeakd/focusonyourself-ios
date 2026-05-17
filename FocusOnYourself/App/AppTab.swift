@@ -8,7 +8,7 @@ enum AppTab: CaseIterable {
         case .checkin:         return "CHECK-IN"
         case .meditate:        return "MEDITATE"
         case .historyInsights: return "PROGRESS"
-        case .settings:        return "SETTINGS"
+        case .settings:        return "ACCOUNT"
         }
     }
 
@@ -17,7 +17,7 @@ enum AppTab: CaseIterable {
         case .checkin:         return "heart.fill"
         case .meditate:        return "figure.mind.and.body"
         case .historyInsights: return "chart.bar.fill"
-        case .settings:        return "gearshape"
+        case .settings:        return "person.fill"
         }
     }
 }

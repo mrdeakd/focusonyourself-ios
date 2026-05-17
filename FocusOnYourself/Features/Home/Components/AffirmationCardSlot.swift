@@ -12,6 +12,7 @@ struct AffirmationCardSlot: View {
                 category: .confidence,
                 isLoading: true
             )
+            .shimmer()
         } else {
             AffirmationCardView(
                 quote: affirmations[index].quote,

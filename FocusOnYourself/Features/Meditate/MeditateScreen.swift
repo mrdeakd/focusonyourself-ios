@@ -25,6 +25,7 @@ struct MeditateScreen: View {
                             ForEach(0..<8, id: \.self) { _ in
                                 SessionCardView(session: .placeholder, isPro: false)
                                     .redacted(reason: .placeholder)
+                                    .shimmer()
                             }
                         } else {
                             ForEach(viewModel.sessions) { session in

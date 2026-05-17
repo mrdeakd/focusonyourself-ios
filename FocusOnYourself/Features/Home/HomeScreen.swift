@@ -43,7 +43,8 @@ struct HomeScreen: View {
 
                         HomeArticlesSectionView(
                             articles: viewModel.articles,
-                            onSelect: { viewModel.selectArticle($0) }
+                            onSelect: { viewModel.selectArticle($0) },
+                            isLoading: viewModel.isLoadingArticles
                         )
                     }
                     .padding(.bottom, Spacing.screenBottom)

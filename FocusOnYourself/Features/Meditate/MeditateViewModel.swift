@@ -6,6 +6,7 @@ import Observation
 final class MeditateViewModel {
     var selectedCategory: MeditationCategory?
     var sessions: [MeditationSession] = []
+    var isLoading = false
     var selectedSession: MeditationSession?
     var showingPaywall = false
     var error: ErrorInfo?
@@ -24,6 +25,8 @@ final class MeditateViewModel {
     }
 
     func loadSessions() async {
+        isLoading = true
+        defer { isLoading = false }
         do {
             let categoryOrder = MeditationCategory.allCases
             sessions = try await meditationService.sessions(for: selectedCategory)

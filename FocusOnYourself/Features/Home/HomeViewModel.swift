@@ -28,6 +28,7 @@ final class HomeViewModel {
     @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
 
     var articles: [Article] = []
+    var isLoadingArticles = false
     var selectedArticle: Article?
 
     init() {
@@ -35,6 +36,8 @@ final class HomeViewModel {
     }
 
     func loadArticles() async {
+        isLoadingArticles = true
+        defer { isLoadingArticles = false }
         do {
             articles = try await articlesService.dailyArticles()
         } catch {

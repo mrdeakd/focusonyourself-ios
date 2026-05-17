@@ -13,15 +13,28 @@ struct MeditateScreen: View {
                 CategoryFilterChipsView(viewModel: viewModel)
                     .padding(.bottom, Spacing.sm)
 
+                if let error = viewModel.error {
+                    InlineErrorView(error: error)
+                        .padding(.horizontal, Spacing.screenHorizontal)
+                        .padding(.bottom, Spacing.sm)
+                }
+
                 ScrollView {
                     LazyVStack(spacing: Spacing.sm) {
-                        ForEach(viewModel.sessions) { session in
-                            Button {
-                                viewModel.handleSessionTap(session)
-                            } label: {
-                                SessionCardView(session: session, isPro: viewModel.isPro)
+                        if viewModel.isLoading {
+                            ForEach(0..<5, id: \.self) { _ in
+                                SessionCardView(session: .placeholder, isPro: false)
+                                    .redacted(reason: .placeholder)
                             }
-                            .buttonStyle(.plain)
+                        } else {
+                            ForEach(viewModel.sessions) { session in
+                                Button {
+                                    viewModel.handleSessionTap(session)
+                                } label: {
+                                    SessionCardView(session: session, isPro: viewModel.isPro)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                     }
                     .padding(.horizontal, Spacing.screenHorizontal)

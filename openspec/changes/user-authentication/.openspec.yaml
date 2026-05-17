@@ -1,0 +1,14 @@
+id: user-authentication
+title: User Authentication
+status: draft
+created: 2026-05-17
+capabilities:
+  - backend-user-model
+  - backend-auth-api
+  - backend-auth-middleware
+  - ios-keychain-service
+  - ios-auth-service
+  - ios-network-auth
+  - ios-auth-state
+  - ios-auth-ui
+  - ios-settings-account

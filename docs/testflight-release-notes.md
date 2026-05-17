@@ -1,5 +1,26 @@
 # TestFlight Release Notes
 
+## Build 5 — 2026-05-17
+
+### What's New
+
+- **Check-in widget** — log your mood directly from the home screen using the new interactive widget (no need to open the app)
+- **Apple Health integration** — mood check-ins are written to the Health app as State of Mind entries (iOS 18+)
+- **Backend content** — articles, meditations, and affirmations now served from our API; content can update without an app release
+- **Meditation audio CDN** — narration MP3s streamed from Supabase and cached locally on first play; app bundle is significantly smaller
+- **CheckInFactors** — sleep quality, stress level, exercise, and social quality tracked per check-in
+- **SwiftUI improvements** — modern API usage, accessibility labels, structural identity fixes throughout
+
+### What to Test
+
+1. Add the check-in widget to your home screen → tap to log a mood → confirm it appears in the app without opening it
+2. Complete a check-in → open Apple Health → verify a State of Mind entry was recorded (iOS 18 required)
+3. Open the Home tab → confirm articles load from the backend (not from a bundle)
+4. Open the Meditate tab → start a session → confirm narration audio plays on the first step
+5. Close and reopen the app → start the same session → confirm audio plays instantly from cache (no download delay)
+6. Open Settings → check that context factors (sleep, stress, exercise, social) appear in the check-in flow
+7. Kill the backend connection (airplane mode) → open the app → confirm graceful fallback with no crash
+
 ## Build 2 — 2026-03-18
 
 ### What's New

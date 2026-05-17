@@ -43,23 +43,26 @@ struct SettingsScreen: View {
 
     // MARK: - Subviews
 
+    // Pencil design node: JTVCT
     private var settingsFAB: some View {
         Button {
             viewModel.showSettingsSheet = true
         } label: {
-            HStack(spacing: Spacing.xs) {
-                Image(systemName: "gearshape.fill")
-                    .font(.foyHintMedium)
-                    .accessibilityHidden(true)
+            VStack(spacing: Spacing.xxs) {
+                ZStack {
+                    Circle()
+                        .fill(Color.foyNavy)
+                        .frame(width: 56, height: 56)
+                        .shadow(color: Color.foyNavy.opacity(0.3), radius: 8, x: 0, y: 4)
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(Color.foyOnPrimary)
+                        .accessibilityHidden(true)
+                }
                 Text("Settings")
-                    .font(.foyBodyMedium)
+                    .font(.foyMicroMedium)
+                    .foregroundStyle(Color.foyNavy)
             }
-            .foregroundStyle(Color.foyOnPrimary)
-            .padding(.vertical, Spacing.sm)
-            .padding(.horizontal, Spacing.md)
-            .background(Color.foyNavy)
-            .clipShape(Capsule())
-            .shadow(color: Color.foyNavy.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .accessibilityLabel("Open Settings")
     }

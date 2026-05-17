@@ -4,5 +4,7 @@
 <dict>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>FocusOnYourself writes your daily mood to Apple Health so you can view it alongside your other health data.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>FocusOnYourself does not read your health data.</string>
 </dict>
 </plist>

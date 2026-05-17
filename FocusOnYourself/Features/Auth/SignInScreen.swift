@@ -87,13 +87,20 @@ struct SignInScreen: View {
             Button {
                 Task { await viewModel.signIn() }
             } label: {
-                Text("Sign In")
-                    .font(.foyButtonLabel)
-                    .foregroundStyle(Color.foyOnPrimary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, Spacing.buttonVertical)
-                    .background(canSubmit ? Color.foyNavy : Color.foyButtonDisabled)
-                    .clipShape(Capsule())
+                Group {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .tint(Color.foyOnPrimary)
+                    } else {
+                        Text("Sign In")
+                            .font(.foyButtonLabel)
+                    }
+                }
+                .foregroundStyle(Color.foyOnPrimary)
+                .frame(maxWidth: .infinity)
+                .frame(height: Spacing.inputHeight)
+                .background(canSubmit ? Color.foyNavy : Color.foyButtonDisabled)
+                .clipShape(Capsule())
             }
             .disabled(!canSubmit || viewModel.isLoading)
 

@@ -97,13 +97,20 @@ struct SignUpScreen: View {
             Button {
                 Task { await viewModel.register() }
             } label: {
-                Text("Create Account")
-                    .font(.foyButtonLabel)
-                    .foregroundStyle(Color.foyOnPrimary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, Spacing.buttonVertical)
-                    .background(canSubmit ? Color.foyNavy : Color.foyButtonDisabled)
-                    .clipShape(Capsule())
+                Group {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .tint(Color.foyOnPrimary)
+                    } else {
+                        Text("Create Account")
+                            .font(.foyButtonLabel)
+                    }
+                }
+                .foregroundStyle(Color.foyOnPrimary)
+                .frame(maxWidth: .infinity)
+                .frame(height: Spacing.inputHeight)
+                .background(canSubmit ? Color.foyNavy : Color.foyButtonDisabled)
+                .clipShape(Capsule())
             }
             .disabled(!canSubmit || viewModel.isLoading)
 

@@ -4,6 +4,8 @@ struct SignUpScreen: View {
     @Bindable var viewModel: AuthViewModel
     let onSwitchToSignIn: () -> Void
 
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.lg) {
@@ -21,13 +23,25 @@ struct SignUpScreen: View {
     }
 
     private var titleBlock: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text("Create Account")
-                .font(.foyHeadline)
-                .foregroundStyle(Color.foyForeground)
-            Text("Join FocusOnYourself to sync your progress across devices.")
-                .foyBodyStyle()
-                .foregroundStyle(Color.foyForegroundSecondary)
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: Spacing.xs) {
+                Text("Create Account")
+                    .font(.foyHeadline)
+                    .foregroundStyle(Color.foyForeground)
+                Text("Join FocusOnYourself to sync your progress across devices.")
+                    .foyBodyStyle()
+                    .foregroundStyle(Color.foyForegroundSecondary)
+            }
+            Spacer()
+            Button { dismiss() } label: {
+                Image(systemName: "xmark")
+                    .font(.foyBodyMedium)
+                    .foregroundStyle(Color.foyForeground)
+                    .frame(width: 32, height: 32)
+                    .background(Color.foyCard)
+                    .clipShape(Circle())
+            }
+            .accessibilityLabel("Close")
         }
     }
 

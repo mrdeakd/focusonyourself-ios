@@ -12,11 +12,11 @@ final class OnboardingViewModel {
     private(set) var notificationsEnabled = false
     private(set) var isCompleted = false
 
-    @ObservationIgnored @Injected(\.notificationService) private var notificationService
-    @ObservationIgnored @Injected(\.profileService) private var profileService
-    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
+    @ObservationIgnored @Injected(\.notificationsUseCase) private var notificationsUseCase
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
 
-    var isPro: Bool { purchaseService.isPro }
+    var isPro: Bool { purchaseUseCase.isPro }
 
     var sortedCategories: [AffirmationCategory] {
         AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }
@@ -43,10 +43,10 @@ final class OnboardingViewModel {
     }
 
     func enableNotifications() async {
-        let granted = await notificationService.requestPermission()
+        let granted = await notificationsUseCase.requestPermission()
         notificationsEnabled = granted
         if granted {
-            notificationService.schedule(name: nameInput)
+            notificationsUseCase.schedule(name: nameInput)
         }
         complete()
     }
@@ -67,7 +67,7 @@ final class OnboardingViewModel {
     }
 
     private func complete() {
-        profileService.updateProfile(buildProfile())
+        profileUseCase.saveCompletedProfile(buildProfile())
         isCompleted = true
     }
 }

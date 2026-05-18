@@ -13,12 +13,12 @@ struct FocusOnYourselfApp: App {
 @Observable
 @MainActor
 private final class AppRootViewModel {
-    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
     @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
     @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
 
-    var onboardingCompleted: Bool { profileService.profile.onboardingCompleted }
-    var appearanceOverride: String? { profileService.profile.appearanceOverride }
+    var onboardingCompleted: Bool { profileUseCase.onboardingCompleted }
+    var appearanceOverride: String? { profileUseCase.appearanceOverride }
 
     func onSceneActive() async {
         checkInUseCase.mergeWidgetCheckIn()

@@ -17,11 +17,12 @@ final class HomeViewModel {
     var socialQuality: Int = 3
 
     @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
-    @ObservationIgnored @Injected(\.profileService) private var profileService
-    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
-    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
-    @ObservationIgnored @Injected(\.articlesService) private var articlesService
-    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.affirmationUseCase) private var affirmationUseCase
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+    @ObservationIgnored @Injected(\.articlesUseCase) private var articlesUseCase
+    @ObservationIgnored @Injected(\.settingsUseCase) private var settingsUseCase
+    @ObservationIgnored @Injected(\.healthKitUseCase) private var healthKitUseCase
 
     var articles: [Article] = []
     var isLoadingArticles = false
@@ -44,25 +45,23 @@ final class HomeViewModel {
         case 12..<17: timeOfDay = "Good afternoon"
         default:      timeOfDay = "Good evening"
         }
-        return profileService.profile.name.isEmpty
-            ? timeOfDay
-            : "\(timeOfDay), \(profileService.profile.name)"
+        return profileUseCase.name.isEmpty ? timeOfDay : "\(timeOfDay), \(profileUseCase.name)"
     }
 
     var formattedDate: String { Date.now.homeScreenFormatted }
 
     var streakCount: Int { checkInUseCase.streakStats().current }
 
-    var showSleepFactor: Bool { userDefaultsService.getLocalBool(.showSleepFactor, defaultingTo: true) }
-    var showStressFactor: Bool { userDefaultsService.getLocalBool(.showStressFactor, defaultingTo: true) }
-    var showExerciseFactor: Bool { userDefaultsService.getLocalBool(.showExerciseFactor, defaultingTo: true) }
-    var showSocialFactor: Bool { userDefaultsService.getLocalBool(.showSocialFactor, defaultingTo: true) }
+    var showSleepFactor: Bool { settingsUseCase.showSleepFactor }
+    var showStressFactor: Bool { settingsUseCase.showStressFactor }
+    var showExerciseFactor: Bool { settingsUseCase.showExerciseFactor }
+    var showSocialFactor: Bool { settingsUseCase.showSocialFactor }
 
     func loadArticles() async {
         isLoadingArticles = true
         defer { isLoadingArticles = false }
         do {
-            articles = try await articlesService.dailyArticles()
+            articles = try await articlesUseCase.dailyArticles()
         } catch {
             self.error = ErrorInfo(title: "Couldn't Load Articles")
         }
@@ -119,15 +118,10 @@ final class HomeViewModel {
         if #available(iOS 18, *) {
             Task { [weak self] in
                 guard let self else { return }
-                await writeToHealthKit(mood: mood, factors: factors)
+                await healthKitUseCase.save(mood: mood, factors: factors)
             }
         }
         showingContextSheet = false
-    }
-
-    @available(iOS 18, *)
-    private func writeToHealthKit(mood: Mood, factors: CheckInFactors?) async {
-        await Container.shared.healthKitService().save(mood: mood, factors: factors)
     }
 
     func generateAffirmationIfNeeded() async {
@@ -135,10 +129,10 @@ final class HomeViewModel {
         isGeneratingAffirmation = true
         defer { isGeneratingAffirmation = false }
         do {
-            let pairs = try await affirmationService.generateBatch(
+            let pairs = try await affirmationUseCase.generateBatch(
                 count: 10,
-                for: profileService.profile.selectedCategories,
-                useAppleIntelligence: profileService.profile.isAppleIntelligenceActive && purchaseService.isPro
+                for: profileUseCase.selectedCategories,
+                useAppleIntelligence: profileUseCase.isAppleIntelligenceActive && purchaseUseCase.isPro
             )
             generatedQuotes = pairs
         } catch {

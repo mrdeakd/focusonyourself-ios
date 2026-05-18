@@ -2,9 +2,10 @@ import Factory
 import Foundation
 
 final class CheckInUseCase: CheckInUseCaseProtocol {
-    @Injected(\.checkInRepository) private var repository
     @Injected(\.profileService) private var profileService
-    private let calculator = StreakCalculator()
+    @Injected(\.checkinsService) private var checkinsService
+    @Injected(\.userDefaultsService) private var userDefaultsService
+    private let streakCalculator = StreakCalculator()
 
     func record(mood: Mood, feelingsDescription: String?, factors: CheckInFactors?) async throws {
         let checkIn = CheckIn(
@@ -13,19 +14,34 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
             feelingsDescription: feelingsDescription,
             factors: factors
         )
-        try await repository.save(checkIn)
+        try await save(checkIn)
     }
 
     func replaceAll(_ checkIns: [CheckIn]) async throws {
-        try await repository.replaceAll(checkIns)
+        var profile = profileService.profile
+        profile.checkIns = checkIns
+        profileService.updateProfile(profile)
     }
 
     func mergeWidgetCheckIn() {
-        repository.mergePendingWidgetCheckIn()
+        guard let raw = userDefaultsService.getLocalData(.pendingWidgetCheckIn) else { return }
+        guard let pending = try? JSONDecoder().decode(PendingWidgetCheckIn.self, from: raw) else {
+            userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
+            return
+        }
+        let existing = profileService.profile.checkIns.first { $0.dateString == pending.dateString }
+        let shouldApply = existing == nil || pending.timestamp > existing!.date
+        if shouldApply, let mood = Mood(rawValue: pending.moodRawValue) {
+            let checkIn = CheckIn(dateString: pending.dateString, mood: mood, feelingsDescription: nil, factors: nil)
+            Task { try? await self.save(checkIn) }
+        }
+        userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
     }
 
     func reset() {
-        repository.reset()
+        var profile = profileService.profile
+        profile.checkIns = []
+        profileService.updateProfile(profile)
     }
 
     var hasCheckedInToday: Bool {
@@ -49,16 +65,31 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     }
 
     func streakStats() -> (current: Int, longest: Int) {
-        calculator.compute(checkIns: profileService.profile.checkIns)
+        streakCalculator.compute(checkIns: profileService.profile.checkIns)
     }
 
     func streakStartDate() -> Date? {
-        calculator.startDate(checkIns: profileService.profile.checkIns)
+        streakCalculator.startDate(checkIns: profileService.profile.checkIns)
     }
 
     var allCheckIns: [CheckIn] { profileService.profile.checkIns }
 
     func checkIn(for dateString: String) -> CheckIn? {
         profileService.profile.checkIns.first { $0.dateString == dateString }
+    }
+
+    // MARK: - Private
+
+    private func save(_ checkIn: CheckIn) async throws {
+        var profile = profileService.profile
+        let dateString = checkIn.dateString
+        if let idx = profile.checkIns.firstIndex(where: { $0.dateString == dateString }) {
+            profile.checkIns[idx] = checkIn
+        } else {
+            profile.checkIns.append(checkIn)
+        }
+        profileService.updateProfile(profile)
+        // Local state is already persisted above — network sync is advisory only
+        Task { try? await checkinsService.post(checkIn) }
     }
 }

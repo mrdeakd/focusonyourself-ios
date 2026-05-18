@@ -5,19 +5,18 @@ import Observation
 
 @Observable @MainActor
 final class AccountViewModel {
-    @ObservationIgnored @Injected(\.profileService) private var profileService
-    @ObservationIgnored @Injected(\.notificationService) private var notificationService
-    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
-    @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.notificationsUseCase) private var notificationsUseCase
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+    @ObservationIgnored @Injected(\.settingsUseCase) private var settingsUseCase
     @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
-    @ObservationIgnored @Injected(\.profileRepository) private var profileRepository
 
     var isAuthenticated: Bool
     var isRefreshing = false
     var accountEmail: String?
     var showAuthFlow = false
     var showSettingsSheet = false
-    var isPro: Bool { purchaseService.isPro }
+    var isPro: Bool { purchaseUseCase.isPro }
 
     init() {
         isAuthenticated = _authUseCase.wrappedValue.isAuthenticated
@@ -40,43 +39,33 @@ final class AccountViewModel {
     }
 
     var currentName: String {
-        profileService.profile.name
+        profileUseCase.name
     }
 
     var currentCategories: Set<AffirmationCategory> {
-        Set(profileService.profile.selectedCategories)
+        Set(profileUseCase.selectedCategories)
     }
 
     var currentNotifications: Bool {
-        get { profileService.profile.notificationsEnabled }
+        get { profileUseCase.notificationsEnabled }
         set {
-            var updated = profileService.profile
-            updated.notificationsEnabled = newValue
-            profileService.updateProfile(updated)
+            profileUseCase.updateNotificationsEnabled(newValue)
             if newValue {
-                notificationService.schedule(name: profileService.profile.name)
+                notificationsUseCase.schedule(name: profileUseCase.name)
             } else {
-                notificationService.cancel()
+                notificationsUseCase.cancel()
             }
         }
     }
 
     var appearanceOverride: String? {
-        get { profileService.profile.appearanceOverride }
-        set {
-            var updated = profileService.profile
-            updated.appearanceOverride = newValue
-            profileService.updateProfile(updated)
-        }
+        get { profileUseCase.appearanceOverride }
+        set { profileUseCase.updateAppearanceOverride(newValue) }
     }
 
     var currentAppleIntelligence: Bool {
-        get { profileService.profile.appleIntelligenceEnabled }
-        set {
-            var updated = profileService.profile
-            updated.appleIntelligenceEnabled = newValue
-            profileService.updateProfile(updated)
-        }
+        get { profileUseCase.appleIntelligenceEnabled }
+        set { profileUseCase.updateAppleIntelligenceEnabled(newValue) }
     }
 
     var isAppleIntelligenceAvailable: Bool {
@@ -84,15 +73,11 @@ final class AccountViewModel {
     }
 
     func updateName(_ name: String) {
-        var updated = profileService.profile
-        updated.name = name
-        profileService.updateProfile(updated)
+        profileUseCase.updateName(name)
     }
 
     func updateCategories(_ categories: Set<AffirmationCategory>) {
-        var updated = profileService.profile
-        updated.selectedCategories = Array(categories)
-        profileService.updateProfile(updated)
+        profileUseCase.updateCategories(Array(categories))
     }
 
     var showChangeNameSheet = false
@@ -110,37 +95,34 @@ final class AccountViewModel {
     }
 
     func resetAllData() async {
-        profileRepository.resetAll()
-        notificationService.cancel()
-        userDefaultsService.setLocalBool(.showSleepFactor, value: true)
-        userDefaultsService.setLocalBool(.showStressFactor, value: true)
-        userDefaultsService.setLocalBool(.showExerciseFactor, value: true)
-        userDefaultsService.setLocalBool(.showSocialFactor, value: true)
-        userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
+        profileUseCase.resetAll()
+        notificationsUseCase.cancel()
+        settingsUseCase.resetFactorToggles()
+        settingsUseCase.clearPendingWidgetCheckIn()
         await authUseCase.signOut()
-        await purchaseService.refreshEntitlements()
+        await purchaseUseCase.refreshEntitlements()
         isAuthenticated = false
         accountEmail = nil
     }
 
     var showSleepFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showSleepFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showSleepFactor, value: newValue) }
+        get { settingsUseCase.showSleepFactor }
+        set { settingsUseCase.showSleepFactor = newValue }
     }
 
     var showStressFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showStressFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showStressFactor, value: newValue) }
+        get { settingsUseCase.showStressFactor }
+        set { settingsUseCase.showStressFactor = newValue }
     }
 
     var showExerciseFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showExerciseFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showExerciseFactor, value: newValue) }
+        get { settingsUseCase.showExerciseFactor }
+        set { settingsUseCase.showExerciseFactor = newValue }
     }
 
     var showSocialFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showSocialFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showSocialFactor, value: newValue) }
+        get { settingsUseCase.showSocialFactor }
+        set { settingsUseCase.showSocialFactor = newValue }
     }
 
     var activeFactorSummary: String {

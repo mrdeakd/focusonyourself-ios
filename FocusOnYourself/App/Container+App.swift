@@ -42,18 +42,6 @@ extension Container {
         self { @MainActor in HealthKitService() }.singleton
     }
 
-    // MARK: - Repositories
-
-    var checkInRepository: Factory<CheckInRepositoryProtocol> {
-        self { @MainActor in CheckInRepositoryImpl() }.singleton
-    }
-    var profileRepository: Factory<ProfileRepositoryProtocol> {
-        self { @MainActor in ProfileRepositoryImpl() }.singleton
-    }
-    var authRepository: Factory<AuthRepositoryProtocol> {
-        self { @MainActor in AuthRepositoryImpl() }.singleton
-    }
-
     // MARK: - Use Cases
 
     var checkInUseCase: Factory<CheckInUseCaseProtocol> {
@@ -64,5 +52,32 @@ extension Container {
     }
     var insightsUseCase: Factory<InsightsUseCaseProtocol> {
         self { @MainActor in InsightsUseCase() }.singleton
+    }
+    var profileUseCase: Factory<ProfileUseCaseProtocol> {
+        self { @MainActor in ProfileUseCase() }.singleton
+    }
+    var affirmationUseCase: Factory<AffirmationUseCaseProtocol> {
+        self { @MainActor in AffirmationUseCase() }.singleton
+    }
+    var articlesUseCase: Factory<ArticlesUseCaseProtocol> {
+        self { @MainActor in ArticlesUseCase() }.singleton
+    }
+    var notificationsUseCase: Factory<NotificationsUseCaseProtocol> {
+        self { @MainActor in NotificationsUseCase() }.singleton
+    }
+    var purchaseUseCase: Factory<PurchaseUseCaseProtocol> {
+        self { @MainActor in PurchaseUseCase() }.singleton
+    }
+    var settingsUseCase: Factory<SettingsUseCaseProtocol> {
+        self { @MainActor in SettingsUseCase() }.singleton
+    }
+    var meditationUseCase: Factory<MeditationUseCaseProtocol> {
+        self { @MainActor in MeditationUseCase() }.singleton
+    }
+    var meditationPlayerUseCase: Factory<MeditationPlayerUseCaseProtocol> {
+        self { @MainActor in MeditationPlayerUseCase() }.singleton
+    }
+    var healthKitUseCase: Factory<HealthKitUseCaseProtocol> {
+        self { @MainActor in HealthKitUseCase() }.singleton
     }
 }

@@ -13,10 +13,10 @@ final class PaywallViewModel {
     var error: ErrorInfo?
     var shouldDismiss = false
     var showSuccess = false
-    var isPro: Bool { purchaseService.isPro }
+    var isPro: Bool { purchaseUseCase.isPro }
     var products: [Product]
 
-    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
 
     var monthlyProduct: Product? {
         products.first { $0.id == ProductID.monthly }
@@ -51,8 +51,8 @@ final class PaywallViewModel {
     }
 
     func onAppear() async {
-        async let loadedProducts = purchaseService.loadProducts()
-        await purchaseService.refreshEntitlements()
+        async let loadedProducts = purchaseUseCase.loadProducts()
+        await purchaseUseCase.refreshEntitlements()
         products = await loadedProducts
     }
 
@@ -71,7 +71,7 @@ final class PaywallViewModel {
 
         Task {
             do {
-                let outcome = try await purchaseService.purchase(product)
+                let outcome = try await purchaseUseCase.purchase(product)
                 switch outcome {
                 case .success:
                     showSuccess = true
@@ -105,7 +105,7 @@ final class PaywallViewModel {
 
         Task {
             do {
-                try await purchaseService.restorePurchases()
+                try await purchaseUseCase.restorePurchases()
             } catch let purchaseError as PurchaseError {
                 if purchaseError != .userCancelled {
                     error = ErrorInfo(title: "Restore Failed", description: purchaseError.defaultDescription)

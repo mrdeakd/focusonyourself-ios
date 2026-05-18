@@ -11,10 +11,10 @@ final class MeditateViewModel {
     var showingPaywall = false
     var error: ErrorInfo?
 
-    @ObservationIgnored @Injected(\.meditationService) private var meditationService
-    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
+    @ObservationIgnored @Injected(\.meditationUseCase) private var meditationUseCase
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
 
-    var isPro: Bool { purchaseService.isPro }
+    var isPro: Bool { purchaseUseCase.isPro }
 
     func handleSessionTap(_ session: MeditationSession) {
         if session.isPro && !isPro {
@@ -29,7 +29,7 @@ final class MeditateViewModel {
         defer { isLoading = false }
         do {
             let categoryOrder = MeditationCategory.allCases
-            sessions = try await meditationService.sessions(for: selectedCategory)
+            sessions = try await meditationUseCase.sessions(for: selectedCategory)
                 .sorted { lhs, rhs in
                     let catA = categoryOrder.firstIndex(of: lhs.category) ?? 0
                     let catB = categoryOrder.firstIndex(of: rhs.category) ?? 0

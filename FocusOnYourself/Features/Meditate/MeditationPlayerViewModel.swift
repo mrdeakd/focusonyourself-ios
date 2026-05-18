@@ -5,7 +5,7 @@ import Observation
 @Observable @MainActor
 final class MeditationPlayerViewModel {
     let session: MeditationSession
-    @ObservationIgnored @Injected(\.meditationAudioService) private var audioService
+    @ObservationIgnored @Injected(\.meditationPlayerUseCase) private var meditationPlayer
 
     var currentStepIndex: Int = 0
     var isComplete = false
@@ -40,7 +40,7 @@ final class MeditationPlayerViewModel {
     }
 
     func onDisappear() {
-        audioService.stopSpeaking()
+        meditationPlayer.stopSpeaking()
         timerTask?.cancel()
     }
 
@@ -48,7 +48,7 @@ final class MeditationPlayerViewModel {
 
     func nextStep() {
         cancelTimer()
-        audioService.stopSpeaking()
+        meditationPlayer.stopSpeaking()
         if isLastStep {
             isComplete = true
         } else {
@@ -60,7 +60,7 @@ final class MeditationPlayerViewModel {
     func previousStep() {
         guard !isFirstStep else { return }
         cancelTimer()
-        audioService.stopSpeaking()
+        meditationPlayer.stopSpeaking()
         currentStepIndex -= 1
         startStep()
     }
@@ -84,7 +84,7 @@ final class MeditationPlayerViewModel {
     private func startStep() {
         phase = .narrating
         if let instruction = currentStep.instruction {
-            audioService.speak(instruction) { [weak self] in
+            meditationPlayer.speak(instruction) { [weak self] in
                 self?.onNarrationFinished()
             }
         } else {
@@ -104,7 +104,7 @@ final class MeditationPlayerViewModel {
 
     private func onNarrationFinished() {
         if let duration = currentStep.silenceDurationSeconds {
-            audioService.playBell()
+            meditationPlayer.playBell()
             timerSecondsRemaining = duration
             phase = .timerRunning
             runTimer()
@@ -151,7 +151,7 @@ final class MeditationPlayerViewModel {
     }
 
     private func onTimerFinished() {
-        audioService.playBell()
+        meditationPlayer.playBell()
         Task {
             try? await Task.sleep(for: .seconds(2.5))
             guard !Task.isCancelled else { return }

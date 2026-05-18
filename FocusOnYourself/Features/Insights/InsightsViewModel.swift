@@ -7,9 +7,9 @@ import SwiftUI
 @MainActor
 final class InsightsViewModel {
     @ObservationIgnored @Injected(\.insightsUseCase) private var insightsUseCase
-    @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
 
-    var isPro: Bool { purchaseService.isPro }
+    var isPro: Bool { purchaseUseCase.isPro }
     var showingPaywall = false
     var selectedFactor: FactorCorrelation?
 

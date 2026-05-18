@@ -9,8 +9,8 @@ final class AccountViewModel {
     @ObservationIgnored @Injected(\.notificationService) private var notificationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
     @ObservationIgnored @Injected(\.userDefaultsService) private var userDefaultsService
-    @ObservationIgnored @Injected(\.authService) private var authService
-    @ObservationIgnored @Injected(\.keychainService) private var keychain
+    @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
+    @ObservationIgnored @Injected(\.profileRepository) private var profileRepository
 
     var isAuthenticated: Bool
     var isRefreshing = false
@@ -20,24 +20,22 @@ final class AccountViewModel {
     var isPro: Bool { purchaseService.isPro }
 
     init() {
-        let token = _keychain.wrappedValue.load(key: KeychainService.accessTokenKey)
-        isAuthenticated = token.map { !$0.isEmpty } ?? false
-        accountEmail = _keychain.wrappedValue.load(key: KeychainService.userEmailKey)
+        isAuthenticated = _authUseCase.wrappedValue.isAuthenticated
+        accountEmail = _authUseCase.wrappedValue.email
     }
 
     func signOut() async {
-        await authService.signOut()
+        await authUseCase.signOut()
         isAuthenticated = false
         accountEmail = nil
     }
 
     func refreshAuthState() async {
-        let token = keychain.load(key: KeychainService.accessTokenKey)
-        guard token.map({ !$0.isEmpty }) ?? false, !isAuthenticated else { return }
+        guard authUseCase.isAuthenticated, !isAuthenticated else { return }
         isRefreshing = true
         try? await Task.sleep(for: .milliseconds(350))
         isAuthenticated = true
-        accountEmail = keychain.load(key: KeychainService.userEmailKey)
+        accountEmail = authUseCase.email
         isRefreshing = false
     }
 
@@ -112,14 +110,14 @@ final class AccountViewModel {
     }
 
     func resetAllData() async {
-        profileService.resetAllData()
+        profileRepository.resetAll()
         notificationService.cancel()
         userDefaultsService.setLocalBool(.showSleepFactor, value: true)
         userDefaultsService.setLocalBool(.showStressFactor, value: true)
         userDefaultsService.setLocalBool(.showExerciseFactor, value: true)
         userDefaultsService.setLocalBool(.showSocialFactor, value: true)
         userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
-        await authService.signOut()
+        await authUseCase.signOut()
         await purchaseService.refreshEntitlements()
         isAuthenticated = false
         accountEmail = nil

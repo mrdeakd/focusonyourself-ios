@@ -10,14 +10,14 @@ final class AuthViewModel {
     var isAuthenticated = false
     var error: ErrorInfo?
 
-    @ObservationIgnored @Injected(\.authService) private var authService
+    @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
 
     func signIn() async {
         isLoading = true
         defer { isLoading = false }
         error = nil
         do {
-            try await authService.signIn(email: email, password: password)
+            try await authUseCase.signIn(email: email, password: password)
             isAuthenticated = true
         } catch let networkError as NetworkError {
             if case .badResponse(let code) = networkError, code == 401 {
@@ -39,7 +39,7 @@ final class AuthViewModel {
         defer { isLoading = false }
         error = nil
         do {
-            try await authService.register(email: email, password: password)
+            try await authUseCase.register(email: email, password: password)
             isAuthenticated = true
         } catch let networkError as NetworkError {
             if case .badResponse(let code) = networkError, code == 409 {

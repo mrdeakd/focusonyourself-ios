@@ -13,15 +13,16 @@ struct FocusOnYourselfApp: App {
 @Observable
 @MainActor
 private final class AppRootViewModel {
-    @ObservationIgnored @Injected(\.authService) private var authService
     @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
+    @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
 
     var onboardingCompleted: Bool { profileService.profile.onboardingCompleted }
     var appearanceOverride: String? { profileService.profile.appearanceOverride }
 
     func onSceneActive() async {
-        profileService.mergeWidgetCheckIn()
-        await authService.refreshTokenIfNeeded()
+        checkInUseCase.mergeWidgetCheckIn()
+        await authUseCase.refreshTokenIfNeeded()
     }
 }
 

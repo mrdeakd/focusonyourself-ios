@@ -16,6 +16,7 @@ final class HomeViewModel {
     var exercised = false
     var socialQuality: Int = 3
 
+    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
     @ObservationIgnored @Injected(\.profileService) private var profileService
     @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
     @ObservationIgnored @Injected(\.purchaseService) private var purchaseService
@@ -30,21 +31,9 @@ final class HomeViewModel {
         isGeneratingAffirmation = true
     }
 
-    var hasCheckedIn: Bool {
-        let dateString = CheckIn.dateString(for: Date.now)
-        return profileService.profile.checkIns.contains { $0.dateString == dateString }
-    }
-
-    var todaysMood: Mood? {
-        let dateString = CheckIn.dateString(for: Date.now)
-        return profileService.profile.checkIns.first { $0.dateString == dateString }?.mood
-    }
-
-    var todaysFactors: CheckInFactors? {
-        let dateString = CheckIn.dateString(for: Date.now)
-        return profileService.profile.checkIns.first { $0.dateString == dateString }?.factors
-    }
-
+    var hasCheckedIn: Bool { checkInUseCase.hasCheckedInToday }
+    var todaysMood: Mood? { checkInUseCase.todaysMood }
+    var todaysFactors: CheckInFactors? { checkInUseCase.todaysFactors }
     var hasFactorsToday: Bool { todaysFactors != nil }
 
     var greeting: String {
@@ -62,9 +51,7 @@ final class HomeViewModel {
 
     var formattedDate: String { Date.now.homeScreenFormatted }
 
-    var streakCount: Int {
-        !profileService.profile.checkIns.isEmpty ? profileService.streakStats().current : 0
-    }
+    var streakCount: Int { checkInUseCase.streakStats().current }
 
     var showSleepFactor: Bool { userDefaultsService.getLocalBool(.showSleepFactor, defaultingTo: true) }
     var showStressFactor: Bool { userDefaultsService.getLocalBool(.showStressFactor, defaultingTo: true) }
@@ -92,16 +79,21 @@ final class HomeViewModel {
     func completeCheckIn() {
         guard let mood = selectedMood else { return }
         let description = feelingsDescription.trimmingCharacters(in: .whitespacesAndNewlines)
-        profileService.recordCheckIn(
-            mood: mood,
-            feelingsDescription: description.isEmpty ? nil : description,
-            factors: nil
-        )
+        Task {
+            do {
+                try await checkInUseCase.record(
+                    mood: mood,
+                    feelingsDescription: description.isEmpty ? nil : description,
+                    factors: nil
+                )
+            } catch {
+                self.error = ErrorInfo(title: "Check-in failed", description: "Please try again.")
+            }
+        }
     }
 
     func loadFactorsFromToday() {
-        let dateString = CheckIn.dateString(for: Date.now)
-        let existing = profileService.profile.checkIns.first { $0.dateString == dateString }?.factors
+        let existing = checkInUseCase.todaysFactors
         sleepQuality  = existing?.sleepQuality ?? 3
         stressLevel   = existing?.stressLevel ?? 3
         exercised     = existing?.exercised ?? false
@@ -109,23 +101,25 @@ final class HomeViewModel {
     }
 
     func saveContext() {
-        let dateString = CheckIn.dateString(for: Date.now)
-        guard let mood = profileService.profile.checkIns.first(where: { $0.dateString == dateString })?.mood else { return }
+        guard let mood = checkInUseCase.todaysMood else { return }
         let factors = CheckInFactors(
             sleepQuality: sleepQuality,
             stressLevel: stressLevel,
             exercised: exercised,
             socialQuality: socialQuality
         )
-        let feelingsDescription = profileService.profile.checkIns.first { $0.dateString == dateString }?.feelingsDescription
-        profileService.recordCheckIn(
-            mood: mood,
-            feelingsDescription: feelingsDescription,
-            factors: factors
-        )
+        let feelingsDescription = checkInUseCase.todaysFeelingsDescription
+        Task {
+            do {
+                try await checkInUseCase.record(mood: mood, feelingsDescription: feelingsDescription, factors: factors)
+            } catch {
+                self.error = ErrorInfo(title: "Check-in failed", description: "Please try again.")
+            }
+        }
         if #available(iOS 18, *) {
             Task { [weak self] in
-                await self?.writeToHealthKit(mood: mood, factors: factors)
+                guard let self else { return }
+                await writeToHealthKit(mood: mood, factors: factors)
             }
         }
         showingContextSheet = false
@@ -138,10 +132,8 @@ final class HomeViewModel {
 
     func generateAffirmationIfNeeded() async {
         guard generatedQuotes.isEmpty else { return }
-
         isGeneratingAffirmation = true
         defer { isGeneratingAffirmation = false }
-
         do {
             let pairs = try await affirmationService.generateBatch(
                 count: 10,

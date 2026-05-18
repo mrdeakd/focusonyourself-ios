@@ -23,9 +23,6 @@ extension Container {
     var keychainService: Factory<KeychainServiceProtocol> {
         self { @MainActor in KeychainService() }.singleton
     }
-    var authService: Factory<AuthServiceProtocol> {
-        self { @MainActor in AuthService() }.singleton
-    }
     var checkinsService: Factory<CheckinsServiceProtocol> {
         self { CheckinsService() }.singleton
     }
@@ -43,5 +40,29 @@ extension Container {
     }
     var healthKitService: Factory<HealthKitServiceProtocol> {
         self { @MainActor in HealthKitService() }.singleton
+    }
+
+    // MARK: - Repositories
+
+    var checkInRepository: Factory<CheckInRepositoryProtocol> {
+        self { @MainActor in CheckInRepositoryImpl() }.singleton
+    }
+    var profileRepository: Factory<ProfileRepositoryProtocol> {
+        self { @MainActor in ProfileRepositoryImpl() }.singleton
+    }
+    var authRepository: Factory<AuthRepositoryProtocol> {
+        self { @MainActor in AuthRepositoryImpl() }.singleton
+    }
+
+    // MARK: - Use Cases
+
+    var checkInUseCase: Factory<CheckInUseCaseProtocol> {
+        self { @MainActor in CheckInUseCase() }.singleton
+    }
+    var authUseCase: Factory<AuthUseCaseProtocol> {
+        self { @MainActor in AuthUseCase() }.singleton
+    }
+    var insightsUseCase: Factory<InsightsUseCaseProtocol> {
+        self { @MainActor in InsightsUseCase() }.singleton
     }
 }

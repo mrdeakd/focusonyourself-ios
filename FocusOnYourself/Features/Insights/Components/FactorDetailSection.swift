@@ -4,7 +4,7 @@ import SwiftUI
 private let minimumGroupEntries = 3
 
 struct FactorDetailSection: View {
-    let factor: InsightsViewModel.FactorCorrelation
+    let factor: FactorCorrelation
     let viewModel: InsightsViewModel
 
     var body: some View {

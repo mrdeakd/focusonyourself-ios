@@ -3,7 +3,7 @@ import SwiftUI
 
 struct FactorCorrelationRankingSection: View {
     let viewModel: InsightsViewModel
-    @Binding var selectedFactor: InsightsViewModel.FactorCorrelation?
+    @Binding var selectedFactor: FactorCorrelation?
 
     var body: some View {
         let correlations = viewModel.factorCorrelations()
@@ -29,7 +29,7 @@ struct FactorCorrelationRankingSection: View {
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.card))
     }
 
-    private func topBoosterCard(_ top: InsightsViewModel.FactorCorrelation) -> some View {
+    private func topBoosterCard(_ top: FactorCorrelation) -> some View {
         HStack(spacing: Spacing.sm) {
             Image(systemName: "sparkles")
                 .foregroundStyle(Color.foyOrange)
@@ -53,7 +53,7 @@ struct FactorCorrelationRankingSection: View {
         }
     }
 
-    private func rankingChart(_ correlations: [InsightsViewModel.FactorCorrelation]) -> some View {
+    private func rankingChart(_ correlations: [FactorCorrelation]) -> some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("What affects your mood")
                 .font(.foyCaptionMedium)

@@ -4,20 +4,20 @@ import Observation
 
 @Observable @MainActor
 final class HistoryViewModel {
-    @ObservationIgnored @Injected(\.profileService) private var profileService
+    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
 
     var streakStats: (current: Int, longest: Int) {
-        !profileService.profile.checkIns.isEmpty ? profileService.streakStats() : (0, 0)
+        !checkInUseCase.allCheckIns.isEmpty ? checkInUseCase.streakStats() : (0, 0)
     }
 
     var checkInDateStrings: Set<String> {
-        Set(profileService.profile.checkIns.map { $0.dateString })
+        Set(checkInUseCase.allCheckIns.map { $0.dateString })
     }
 
     var selectedCheckIn: CheckIn?
 
     func checkIn(for dateString: String) -> CheckIn? {
-        profileService.profile.checkIns.first { $0.dateString == dateString }
+        checkInUseCase.checkIn(for: dateString)
     }
 
     func selectDay(_ dateString: String) {
@@ -27,17 +27,13 @@ final class HistoryViewModel {
     var calendarMonths: [Date] {
         let cal = Calendar.current
         let today = Date.now
-
-        let startDate = profileService.profile.checkIns.map { $0.date }.min() ?? today
-
+        let startDate = checkInUseCase.earliestCheckInDate ?? today
         var comps = cal.dateComponents([.year, .month], from: startDate)
         comps.day = 1
         guard let startOfStartMonth = cal.date(from: comps) else { return [today] }
-
         var todayComps = cal.dateComponents([.year, .month], from: today)
         todayComps.day = 1
         guard let startOfCurrentMonth = cal.date(from: todayComps) else { return [today] }
-
         var months: [Date] = []
         var current = startOfStartMonth
         while current <= startOfCurrentMonth {
@@ -45,7 +41,6 @@ final class HistoryViewModel {
             guard let next = cal.date(byAdding: .month, value: 1, to: current) else { break }
             current = next
         }
-
         return months.reversed()
     }
 }

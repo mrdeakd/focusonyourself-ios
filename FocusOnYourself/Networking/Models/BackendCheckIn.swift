@@ -10,10 +10,6 @@ struct BackendCheckIn: Codable {
     let socialQuality: Int?
 }
 
-struct ImportCheckInsBody: Encodable {
-    let checkIns: [BackendCheckIn]
-}
-
 extension CheckIn {
     func toBackendModel() -> BackendCheckIn {
         BackendCheckIn(

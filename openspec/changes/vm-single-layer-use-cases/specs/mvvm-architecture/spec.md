@@ -23,9 +23,32 @@ A Service MAY encode typed inputs into URL/query/body and decode the response (i
 - **WHEN** a Service file is reviewed
 - **THEN** it MUST NOT contain a guard validating inputs (e.g. empty-check), a cache lookup, a branch on a feature flag, a fallback to alternate paths, or held state beyond constants
 
+### Requirement: Models split by purpose, one type per file
+
+Domain models SHALL live in `FocusOnYourself/Domain/Models/`. Wire-format models (request bodies, response payloads, backend variants, response envelopes) SHALL live in `FocusOnYourself/Networking/Models/`.
+
+Every top-level struct or enum SHALL live in its own file, named `<TypeName>.swift`. Multiple types in one file are forbidden — including conceptually-related types (e.g. `MeditationStep` lives in its own file even though it's only used inside `MeditationSession`).
+
+**Exception**: when mapper extensions exist (`toBackendModel()` / `toDomainModel()`), both extensions co-locate with the backend type in the backend type's file. This is the only case where a model file contains more than one top-level declaration.
+
+#### Scenario: Domain enum
+
+- **WHEN** an enum represents a domain concept (`Mood`, `AffirmationCategory`, `MeditationCategory`, `ArticleTopic`)
+- **THEN** it lives at `Domain/Models/<EnumName>.swift` as the sole top-level declaration
+
+#### Scenario: Wire-format request or response
+
+- **WHEN** a type is sent as a request body or received as a response payload
+- **THEN** it lives at `Networking/Models/<TypeName>.swift` as the sole top-level declaration
+
+#### Scenario: Nested wire types extracted
+
+- **WHEN** a wire-format type references another wire-format type (e.g. `MeditationSession` has `[MeditationStep]`)
+- **THEN** the inner type lives in its own file (`Networking/Models/MeditationStep.swift`) — never embedded in the outer type's file
+
 ### Requirement: Backend models live in `Networking/Models/` with both mappers when shapes differ
 
-Every model used in a network call (request body, response payload, response wrapper) SHALL live in `FocusOnYourself/Networking/Models/`. Domain models live in `FocusOnYourself/Models/`.
+Every model used in a network call (request body, response payload, response wrapper) SHALL live in `FocusOnYourself/Networking/Models/`. Domain models live in `FocusOnYourself/Domain/Models/`.
 
 When a backend model's wire shape differs from the corresponding domain shape, **both** mappers SHALL exist in the backend model file:
 

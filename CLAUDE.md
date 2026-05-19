@@ -48,7 +48,8 @@ Key limits: line length 130 (error), file length 400/500, function body 75 lines
 | Use Case | `Domain/UseCases/<Feature>/<Name>UseCase.swift` + protocol | **SHARED business logic** across 2+ ViewModels. May be `@Observable` if it holds reactive state (`ProfileUseCase`, `PurchaseUseCase`). Inlines device frameworks (Keychain, UserDefaults, UNUserNotificationCenter, StoreKit) that aren't network. | Services + Calculators + other state-store Use Cases (`ProfileUseCase`) |
 | Calculator | `Domain/Calculators/<Name>Calculator.swift` | Pure `struct`. No DI, no `@Observable`, no `@MainActor`, no `import SwiftUI`. All inputs are method args. | Nothing |
 | Service | `Services/<Domain>/<Name>Service.swift` + protocol | **NETWORK IO ONLY.** Thin: takes prepared parameters from caller, returns raw decoded data. No caching, no branching, no business logic. No device frameworks (Keychain/UserDefaults/HealthKit/etc.). | `NetworkClient` |
-| Model | `Models/` | Plain `Codable` structs/enums, no logic | Nothing |
+| Domain Model | `Domain/Models/<Name>.swift` | Plain `Codable` struct/enum — one type per file, no logic | Nothing |
+| Wire Model | `Networking/Models/<Name>.swift` | Wire-format `Codable` types (request bodies, responses, backend variants) — one type per file. Mapper extensions co-locate with the backend type. | Domain models |
 | Design System | `DesignSystem/` | Tokens — `DS+Colors.swift`, `DS+Spacing.swift`, etc. | Nothing |
 | Components | `Features/<Feature>/Components/` or `DesignSystem/Components/` | Reusable views in their own files | DesignSystem tokens, parent ViewModel |
 
@@ -130,9 +131,15 @@ func allSessions() async throws -> [MeditationSession] {
 
 **Invariant** (run to verify): `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` — must return empty.
 
-### Networking models — placement and domain mappers
+### Models — placement, one-per-file, and domain mappers
 
-**Every model used in a network call lives in `Networking/Models/`.** This includes request bodies, response bodies, response wrappers, and shared envelopes (`EmptyResponse`, `AuthResponse`, `LoginBody`, `RefreshBody`, `BackendCheckIn`, `CachedAffirmation`, etc.). Domain models live in `Models/` and never leak the wire format.
+**Folder split:**
+- `Domain/Models/` — domain types (the language of the business): `CheckIn`, `CheckInFactors`, `Mood`, `UserProfile`, `AffirmationCategory`, `MeditationCategory`, `ArticleTopic`, `PendingWidgetCheckIn`, `ProductID`, `PurchaseError`, `PurchaseOutcome`, `UserDefaultsKey`, etc.
+- `Networking/Models/` — wire-format ONLY (request bodies, response payloads, backend variants, shared envelopes): `AuthResponse`, `LoginBody`, `RefreshBody`, `BackendCheckIn`, `ImportCheckInsBody`, `Article`, `MeditationSession`, `MeditationStep`, `CachedAffirmation`, `EmptyResponse`, etc.
+
+**One struct/enum per file.** Every top-level type lives in its own file named after the type (`<TypeName>.swift`). No grouping multiple types in one file even when they're conceptually related (e.g. `MeditationStep` does NOT live in `MeditationSession.swift`; `ImportCheckInsBody` does NOT live in `BackendCheckIn.swift`).
+
+**Exception — mapper extensions co-locate with the backend type.** When a backend model needs `toBackendModel()` / `toDomainModel()` mappers, BOTH extensions live in the **backend type's file** (e.g. `Networking/Models/BackendCheckIn.swift` contains the `BackendCheckIn` struct, the `extension CheckIn { toBackendModel() }`, and the `extension BackendCheckIn { toDomainModel() }`). This is the only case where a model file contains more than one top-level declaration.
 
 **Naming conventions in `Networking/Models/`:**
 - Request body: `<Action>Body` (e.g. `LoginBody`, `RefreshBody`, `ImportCheckInsBody`)
@@ -311,7 +318,7 @@ Always add `.scrollIndicators(.hidden)` to every `ScrollView`.
 - `Domain/UseCases/Auth/AuthUseCase.swift` — login/register/refresh + post-auth sync; inlines Keychain
 - `Domain/UseCases/Purchase/PurchaseUseCase.swift` — `@Observable` `isPro` + StoreKit
 - `Models/UserDefaultsKey.swift` — App Group UserDefaults key enum
-- `Models/UserProfile.swift` + `Models/CheckIn.swift` — core Codable models (domain/persistence)
+- `Domain/Models/UserProfile.swift` + `Domain/Models/CheckIn.swift` — core domain models
 - `Networking/Models/Article.swift` + `Networking/Models/MeditationSession.swift` — API response models
 - `DesignSystem/DS+Colors.swift` — full color token list
 - `DesignSystem/DS+Spacing.swift` — spacing scale

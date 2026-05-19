@@ -152,7 +152,8 @@ final class HomeViewModel {
             if useAppleIntelligence {
                 pairs = try await generateUsingAppleIntelligence(count: 10, for: categories)
             } else {
-                pairs = try await affirmationService.fetchAffirmations(count: 10, for: categories)
+                let items = try await affirmationService.fetchAffirmations(count: 10, for: categories)
+                pairs = items.map { (quote: $0.quote, category: $0.category) }
             }
             cacheAffirmations(pairs)
             generatedQuotes = pairs

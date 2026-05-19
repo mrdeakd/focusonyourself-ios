@@ -28,16 +28,21 @@ final class MeditateViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
+            let fetched: [MeditationSession]
+            if let selectedCategory {
+                fetched = try await meditationService.sessions(in: selectedCategory)
+            } else {
+                fetched = try await meditationService.allSessions()
+            }
             let categoryOrder = MeditationCategory.allCases
-            sessions = try await meditationService.sessions(for: selectedCategory)
-                .sorted { lhs, rhs in
-                    let catA = categoryOrder.firstIndex(of: lhs.category) ?? 0
-                    let catB = categoryOrder.firstIndex(of: rhs.category) ?? 0
-                    if catA != catB {
-                        return catA < catB
-                    }
-                    return !lhs.isPro && rhs.isPro
+            sessions = fetched.sorted { lhs, rhs in
+                let catA = categoryOrder.firstIndex(of: lhs.category) ?? 0
+                let catB = categoryOrder.firstIndex(of: rhs.category) ?? 0
+                if catA != catB {
+                    return catA < catB
                 }
+                return !lhs.isPro && rhs.isPro
+            }
         } catch {
             self.error = ErrorInfo(title: "Couldn't Load Meditations", description: error.localizedDescription)
         }

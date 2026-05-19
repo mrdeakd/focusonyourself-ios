@@ -7,11 +7,8 @@ final class AffirmationService: AffirmationServiceProtocol {
     func fetchAffirmations(
         count: Int,
         for categories: [AffirmationCategory]
-    ) async throws -> [(quote: String, category: AffirmationCategory)] {
-        guard !categories.isEmpty else { return [] }
+    ) async throws -> [CachedAffirmation] {
         let categoryParams = categories.map(\.rawValue).joined(separator: ",")
-        let path = "/api/affirmations/batch?categories=\(categoryParams)&count=\(count)"
-        let items: [CachedAffirmation] = try await networkClient.get(path)
-        return items.map { (quote: $0.quote, category: $0.category) }
+        return try await networkClient.get("/api/affirmations/batch?categories=\(categoryParams)&count=\(count)")
     }
 }

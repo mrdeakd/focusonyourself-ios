@@ -5,7 +5,8 @@ final class CheckinsService: CheckinsServiceProtocol {
     @Injected(\.networkClient) private var networkClient
 
     func post(_ checkIn: CheckIn) async throws {
-        _ = try await networkClient.post("/api/checkins", body: checkIn.toBackendModel()) as EmptyResponse
+        let body = checkIn.toBackendModel()
+        _ = try await networkClient.post("/api/checkins", body: body) as EmptyResponse
     }
 
     func importAll(_ checkIns: [CheckIn]) async throws {

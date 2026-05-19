@@ -2,10 +2,19 @@ import Factory
 import Foundation
 
 extension Container {
+    // MARK: - Stores (device-framework IO)
+
+    var keychainStore: Factory<KeychainStoreProtocol> {
+        self { @MainActor in KeychainStore() }.singleton
+    }
+    var userDefaultsStore: Factory<UserDefaultsStoreProtocol> {
+        self { @MainActor in UserDefaultsStore() }.singleton
+    }
+
     // MARK: - Services (network only)
 
     var networkClient: Factory<NetworkClientProtocol> {
-        self { @MainActor in URLSessionNetworkClient() }.singleton
+        self { @MainActor in URLSessionNetworkClient(keychainStore: self.keychainStore()) }.singleton
     }
     var checkinsService: Factory<CheckinsServiceProtocol> {
         self { CheckinsService() }.singleton

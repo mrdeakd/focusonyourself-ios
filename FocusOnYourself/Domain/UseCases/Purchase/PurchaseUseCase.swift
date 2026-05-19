@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import Observation
 import StoreKit
@@ -6,11 +7,11 @@ import StoreKit
 final class PurchaseUseCase: PurchaseUseCaseProtocol {
     private(set) var isPro = false
 
-    @ObservationIgnored private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
+    @ObservationIgnored @Injected(\.userDefaultsStore) private var userDefaultsStore
     @ObservationIgnored private var updatesTask: Task<Void, Never>?
 
     init() {
-        isPro = defaults.bool(forKey: UserDefaultsKey.isPro.rawValue)
+        isPro = _userDefaultsStore.wrappedValue.bool(for: .isPro, defaultingTo: false)
         Task { await refreshEntitlements() }
         updatesTask = Task {
             for await _ in Transaction.updates {
@@ -70,6 +71,6 @@ final class PurchaseUseCase: PurchaseUseCaseProtocol {
             }
         }
         isPro = hasEntitlement
-        defaults.set(hasEntitlement, forKey: UserDefaultsKey.isPro.rawValue)
+        userDefaultsStore.setBool(hasEntitlement, for: .isPro)
     }
 }

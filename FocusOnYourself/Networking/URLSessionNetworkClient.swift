@@ -1,9 +1,12 @@
 import Foundation
-import SwiftSecurity
 
 struct URLSessionNetworkClient: NetworkClientProtocol {
     private let baseURL = URL(string: "https://focusonyourself-backend.onrender.com")!
-    private let keychain = Keychain.default
+    private let keychainStore: KeychainStoreProtocol
+
+    init(keychainStore: KeychainStoreProtocol) {
+        self.keychainStore = keychainStore
+    }
 
     func get<T: Decodable>(_ path: String) async throws -> T {
         let request = try buildRequest(path: path, method: "GET", body: nil as Data?)
@@ -28,7 +31,7 @@ struct URLSessionNetworkClient: NetworkClientProtocol {
             request.httpBody = body
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        if let token = loadAccessToken() {
+        if let token = keychainStore.load("foy.accessToken") {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         return request
@@ -49,12 +52,5 @@ struct URLSessionNetworkClient: NetworkClientProtocol {
         default:
             throw NetworkError.badResponse(http.statusCode)
         }
-    }
-
-    private func loadAccessToken() -> String? {
-        var query = SecItemQuery<GenericPassword>()
-        query.service = "FocusOnYourself"
-        query.account = "foy.accessToken"
-        return try? keychain.retrieve(query)
     }
 }

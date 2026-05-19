@@ -48,6 +48,7 @@ Key limits: line length 130 (error), file length 400/500, function body 75 lines
 | Use Case | `Domain/UseCases/<Feature>/<Name>UseCase.swift` + protocol | **SHARED business logic** across 2+ ViewModels. May be `@Observable` if it holds reactive state (`ProfileUseCase`, `PurchaseUseCase`). Inlines device frameworks (Keychain, UserDefaults, UNUserNotificationCenter, StoreKit) that aren't network. | Services + Calculators + other state-store Use Cases (`ProfileUseCase`) |
 | Calculator | `Domain/Calculators/<Name>Calculator.swift` | Pure `struct`. No DI, no `@Observable`, no `@MainActor`, no `import SwiftUI`. All inputs are method args. | Nothing |
 | Service | `Services/<Domain>/<Name>Service.swift` + protocol | **NETWORK IO ONLY.** Thin: takes prepared parameters from caller, returns raw decoded data. No caching, no branching, no business logic. No device frameworks (Keychain/UserDefaults/HealthKit/etc.). | `NetworkClient` |
+| Store | `Stores/<Domain>/<Name>Store.swift` + protocol | Thin wrapper for a device-framework primitive (Keychain, UserDefaults, future DB, etc.). Same rules as Service: no business logic, no validation, no branching. | The wrapped framework |
 | Domain Model | `Domain/Models/<Name>.swift` | Plain `Codable` struct/enum — one type per file, no logic | Nothing |
 | Wire Model | `Networking/Models/<Name>.swift` | Wire-format `Codable` types (request bodies, responses, backend variants) — one type per file. Mapper extensions co-locate with the backend type. | Domain models |
 | Design System | `DesignSystem/` | Tokens — `DS+Colors.swift`, `DS+Spacing.swift`, etc. | Nothing |
@@ -131,6 +132,49 @@ func allSessions() async throws -> [MeditationSession] {
 
 **Invariant** (run to verify): `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` — must return empty.
 
+### Stores — device-framework IO (Keychain, UserDefaults, future DB)
+
+Stores are the peer of Services for non-network device frameworks. Same rules as Services: thin, one external system per Store, no business logic. Registered in `Container+App.swift` under `// MARK: - Stores`.
+
+**Existing Stores:**
+- `KeychainStore` — SwiftSecurity Keychain access (`save(_:for:)`, `load(_:)`, `delete(_:)` by string key). Account namespace is fixed to `"FocusOnYourself"`.
+- `UserDefaultsStore` — App Group UserDefaults access (`data` / `bool` / `string` getters + setters + `remove`, all typed by `UserDefaultsKey`).
+
+**Extraction rule** — same as for Use Cases: extract to a Store when 2+ consumers (Use Cases or ViewModels) need the same device-framework primitive. Single-consumer frameworks stay inlined in their sole consumer:
+
+| Framework | Status |
+|-----------|--------|
+| Keychain (SwiftSecurity) | ✓ Store (used by AuthUseCase + URLSessionNetworkClient) |
+| UserDefaults | ✓ Store (used by 5 consumers) |
+| HealthKit | inlined in HomeViewModel (single consumer) |
+| AVAudio | inlined in MeditationPlayerViewModel (single consumer) |
+| StoreKit | inlined in PurchaseUseCase (single consumer) |
+| UNUserNotificationCenter | inlined in NotificationsUseCase (single consumer) |
+| FoundationModels | inlined in HomeViewModel (single consumer) |
+
+When a second consumer for any inlined framework appears, extract to a Store at the same time as you migrate the new consumer.
+
+**Forbidden in a Store**:
+- Business logic, validation, branching between alternate paths
+- Holding state beyond constants
+- Knowing the meaning of specific keys (e.g. `UserDefaultsStore` takes a generic `UserDefaultsKey`; consumers know what each key is for)
+
+**Allowed callers**:
+- Use Cases (preferred — wraps access in a business operation)
+- ViewModels (for single-VM keys, same rule as Services)
+- The `NetworkClient` (auth header injection — token reading is network plumbing)
+
+**Future Stores**: when we add SwiftData / GRDB / SQLite, it'll live here as `Stores/Database/DatabaseStore.swift` following the same shape.
+
+**Invariants** (run to verify):
+```bash
+# Inline Keychain.default outside Stores/Keychain/ → empty
+grep -rn "Keychain.default" FocusOnYourself --include="*.swift" | grep -v "Stores/Keychain/"
+
+# Inline UserDefaults(suiteName: outside Stores/UserDefaults/ → empty
+grep -rn "UserDefaults(suiteName:" FocusOnYourself --include="*.swift" | grep -v "Stores/UserDefaults/"
+```
+
 ### Models — placement, one-per-file, and domain mappers
 
 **Folder split:**
@@ -191,7 +235,7 @@ extension BackendCheckIn {
 - Create a Use Case when (and only when) two or more ViewModels need the same operation. Single-VM logic stays in the ViewModel.
 - One Use Case per feature domain; group related operations together (`CheckInUseCase` covers `record`, `streakStats`, `mergeWidgetCheckIn`, query properties).
 - A Use Case may be `@Observable` when it holds reactive state (`ProfileUseCase` holds `UserProfile`, `PurchaseUseCase` holds `isPro`). Otherwise it's plain `final class @MainActor`.
-- A Use Case may inject Services (network), may hold Calculators as `private let`, and may inline non-network device frameworks (Keychain, UserDefaults via AppGroup, UNUserNotificationCenter, StoreKit) — services are network-only, so any device framework lives here or in a VM.
+- A Use Case may inject Services (network) + Stores (Keychain, UserDefaults), may hold Calculators as `private let`, and may inline single-consumer device frameworks (UNUserNotificationCenter in NotificationsUseCase, StoreKit in PurchaseUseCase, etc.). Multi-consumer device frameworks always go through a Store (see "Stores" section above).
 - A Use Case does NOT inject other Use Cases EXCEPT the `@Observable` state-store ones (`ProfileUseCase`, `PurchaseUseCase`) which are explicitly shared state.
 
 **When to extract from VM → Use Case**:
@@ -277,7 +321,7 @@ Views never call `Container.shared.resolve()`.
 - `NSUbiquitousKeyValueStore` (iCloud KVS) — syncs across devices
 - App Group UserDefaults (`group.app.ddworks.FocusOnYourself`) — shared with widgets
 
-Keys are defined in the `UserDefaultsKey` enum at `Models/UserDefaultsKey.swift`. There is no `UserDefaultsService` — each Use Case (or ViewModel, for single-VM data) instantiates `UserDefaults(suiteName: AppGroup.suiteName)` inline.
+Keys are defined in the `UserDefaultsKey` enum at `Domain/Models/UserDefaultsKey.swift`. All UserDefaults access goes through `UserDefaultsStore` (`Stores/UserDefaults/`) — Use Cases and ViewModels inject `@Injected(\.userDefaultsStore)` rather than instantiating `UserDefaults` directly.
 
 The root model is `UserProfile` (contains `[CheckIn]`). `ProfileUseCase` is the `@Observable` state store: it loads `UserProfile` on init, persists on every `updateProfile`, and triggers `WidgetCenter.shared.reloadAllTimelines()`. All profile reads / writes go through `ProfileUseCase`.
 
@@ -315,7 +359,7 @@ Always add `.scrollIndicators(.hidden)` to every `ScrollView`.
 - `App/Container+App.swift` — all service registrations; add new services here
 - `Domain/UseCases/Profile/ProfileUseCase.swift` — `@Observable` state store for `UserProfile`; owns load/persist + widget reload
 - `Domain/UseCases/CheckIn/CheckInUseCase.swift` — check-in CRUD + streak via `StreakCalculator`
-- `Domain/UseCases/Auth/AuthUseCase.swift` — login/register/refresh + post-auth sync; inlines Keychain
+- `Domain/UseCases/Auth/AuthUseCase.swift` — login/register/refresh + post-auth sync (uses `KeychainStore`)
 - `Domain/UseCases/Purchase/PurchaseUseCase.swift` — `@Observable` `isPro` + StoreKit
 - `Models/UserDefaultsKey.swift` — App Group UserDefaults key enum
 - `Domain/Models/UserProfile.swift` + `Domain/Models/CheckIn.swift` — core domain models
@@ -487,7 +531,7 @@ var articlesService: Factory<ArticlesServiceProtocol> {
 }
 ```
 
-**State-store Use Cases — `ProfileUseCase`, `PurchaseUseCase`**: Both are `@Observable @MainActor final class` registered with their protocol type. They hold reactive state (`UserProfile`, `isPro`) and inline framework code (UserDefaults for persistence, StoreKit for transactions). Their `@Injected` dependencies must use `@ObservationIgnored` to prevent a backing-storage name collision with the `@Observable` macro. When mutating `@Observable`-tracked properties from inside the class, always assign to `self.property` — never to the synthesized `_property` backing store, which bypasses the observation system.
+**State-store Use Cases — `ProfileUseCase`, `PurchaseUseCase`**: Both are `@Observable @MainActor final class` registered with their protocol type. They hold reactive state (`UserProfile`, `isPro`); persistence goes through `UserDefaultsStore`, and `PurchaseUseCase` inlines StoreKit (single consumer). Their `@Injected` dependencies must use `@ObservationIgnored` to prevent a backing-storage name collision with the `@Observable` macro. When mutating `@Observable`-tracked properties from inside the class, always assign to `self.property` — never to the synthesized `_property` backing store, which bypasses the observation system.
 
 **Never use `NotificationCenter`** for propagating state changes between layers — use `@Observable` or async sequences instead.
 

@@ -1,3 +1,4 @@
+import Factory
 import Foundation
 import Observation
 import WidgetKit
@@ -7,10 +8,10 @@ import WidgetKit
 final class ProfileUseCase: ProfileUseCaseProtocol {
     private(set) var profile = UserProfile()
 
-    @ObservationIgnored private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
+    @ObservationIgnored @Injected(\.userDefaultsStore) private var userDefaultsStore
 
     init() {
-        profile = defaults.data(forKey: UserDefaultsKey.userProfile.rawValue)
+        profile = _userDefaultsStore.wrappedValue.data(for: .userProfile)
             .flatMap { try? JSONDecoder().decode(UserProfile.self, from: $0) }
             ?? UserProfile()
     }
@@ -30,7 +31,7 @@ final class ProfileUseCase: ProfileUseCaseProtocol {
     func updateProfile(_ profile: UserProfile) {
         self.profile = profile
         if let data = try? JSONEncoder().encode(profile) {
-            defaults.set(data, forKey: UserDefaultsKey.userProfile.rawValue)
+            userDefaultsStore.setData(data, for: .userProfile)
         }
         WidgetCenter.shared.reloadAllTimelines()
     }
@@ -70,9 +71,9 @@ final class ProfileUseCase: ProfileUseCaseProtocol {
     }
 
     func resetAll() {
-        defaults.removeObject(forKey: UserDefaultsKey.userProfile.rawValue)
-        defaults.removeObject(forKey: UserDefaultsKey.affirmationCache.rawValue)
-        defaults.removeObject(forKey: UserDefaultsKey.affirmationCacheDate.rawValue)
+        userDefaultsStore.remove(.userProfile)
+        userDefaultsStore.remove(.affirmationCache)
+        userDefaultsStore.remove(.affirmationCacheDate)
         updateProfile(UserProfile())
     }
 }

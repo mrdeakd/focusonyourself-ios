@@ -4,8 +4,8 @@ import Foundation
 final class CheckInUseCase: CheckInUseCaseProtocol {
     @Injected(\.profileUseCase) private var profileUseCase
     @Injected(\.checkinsService) private var checkinsService
+    @Injected(\.userDefaultsStore) private var userDefaultsStore
     private let streakCalculator = StreakCalculator()
-    private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
 
     func record(mood: Mood, feelingsDescription: String?, factors: CheckInFactors?) async throws {
         let checkIn = CheckIn(
@@ -24,9 +24,9 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     }
 
     func mergeWidgetCheckIn() {
-        guard let raw = defaults.data(forKey: UserDefaultsKey.pendingWidgetCheckIn.rawValue) else { return }
+        guard let raw = userDefaultsStore.data(for: .pendingWidgetCheckIn) else { return }
         guard let pending = try? JSONDecoder().decode(PendingWidgetCheckIn.self, from: raw) else {
-            defaults.removeObject(forKey: UserDefaultsKey.pendingWidgetCheckIn.rawValue)
+            userDefaultsStore.remove(.pendingWidgetCheckIn)
             return
         }
         let existing = profileUseCase.profile.checkIns.first { $0.dateString == pending.dateString }
@@ -35,7 +35,7 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
             let checkIn = CheckIn(dateString: pending.dateString, mood: mood, feelingsDescription: nil, factors: nil)
             Task { try? await self.save(checkIn) }
         }
-        defaults.removeObject(forKey: UserDefaultsKey.pendingWidgetCheckIn.rawValue)
+        userDefaultsStore.remove(.pendingWidgetCheckIn)
     }
 
     func reset() {

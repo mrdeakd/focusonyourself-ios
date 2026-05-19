@@ -24,12 +24,12 @@ final class HomeViewModel {
     @ObservationIgnored @Injected(\.settingsUseCase) private var settingsUseCase
     @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
     @ObservationIgnored @Injected(\.articlesService) private var articlesService
+    @ObservationIgnored @Injected(\.userDefaultsStore) private var userDefaultsStore
 
     private let affirmationCalculator = AffirmationCalculator()
     private let moodHealthKitCalculator = MoodHealthKitCalculator()
     private let dailyCacheChecker = DailyCacheChecker()
     private let healthStore = HKHealthStore()
-    private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
 
     var articles: [Article] = []
     var isLoadingArticles = false
@@ -181,9 +181,9 @@ final class HomeViewModel {
     // MARK: - Affirmation cache (inlined UserDefaults)
 
     private func cachedAffirmations() -> [(quote: String, category: AffirmationCategory)]? {
-        let cachedDate = defaults.string(forKey: UserDefaultsKey.affirmationCacheDate.rawValue)
+        let cachedDate = userDefaultsStore.string(for: .affirmationCacheDate)
         guard dailyCacheChecker.isFreshForToday(cachedDateString: cachedDate) else { return nil }
-        guard let data = defaults.data(forKey: UserDefaultsKey.affirmationCache.rawValue) else { return nil }
+        guard let data = userDefaultsStore.data(for: .affirmationCache) else { return nil }
         guard let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data) else { return nil }
         return cached.map { (quote: $0.quote, category: $0.category) }
     }
@@ -191,9 +191,9 @@ final class HomeViewModel {
     private func cacheAffirmations(_ pairs: [(quote: String, category: AffirmationCategory)]) {
         let cached = pairs.map { CachedAffirmation(quote: $0.quote, category: $0.category) }
         if let data = try? JSONEncoder().encode(cached) {
-            defaults.set(data, forKey: UserDefaultsKey.affirmationCache.rawValue)
+            userDefaultsStore.setData(data, for: .affirmationCache)
         }
-        defaults.set(dailyCacheChecker.todayString(), forKey: UserDefaultsKey.affirmationCacheDate.rawValue)
+        userDefaultsStore.setString(dailyCacheChecker.todayString(), for: .affirmationCacheDate)
     }
 
     // MARK: - HealthKit (inlined)

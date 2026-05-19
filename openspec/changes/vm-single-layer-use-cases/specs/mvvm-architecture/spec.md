@@ -23,6 +23,37 @@ A Service MAY encode typed inputs into URL/query/body and decode the response (i
 - **WHEN** a Service file is reviewed
 - **THEN** it MUST NOT contain a guard validating inputs (e.g. empty-check), a cache lookup, a branch on a feature flag, a fallback to alternate paths, or held state beyond constants
 
+### Requirement: Stores wrap multi-consumer device frameworks
+
+When two or more consumers (Use Cases or ViewModels) need the same device-framework primitive, the framework SHALL be wrapped in a Store at `Stores/<Domain>/<Name>Store.swift` + protocol. Single-consumer device frameworks remain inlined in their sole consumer.
+
+A Store SHALL be a thin wrapper: no business logic, no validation, no branching, no held state beyond constants. Same rules as Services.
+
+Stores SHALL be registered in `App/Container+App.swift` under `// MARK: - Stores` using their protocol type as `.singleton`. The currently registered stores are `keychainStore` and `userDefaultsStore`.
+
+#### Scenario: Keychain extraction
+
+- **WHEN** Keychain is used by both `AuthUseCase` and `URLSessionNetworkClient`
+- **THEN** the access is encapsulated in `KeychainStore` (`save(_:for:)`, `load(_:)`, `delete(_:)` by string key)
+- **AND** no other file references `Keychain.default` directly
+
+#### Scenario: UserDefaults extraction
+
+- **WHEN** UserDefaults is used by multiple consumers (`ProfileUseCase`, `CheckInUseCase`, `SettingsUseCase`, `PurchaseUseCase`, `HomeViewModel`)
+- **THEN** the access is encapsulated in `UserDefaultsStore` (typed by `UserDefaultsKey`)
+- **AND** no other file instantiates `UserDefaults(suiteName:)` directly
+
+#### Scenario: Single-consumer device framework
+
+- **WHEN** a device framework (HealthKit, AVAudio, StoreKit, UNUserNotificationCenter, FoundationModels) has exactly one consumer
+- **THEN** it is inlined in that consumer, NOT extracted to a Store
+- **AND** extraction to a Store happens only when a second consumer appears
+
+#### Scenario: Future Store (database, etc.)
+
+- **WHEN** a future feature needs a new device-framework primitive shared across consumers (e.g. SwiftData/SQLite for an offline database)
+- **THEN** a new Store is created at `Stores/<Domain>/<Name>Store.swift` following the same shape as `KeychainStore` and `UserDefaultsStore`
+
 ### Requirement: Models split by purpose, one type per file
 
 Domain models SHALL live in `FocusOnYourself/Domain/Models/`. Wire-format models (request bodies, response payloads, backend variants, response envelopes) SHALL live in `FocusOnYourself/Networking/Models/`.

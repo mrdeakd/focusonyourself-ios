@@ -1,13 +1,11 @@
 import Factory
 import Foundation
-import SwiftSecurity
 
 final class AuthUseCase: AuthUseCaseProtocol {
     @Injected(\.authService) private var authService
     @Injected(\.checkinsService) private var checkinsService
     @Injected(\.profileUseCase) private var profileUseCase
-
-    private let keychain = Keychain.default
+    @Injected(\.keychainStore) private var keychainStore
 
     private static let accessTokenKey  = "foy.accessToken"
     private static let refreshTokenKey = "foy.refreshToken"
@@ -26,62 +24,43 @@ final class AuthUseCase: AuthUseCaseProtocol {
     }
 
     func signOut() async {
-        if let refresh = loadKeychain(Self.refreshTokenKey) {
+        if let refresh = keychainStore.load(Self.refreshTokenKey) {
             try? await authService.logout(refreshToken: refresh)
         }
         clearAuthTokens()
     }
 
     func refreshTokenIfNeeded() async {
-        guard let accessToken = loadKeychain(Self.accessTokenKey) else { return }
+        guard let accessToken = keychainStore.load(Self.accessTokenKey) else { return }
         guard jwtIsNearExpiry(accessToken) else { return }
-        guard let refresh = loadKeychain(Self.refreshTokenKey) else {
+        guard let refresh = keychainStore.load(Self.refreshTokenKey) else {
             clearAuthTokens()
             return
         }
         do {
             let response = try await authService.refresh(refreshToken: refresh)
-            try? saveKeychain(Self.accessTokenKey, value: response.accessToken)
-            try? saveKeychain(Self.refreshTokenKey, value: response.refreshToken)
+            try? keychainStore.save(response.accessToken, for: Self.accessTokenKey)
+            try? keychainStore.save(response.refreshToken, for: Self.refreshTokenKey)
         } catch {
             clearAuthTokens()
         }
     }
 
-    var email: String? { loadKeychain(Self.userEmailKey) }
-    var isAuthenticated: Bool { loadKeychain(Self.accessTokenKey) != nil }
+    var email: String? { keychainStore.load(Self.userEmailKey) }
+    var isAuthenticated: Bool { keychainStore.load(Self.accessTokenKey) != nil }
 
-    // MARK: - Keychain (inlined SwiftSecurity)
+    // MARK: - Token persistence
 
     private func saveAuthTokens(access: String, refresh: String, email: String) {
-        try? saveKeychain(Self.accessTokenKey, value: access)
-        try? saveKeychain(Self.refreshTokenKey, value: refresh)
-        try? saveKeychain(Self.userEmailKey, value: email)
+        try? keychainStore.save(access, for: Self.accessTokenKey)
+        try? keychainStore.save(refresh, for: Self.refreshTokenKey)
+        try? keychainStore.save(email, for: Self.userEmailKey)
     }
 
     private func clearAuthTokens() {
-        deleteKeychain(Self.accessTokenKey)
-        deleteKeychain(Self.refreshTokenKey)
-        deleteKeychain(Self.userEmailKey)
-    }
-
-    private func saveKeychain(_ key: String, value: String) throws {
-        try keychain.store(value, query: keychainQuery(for: key))
-    }
-
-    private func loadKeychain(_ key: String) -> String? {
-        try? keychain.retrieve(keychainQuery(for: key))
-    }
-
-    private func deleteKeychain(_ key: String) {
-        _ = try? keychain.remove(keychainQuery(for: key))
-    }
-
-    private func keychainQuery(for key: String) -> SecItemQuery<GenericPassword> {
-        var query = SecItemQuery<GenericPassword>()
-        query.service = "FocusOnYourself"
-        query.account = key
-        return query
+        keychainStore.delete(Self.accessTokenKey)
+        keychainStore.delete(Self.refreshTokenKey)
+        keychainStore.delete(Self.userEmailKey)
     }
 
     // MARK: - Check-in sync

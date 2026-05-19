@@ -19,6 +19,9 @@ extension Container {
     var affirmationService: Factory<AffirmationServiceProtocol> {
         self { @MainActor in AffirmationService() }.singleton
     }
+    var authService: Factory<AuthServiceProtocol> {
+        self { @MainActor in AuthService() }.singleton
+    }
 
     // MARK: - Use Cases
 

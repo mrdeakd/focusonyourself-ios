@@ -3,7 +3,7 @@ import Foundation
 import SwiftSecurity
 
 final class AuthUseCase: AuthUseCaseProtocol {
-    @Injected(\.networkClient) private var networkClient
+    @Injected(\.authService) private var authService
     @Injected(\.checkinsService) private var checkinsService
     @Injected(\.profileUseCase) private var profileUseCase
 
@@ -14,26 +14,20 @@ final class AuthUseCase: AuthUseCaseProtocol {
     private static let userEmailKey    = "foy.userEmail"
 
     func register(email: String, password: String) async throws {
-        let response: AuthResponse = try await networkClient.post(
-            "/api/auth/register",
-            body: LoginBody(email: email, password: password)
-        )
+        let response = try await authService.register(email: email, password: password)
         saveAuthTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
         await uploadLocalCheckIns()
     }
 
     func signIn(email: String, password: String) async throws {
-        let response: AuthResponse = try await networkClient.post(
-            "/api/auth/login",
-            body: LoginBody(email: email, password: password)
-        )
+        let response = try await authService.login(email: email, password: password)
         saveAuthTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
         await downloadAndReplaceCheckIns()
     }
 
     func signOut() async {
         if let refresh = loadKeychain(Self.refreshTokenKey) {
-            _ = try? await networkClient.post("/api/auth/logout", body: RefreshBody(refreshToken: refresh)) as EmptyResponse
+            try? await authService.logout(refreshToken: refresh)
         }
         clearAuthTokens()
     }
@@ -46,10 +40,7 @@ final class AuthUseCase: AuthUseCaseProtocol {
             return
         }
         do {
-            let response: RefreshResponse = try await networkClient.post(
-                "/api/auth/refresh",
-                body: RefreshBody(refreshToken: refresh)
-            )
+            let response = try await authService.refresh(refreshToken: refresh)
             try? saveKeychain(Self.accessTokenKey, value: response.accessToken)
             try? saveKeychain(Self.refreshTokenKey, value: response.refreshToken)
         } catch {

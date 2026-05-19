@@ -8,7 +8,11 @@ final class AffirmationService: AffirmationServiceProtocol {
         count: Int,
         for categories: [AffirmationCategory]
     ) async throws -> [CachedAffirmation] {
+        let path = "/api/affirmations/batch"
         let categoryParams = categories.map(\.rawValue).joined(separator: ",")
-        return try await networkClient.get("/api/affirmations/batch?categories=\(categoryParams)&count=\(count)")
+        let response: [CachedAffirmation] = try await networkClient.get(
+            "\(path)?categories=\(categoryParams)&count=\(count)"
+        )
+        return response
     }
 }

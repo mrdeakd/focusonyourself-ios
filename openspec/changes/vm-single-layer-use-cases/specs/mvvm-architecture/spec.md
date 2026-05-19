@@ -2,9 +2,9 @@
 
 ### Requirement: Services contain only network calls
 
-A Service SHALL only call `networkClient` (or the underlying HTTP layer). A Service MUST NOT touch `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`, or any other device framework. A Service MUST NOT contain caching logic, branching between alternate paths, business-rule transformations, or held state beyond what's needed for the network call itself.
+A Service SHALL only call `networkClient` (or the underlying HTTP layer). A Service MUST NOT touch `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`, or any other device framework. A Service MUST NOT contain caching logic, branching between alternate paths, validation, business-rule transformations, or held state beyond what's needed for the network call itself.
 
-A Service receives prepared parameters from its caller (Use Case or ViewModel) and returns the raw decoded response.
+A Service MAY encode typed inputs into URL/query/body and decode the response (including `.toBackendModel()` / `.toDomainModel()` Codable mappings). A Service receives prepared parameters from its caller (Use Case or ViewModel) and returns mapped models.
 
 #### Scenario: New network endpoint
 
@@ -21,7 +21,74 @@ A Service receives prepared parameters from its caller (Use Case or ViewModel) a
 #### Scenario: Forbidden patterns in a Service
 
 - **WHEN** a Service file is reviewed
-- **THEN** it MUST NOT contain a date check, a cache lookup, a branch on a feature flag, a mapping rule, a formula, or held state beyond constants
+- **THEN** it MUST NOT contain a guard validating inputs (e.g. empty-check), a cache lookup, a branch on a feature flag, a fallback to alternate paths, or held state beyond constants
+
+### Requirement: Service methods follow the 4-line template
+
+Every Service method SHALL follow this exact structure, in this order:
+
+1. `let path = "..."` — endpoint base path as a string literal, no query string
+2. `let <name> = <encoded value>` — zero or more `let` lines that encode typed inputs into wire-format values (joined arrays, `.toBackendModel()`, date formatting, etc.)
+3. `let response: <T> = try await networkClient.<verb>(...)` — the single network call, interpolating the path and params at the call site
+4. `return response` or `return response.map { ... }` / `return response.compactMap { ... }` — the return statement, optionally with a final mapping (typically `.toDomainModel()`)
+
+For void-returning calls, step 3 becomes `let _: EmptyResponse = try await networkClient.post(path, body: body)` and step 4 is omitted.
+
+#### Scenario: GET with encoded query params
+
+- **WHEN** a Service method fetches by typed parameters
+- **THEN** the body is structured as:
+  ```swift
+  let path = "/api/affirmations/batch"
+  let categoryParams = categories.map(\.rawValue).joined(separator: ",")
+  let response: [CachedAffirmation] = try await networkClient.get(
+      "\(path)?categories=\(categoryParams)&count=\(count)"
+  )
+  return response
+  ```
+
+#### Scenario: GET with model translation
+
+- **WHEN** the response shape differs from the domain shape
+- **THEN** the final line maps via `compactMap { $0.toDomainModel() }` (or `map`), e.g.:
+  ```swift
+  let path = "/api/checkins"
+  let response: [BackendCheckIn] = try await networkClient.get(path)
+  return response.compactMap { $0.toDomainModel() }
+  ```
+
+#### Scenario: POST with body and typed response
+
+- **WHEN** a Service method posts a body and reads a typed response
+- **THEN** the body is structured as:
+  ```swift
+  let path = "/api/auth/login"
+  let body = LoginBody(email: email, password: password)
+  let response: AuthResponse = try await networkClient.post(path, body: body)
+  return response
+  ```
+
+#### Scenario: POST with no response body
+
+- **WHEN** the endpoint returns no useful payload
+- **THEN** the call is discarded with a typed `EmptyResponse`:
+  ```swift
+  let path = "/api/checkins"
+  let body = checkIn.toBackendModel()
+  let _: EmptyResponse = try await networkClient.post(path, body: body)
+  ```
+
+#### Scenario: Two alternative endpoints
+
+- **WHEN** a feature has two distinct endpoints (e.g. all-vs-filtered)
+- **THEN** the Service SHALL expose two methods, NOT one method with `if/else` branching
+- **AND** the caller chooses which to call
+
+#### Scenario: Caller-provided values
+
+- **WHEN** a Service method needs a value that represents a business decision (e.g. "today's date" vs. "any date")
+- **THEN** the value SHALL be passed as a parameter from the caller, NOT computed inside the Service
+- **EXCEPT** when the value is a pure encoding concern (e.g. ISO8601 formatting of a Date the caller provided)
 
 ### Requirement: Use Cases exist only for SHARED logic
 

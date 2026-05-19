@@ -55,9 +55,78 @@ Key limits: line length 130 (error), file length 400/500, function body 75 lines
 ### Services — network only
 
 - A Service file may contain ONLY network calls via `networkClient`. No `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`.
-- A Service does not branch between paths, cache anything, decide when to call, transform data beyond decoding, or hold state.
-- The Service receives prepared parameters from its caller (Use Case or ViewModel) and returns raw decoded values.
+- A Service does not branch between paths, cache anything, decide when to call, validate inputs, or hold state.
+- A Service may encode typed inputs into URL/query/body (transformation for the wire) and decode the response, INCLUDING `.toBackendModel()` / `.toDomainModel()` mappings on Codable models.
+- The Service receives prepared parameters from its caller (Use Case or ViewModel) and returns the mapped models (domain types where applicable, or raw decoded backend types where translation isn't needed).
 - Services are registered as `Factory<<Name>ServiceProtocol>` in `Container+App.swift` under `// MARK: - Services`.
+
+#### Mandatory method template (ENFORCE on every Service method)
+
+Every Service method **must** follow this exact 4-line structure:
+
+```
+1. let path = "..."                                         // endpoint path (base, without query)
+2. let <param> = ... / let body = ...                       // params: encode inputs to wire format (zero or more lines)
+3. let response: <T> = try await networkClient.get/post(...)  // the call (may interpolate path + params)
+4. return response  /  return response.map { ... }          // return, with optional mapping
+```
+
+Rules:
+- Line 1 is ALWAYS `let path = "..."` — a string literal for the endpoint base, no query string here.
+- Lines 2…N are ALWAYS `let <name> = <encoded value>` — one `let` per param transformation (`categories.map(\.rawValue).joined(...)`, `Date.now.formatted(...)`, `.toBackendModel()`, etc.). Skip if there are no params.
+- The call line ALWAYS captures into `let response: T = try await networkClient.<verb>(...)`. The query string is built inline at the call site by interpolating the `path` and param `let`s (e.g. `"\(path)?date=\(date)"`).
+- The return line is either `return response` or `return response.compactMap { ... }` / `return response.map { ... }` when a domain translation is needed (typically `.toDomainModel()`).
+- For void-returning calls (POST with empty response), replace lines 3–4 with `let _: EmptyResponse = try await networkClient.post(path, body: body)` (no return statement). The discard goes on the same call line.
+- One method = one network call. If a feature needs multiple round-trips, expose multiple methods on the Service (the caller composes them).
+
+**Conforming examples:**
+
+```swift
+// GET with query params
+func fetchAffirmations(count: Int, for categories: [AffirmationCategory]) async throws -> [CachedAffirmation] {
+    let path = "/api/affirmations/batch"
+    let categoryParams = categories.map(\.rawValue).joined(separator: ",")
+    let response: [CachedAffirmation] = try await networkClient.get(
+        "\(path)?categories=\(categoryParams)&count=\(count)"
+    )
+    return response
+}
+
+// GET with mapping
+func fetch() async throws -> [CheckIn] {
+    let path = "/api/checkins"
+    let response: [BackendCheckIn] = try await networkClient.get(path)
+    return response.compactMap { $0.toDomainModel() }
+}
+
+// POST with body, typed response
+func login(email: String, password: String) async throws -> AuthResponse {
+    let path = "/api/auth/login"
+    let body = LoginBody(email: email, password: password)
+    let response: AuthResponse = try await networkClient.post(path, body: body)
+    return response
+}
+
+// POST with body, no response
+func post(_ checkIn: CheckIn) async throws {
+    let path = "/api/checkins"
+    let body = checkIn.toBackendModel()
+    let _: EmptyResponse = try await networkClient.post(path, body: body)
+}
+
+// GET no params
+func allSessions() async throws -> [MeditationSession] {
+    let path = "/api/meditations"
+    let response: [MeditationSession] = try await networkClient.get(path)
+    return response
+}
+```
+
+**Forbidden in Service methods (violations of the template):**
+- `guard !x.isEmpty else { return [] }` — validation belongs to the caller
+- `if/else` branching between alternate paths — split into two methods instead (`allSessions()` + `sessions(in:)`)
+- Inline `Date.now` or other runtime decisions that aren't pure encoding — the caller provides the value when it's a business decision
+- Caching, retry loops, fallback logic — those belong in the Use Case or ViewModel
 
 **Invariant** (run to verify): `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` — must return empty.
 

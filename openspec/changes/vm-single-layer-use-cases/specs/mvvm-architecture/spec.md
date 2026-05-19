@@ -23,6 +23,51 @@ A Service MAY encode typed inputs into URL/query/body and decode the response (i
 - **WHEN** a Service file is reviewed
 - **THEN** it MUST NOT contain a guard validating inputs (e.g. empty-check), a cache lookup, a branch on a feature flag, a fallback to alternate paths, or held state beyond constants
 
+### Requirement: Calculators have one responsibility
+
+A Calculator SHALL have a single responsibility, definable as a noun phrase without "and". Methods within a Calculator SHALL share either an input domain or contribute to the same kind of output (cohesion test). When a Calculator accumulates methods across disjoint input domains, it SHALL be split — single-purpose Calculators for reusable algorithms, inline the rest as `private func` in the single consumer.
+
+A Calculator SHALL be a `struct` with no `@Injected` properties, no `@Observable`, no `@MainActor`, no `import SwiftUI`. All inputs are method arguments; all outputs are return values. No held state beyond constants. No side effects (no `print`, no IO, no logging).
+
+#### Scenario: Cohesion preserved despite many methods
+
+- **WHEN** all methods on a Calculator take the same input type and return values in the same conceptual family (e.g. `InsightsCalculator` — all take `[CheckIn]`, return insight values)
+- **THEN** the Calculator remains as one file even with 14+ methods
+
+#### Scenario: SRP violation — split required
+
+- **WHEN** a Calculator has methods that take disjoint input types (e.g. `(Int, Int)`, `(String, Int)`, `(Category, Int)`)
+- **THEN** the Calculator SHALL be split
+- **AND** reusable algorithm methods become single-purpose Calculators
+- **AND** non-reusable helpers are inlined as `private func` in the single consumer (ViewModel or Use Case)
+
+#### Scenario: Extraction threshold
+
+- **WHEN** pure logic is ≥ 10 LOC AND has a reusable concept
+- **THEN** extract to a Calculator under `Domain/Calculators/`
+- **OTHERWISE** inline as `private func` in the consumer (don't pre-extract for hypothetical reuse)
+
+### Requirement: Split big methods into named private helpers
+
+When a method exceeds ~25 LOC OR contains multiple distinct sub-tasks, it SHALL be refactored such that the public method reads as a sequence of named steps and the sub-tasks live in `private func` helpers within the same Calculator. The hard upper bound is 75 LOC per function (SwiftLint).
+
+#### Scenario: Method ≤ 25 LOC
+
+- **WHEN** a method is ≤ 25 LOC and reads clearly
+- **THEN** no splitting required
+
+#### Scenario: Method > 25 LOC with distinct sub-tasks
+
+- **WHEN** a method exceeds ~25 LOC OR performs multiple distinct sub-tasks
+- **THEN** each sub-task SHALL be extracted to a named `private func` within the same Calculator
+- **AND** the public method becomes orchestration (named steps reading like prose)
+- **AND** private helper names read like verbs (`entriesWithFactors`, `correlate`, `groupByRange`)
+
+#### Scenario: Reusable private helper
+
+- **WHEN** a private helper turns out to be reused in another Calculator or another call site
+- **THEN** it SHALL be promoted to its own Calculator following the cohesion rule
+
 ### Requirement: Stores wrap multi-consumer device frameworks
 
 When two or more consumers (Use Cases or ViewModels) need the same device-framework primitive, the framework SHALL be wrapped in a Store at `Stores/<Domain>/<Name>Store.swift` + protocol. Single-consumer device frameworks remain inlined in their sole consumer.

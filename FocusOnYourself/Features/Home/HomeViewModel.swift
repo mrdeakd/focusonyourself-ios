@@ -26,7 +26,7 @@ final class HomeViewModel {
     @ObservationIgnored @Injected(\.articlesService) private var articlesService
     @ObservationIgnored @Injected(\.userDefaultsStore) private var userDefaultsStore
 
-    private let affirmationCalculator = AffirmationCalculator()
+    private let distributionCalculator = DistributionCalculator()
     private let moodHealthKitCalculator = MoodHealthKitCalculator()
     private let dailyCacheChecker = DailyCacheChecker()
     private let healthStore = HKHealthStore()
@@ -166,16 +166,39 @@ final class HomeViewModel {
         count: Int,
         for categories: [AffirmationCategory]
     ) async throws -> [(quote: String, category: AffirmationCategory)] {
-        let counts = affirmationCalculator.distribute(total: count, across: categories.count)
+        let counts = distributionCalculator.distribute(total: count, across: categories.count)
         var results: [(quote: String, category: AffirmationCategory)] = []
         for (category, affirmationCount) in zip(categories, counts) {
-            let prompt = affirmationCalculator.promptFor(category: category, count: affirmationCount)
+            let prompt = affirmationPrompt(category: category, count: affirmationCount)
             let session = LanguageModelSession()
             let response = try await session.respond(to: prompt)
-            let quotes = affirmationCalculator.parseNumberedList(response.content, expected: affirmationCount)
+            let quotes = parseNumberedList(response.content, expected: affirmationCount)
             results += quotes.map { (quote: $0, category: category) }
         }
         return results
+    }
+
+    private func affirmationPrompt(category: AffirmationCategory, count: Int) -> String {
+        """
+        Write \(count) short, powerful daily affirmations in the theme of: \(category.displayName). \
+        Use first person ("I am", "I have", or "I choose"). \
+        Format as a numbered list (1. ... 2. ... etc.), one affirmation per line. \
+        Return only the affirmation texts, no explanations.
+        """
+    }
+
+    private func parseNumberedList(_ text: String, expected: Int) -> [String] {
+        let lines = text.components(separatedBy: .newlines)
+        var results: [String] = []
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { continue }
+            let stripped = trimmed.replacing(#/^\d+\.\s*/#, with: "")
+            if !stripped.isEmpty {
+                results.append(stripped)
+            }
+        }
+        return Array(results.prefix(expected))
     }
 
     // MARK: - Affirmation cache (inlined UserDefaults)

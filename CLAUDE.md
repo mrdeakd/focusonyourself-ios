@@ -243,11 +243,83 @@ extension BackendCheckIn {
 - Create `XUseCase` (or fold into an existing relevant Use Case). Move the logic. Both VMs inject the Use Case.
 - This is the only trigger — don't extract preemptively.
 
-### Calculators — pure, > ~10 LOC
+### Calculators — pure SOLID logic
 
-- Pure `struct`. All inputs are method arguments, all outputs are return values.
-- No DI, no `@Observable`, no `@MainActor`, no `import SwiftUI` (other framework imports like `HealthKit` are allowed for type mapping).
-- Use Calculators when a chunk of pure logic gets large enough to benefit from isolation (distribution algorithms, statistical math, mapping rules, date math).
+Calculators are the SOLID slot of the architecture: pure `struct`s with no dependencies, no state, no side effects. Given inputs, return outputs. They are HELD BY Use Cases / ViewModels (`private let calculator = XCalculator()`) and used to delegate pure math out of the caller.
+
+#### Rule 1 — When to extract a Calculator (vs inline)
+
+Extract when ALL three are true:
+1. **Pure** — no IO, no state, no framework side effects
+2. **Worth a name** — ≥ 10 LOC, OR ≥ 2 test-worthy edge cases, OR shared by 2+ consumers
+3. **Reusable in concept** — a future feature might want the same transform
+
+Otherwise inline as `private func` in the consumer. Don't pre-extract.
+
+#### Rule 2 — Calculator vs Use Case vs ViewModel — the decision tree
+
+```
+Has IO / state / side effects?
+├── NO  → Calculator (≥ 10 LOC) OR private func in the consumer
+└── YES → Shared across 2+ ViewModels?
+         ├── YES → Use Case
+         └── NO  → keep in the single ViewModel
+```
+
+Calculators do the math. Use Cases / ViewModels do the IO around the math.
+
+#### Rule 3 — One responsibility per Calculator (the "and" test)
+
+A Calculator's name must be a single noun phrase you can defend without "and". If you need "X and Y calculator" to describe it, split it.
+
+**Cohesion test**: methods within a Calculator MUST share an input domain OR contribute to the same kind of output.
+- ✓ `StreakCalculator` — all methods take `[CheckIn]`, return streak values
+- ✓ `MoodHealthKitCalculator` — all methods translate `Mood` → HealthKit types
+- ✓ `InsightsCalculator` — 14 methods but all take `[CheckIn]`, return insight values (broad but cohesive)
+- ✗ Bad example (the now-split `AffirmationCalculator` was this): method A took `(Int, Int)`, B took `(String, Int)`, C took `(Category, Int)` — three input domains = three responsibilities
+
+#### Rule 4 — How to split a big method
+
+When a method exceeds ~25 LOC or contains multiple distinct sub-tasks:
+
+1. **Read the body as English sentences.** Each sentence = one responsibility.
+2. **Extract each sub-task as a named `private func`** in the same Calculator. The orchestrator becomes a list of named steps that reads like prose.
+3. **Helper names read like verbs**: `entriesWithFactors(_:)`, `correlate(_:factor:moods:)`, `groupByRange(_:keyPath:)`.
+4. **Promote** a private helper to its own Calculator only if reused elsewhere.
+5. **Hard limit**: 75 LOC per function (SwiftLint). **Soft target**: ≤ 25 LOC per public method.
+
+Worked example:
+```swift
+// Before (one big method doing 4 things):
+func factorCorrelations(from checkIns: [CheckIn]) -> [FactorCorrelation] {
+    let entries = checkIns.filter { $0.factors != nil }
+    guard entries.count >= Self.factorMinimum else { return [] }
+    let moods = entries.map { Double($0.mood.numericValue) }
+    var results: [FactorCorrelation] = []
+    // ... 4× correlate ...
+    return results.sorted { abs($0.pearsonR) > abs($1.pearsonR) }
+}
+
+// After (orchestrator reads as named steps):
+func factorCorrelations(from checkIns: [CheckIn]) -> [FactorCorrelation] {
+    let entries = entriesWithFactors(checkIns)
+    guard meetsMinimumCount(entries) else { return [] }
+    return correlateAllFactors(entries).sorted { abs($0.pearsonR) > abs($1.pearsonR) }
+}
+```
+
+#### Rule 5 — Forbidden in Calculators
+
+- `@Injected` — no DI
+- `@Observable` / `@MainActor`
+- `import SwiftUI` / `import Charts` / any UI framework (`import HealthKit` etc. is OK for type-mapping calculators)
+- Mutating instance state — calculators are stateless; use `let` and return values
+- `print`, logging, FileManager, URLSession, anything with side effects
+- Holding a reference to a Service / Store / Use Case / other Calculator
+
+#### Rule 6 — Pragmatic exception for random algorithms
+
+A Calculator may use `Int.random` etc. when randomness is part of its algorithmic contract (e.g. fair distribution). The output is deterministic given the same random seed. Don't extract for seedable testing unless you actually need it.
 
 ### ViewModels — inject Use Cases and/or Services
 

@@ -23,6 +23,48 @@ A Service MAY encode typed inputs into URL/query/body and decode the response (i
 - **WHEN** a Service file is reviewed
 - **THEN** it MUST NOT contain a guard validating inputs (e.g. empty-check), a cache lookup, a branch on a feature flag, a fallback to alternate paths, or held state beyond constants
 
+### Requirement: Backend models live in `Networking/Models/` with both mappers when shapes differ
+
+Every model used in a network call (request body, response payload, response wrapper) SHALL live in `FocusOnYourself/Networking/Models/`. Domain models live in `FocusOnYourself/Models/`.
+
+When a backend model's wire shape differs from the corresponding domain shape, **both** mappers SHALL exist in the backend model file:
+
+```swift
+extension <DomainType> {
+    func toBackendModel() -> <BackendType> { … }
+}
+
+extension <BackendType> {
+    func toDomainModel() -> <DomainType>? { … }
+}
+```
+
+Mapper naming SHALL be exactly `toBackendModel()` and `toDomainModel()`. `toDomainModel()` returns an optional when any field requires validation. Call sites use `compactMap { $0.toDomainModel() }` on collections.
+
+#### Scenario: New backend model
+
+- **WHEN** a Service introduces a request body or response payload type
+- **THEN** the type SHALL be defined in `Networking/Models/<Name>.swift`
+- **AND** it SHALL NOT live in `Models/`
+
+#### Scenario: Wire shape matches domain shape
+
+- **WHEN** a backend response can be consumed directly without translation (e.g. `LoginBody`, `AuthResponse`)
+- **THEN** no mappers are required
+- **AND** the backend type may be used as-is by the Use Case / ViewModel that consumes the Service
+
+#### Scenario: Wire shape diverges from domain shape
+
+- **WHEN** any field needs renaming, enum conversion, validation, or restructuring between wire and domain
+- **THEN** both `toBackendModel()` (in a `<DomainType>` extension) AND `toDomainModel() -> <DomainType>?` (in a `<BackendType>` extension) SHALL exist in the backend model file
+- **AND** the Service uses these mappers in the 4-line template (`let body = checkIn.toBackendModel()` or `return response.compactMap { $0.toDomainModel() }`)
+
+#### Scenario: Bidirectional symmetry
+
+- **WHEN** one mapper exists for a type pair
+- **THEN** the inverse mapper SHALL also exist in the same file, even if only one direction is currently called
+- **AND** the file SHALL NOT split the two mappers across separate files
+
 ### Requirement: Service methods follow the 4-line template
 
 Every Service method SHALL follow this exact structure, in this order:

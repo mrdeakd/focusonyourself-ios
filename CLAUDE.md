@@ -130,6 +130,55 @@ func allSessions() async throws -> [MeditationSession] {
 
 **Invariant** (run to verify): `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` — must return empty.
 
+### Networking models — placement and domain mappers
+
+**Every model used in a network call lives in `Networking/Models/`.** This includes request bodies, response bodies, response wrappers, and shared envelopes (`EmptyResponse`, `AuthResponse`, `LoginBody`, `RefreshBody`, `BackendCheckIn`, `CachedAffirmation`, etc.). Domain models live in `Models/` and never leak the wire format.
+
+**Naming conventions in `Networking/Models/`:**
+- Request body: `<Action>Body` (e.g. `LoginBody`, `RefreshBody`, `ImportCheckInsBody`)
+- Response payload: `<Action>Response` (e.g. `AuthResponse`, `RefreshResponse`) OR `Backend<DomainType>` when the response is a backend-shaped variant of a domain type (e.g. `BackendCheckIn`)
+- Empty/discard response: shared `EmptyResponse`
+
+**Domain mappers — REQUIRED both ways when the wire shape differs from the domain shape.** If a backend model has even one field that needs validation, renaming, enum conversion, or restructuring before it becomes a domain model, BOTH mappers must exist in the backend model file:
+
+```swift
+// Networking/Models/BackendCheckIn.swift
+
+struct BackendCheckIn: Codable {
+    let date: String
+    let mood: String
+    let feelingsDescription: String?
+    let factors: BackendCheckInFactors?
+}
+
+extension CheckIn {
+    func toBackendModel() -> BackendCheckIn { … }   // outbound: domain → API
+}
+
+extension BackendCheckIn {
+    func toDomainModel() -> CheckIn? { … }          // inbound: API → domain
+}
+```
+
+**Mapper rules:**
+- Naming: ALWAYS `toBackendModel()` and `toDomainModel()`. No other names.
+- Both extensions live in the **backend model file** (`Networking/Models/<Backend>.swift`), never split across files.
+- `toDomainModel()` returns an **optional** when any field can fail validation (e.g. `guard let mood = Mood(rawValue: rawMood)`). Call sites use `compactMap { $0.toDomainModel() }` to filter invalid entries.
+- `toBackendModel()` returns non-optional — the domain model is already valid by construction.
+- Enum conversion: `.rawValue` outbound; guarded `Enum(rawValue:)` inbound.
+- Optional sub-model groups: collect multiple optional fields into an optional struct using an inline closure:
+  ```swift
+  let factors: CheckInFactors? = {
+      guard let sleepQuality, let stressLevel,
+            let exercised, let socialQuality else { return nil }
+      return CheckInFactors(…)
+  }()
+  ```
+
+**When mappers are NOT required**: if a backend model is used directly without translation (the wire shape matches the consumer's needs exactly), no mapper is needed. Examples: `LoginBody`, `RefreshBody`, `AuthResponse`, `EmptyResponse` — they're used as-is. But the moment a domain type needs a different shape from the wire, both mappers MUST exist together.
+
+**Invariant** (run to verify): `ls FocusOnYourself/Models/ | xargs -I{} grep -l "Codable" FocusOnYourself/Models/{}` — files listed here that are network request/response shapes belong in `Networking/Models/` instead. Domain models in `Models/` may still be `Codable` (for UserDefaults persistence), but they aren't network wire formats.
+
 ### Use Cases — only when SHARED across 2+ ViewModels
 
 - Create a Use Case when (and only when) two or more ViewModels need the same operation. Single-VM logic stays in the ViewModel.
@@ -435,35 +484,7 @@ var articlesService: Factory<ArticlesServiceProtocol> {
 
 **Never use `NotificationCenter`** for propagating state changes between layers — use `@Observable` or async sequences instead.
 
-**Model placement:**
-- API request/response models → `Networking/Models/`
-- Domain and persistence models → `Models/`
-- No `import SwiftUI` in model files. UI-specific properties (colors, tints) go in a `ModelType+UI.swift` extension placed near the views that consume them.
-
-**Model conversion (domain ↔ backend):** When a domain model needs to be serialised for the API (or deserialised from it), add two extensions — both in the backend model file (`Networking/Models/BackendModel.swift`), not split across files:
-
-```swift
-extension CheckIn {
-    func toBackendModel() -> BackendCheckIn { … }   // outbound: domain → API
-}
-
-extension BackendCheckIn {
-    func toDomainModel() -> CheckIn? { … }          // inbound: API → domain (optional = validation can fail)
-}
-```
-
-Rules:
-- Naming: always `toBackendModel()` and `toDomainModel()`.
-- `toDomainModel()` returns an optional when any field requires validation (e.g. `guard let mood = Mood(rawValue: mood)`). Use `compactMap` at call sites to filter invalid entries.
-- Enum conversion: `.rawValue` outbound; guarded `Enum(rawValue:)` inbound.
-- Optional sub-model groups: collect multiple optional fields into an optional struct using an inline closure:
-  ```swift
-  let factors: CheckInFactors? = {
-      guard let sleepQuality, let stressLevel,
-            let exercised, let socialQuality else { return nil }
-      return CheckInFactors(…)
-  }()
-  ```
+**Model placement is governed by the "Networking models" section earlier in this file** — backend models go in `Networking/Models/` with both `toBackendModel()` / `toDomainModel()` mappers when the wire shape differs from the domain; domain models go in `Models/`. No `import SwiftUI` in model files.
 
 **Views must never access services, use cases, or `Container.shared` directly.** All interaction goes through a ViewModel. **ViewModels must never access services directly** — all service interaction goes through a Use Case (see "The one-layer rule for ViewModels" earlier in this file).
 

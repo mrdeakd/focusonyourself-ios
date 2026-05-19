@@ -1,23 +1,33 @@
+import AVFoundation
 import Factory
 import Foundation
 import Observation
 
 @Observable @MainActor
-final class MeditationPlayerViewModel {
+final class MeditationPlayerViewModel: NSObject {
     let session: MeditationSession
-    @ObservationIgnored @Injected(\.meditationPlayerUseCase) private var meditationPlayer
+    @ObservationIgnored @Injected(\.networkClient) private var networkClient
 
     var currentStepIndex: Int = 0
     var isComplete = false
     var phase: MeditationPhase = .narrating
     var timerSecondsRemaining: Int = 0
 
-    private var timerTask: Task<Void, Never>?
+    @ObservationIgnored private var timerTask: Task<Void, Never>?
+    @ObservationIgnored private var narrationMap: [String: String] = [:]
+    @ObservationIgnored private var narrationPlayer: AVAudioPlayer?
+    @ObservationIgnored private var onNarrationComplete: (() -> Void)?
+    @ObservationIgnored private var speakTask: Task<Void, Never>?
+    @ObservationIgnored private var bellEngine: AVAudioEngine?
+    @ObservationIgnored private var audioPlayer: AVAudioPlayer?
 
     private let processingBreakDuration = 15
 
     init(session: MeditationSession) {
         self.session = session
+        super.init()
+        configureAudioSession()
+        Task { await fetchNarrationMap() }
     }
 
     // MARK: - Computed
@@ -40,7 +50,7 @@ final class MeditationPlayerViewModel {
     }
 
     func onDisappear() {
-        meditationPlayer.stopSpeaking()
+        stopSpeaking()
         timerTask?.cancel()
     }
 
@@ -48,7 +58,7 @@ final class MeditationPlayerViewModel {
 
     func nextStep() {
         cancelTimer()
-        meditationPlayer.stopSpeaking()
+        stopSpeaking()
         if isLastStep {
             isComplete = true
         } else {
@@ -60,7 +70,7 @@ final class MeditationPlayerViewModel {
     func previousStep() {
         guard !isFirstStep else { return }
         cancelTimer()
-        meditationPlayer.stopSpeaking()
+        stopSpeaking()
         currentStepIndex -= 1
         startStep()
     }
@@ -79,12 +89,130 @@ final class MeditationPlayerViewModel {
         runTimer()
     }
 
-    // MARK: - Private
+    // MARK: - Audio (inlined AVAudio)
+
+    private func configureAudioSession() {
+        #if os(iOS)
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: .duckOthers)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        #endif
+    }
+
+    private func activateAudioSession() {
+        #if os(iOS)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        #endif
+    }
+
+    private func fetchNarrationMap() async {
+        do {
+            narrationMap = try await networkClient.get("/api/narration-map")
+        } catch {
+            // Map unavailable — speak() will silently do nothing until map loads
+        }
+    }
+
+    private func speak(_ text: String, onComplete: @escaping () -> Void) {
+        activateAudioSession()
+        stopSpeaking()
+
+        guard let audioUrl = narrationMap[text] else { return }
+
+        onNarrationComplete = onComplete
+        speakTask = Task { [weak self] in
+            guard let self else { return }
+            guard !Task.isCancelled else { return }
+            if let localURL = await self.cachedAudio(for: audioUrl) {
+                guard !Task.isCancelled else { return }
+                if let player = try? AVAudioPlayer(contentsOf: localURL) {
+                    self.narrationPlayer = player
+                    self.narrationPlayer?.delegate = self
+                    self.narrationPlayer?.play()
+                }
+            }
+        }
+    }
+
+    private func cachedAudio(for urlString: String) async -> URL? {
+        guard let remoteURL = URL(string: urlString) else { return nil }
+        let filename = remoteURL.lastPathComponent
+        let cacheDir = FileManager.default
+            .urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("narrations")
+        let localURL = cacheDir.appendingPathComponent(filename)
+
+        if FileManager.default.fileExists(atPath: localURL.path) {
+            return localURL
+        }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: remoteURL)
+            try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+            try data.write(to: localURL)
+            return localURL
+        } catch {
+            return nil
+        }
+    }
+
+    private func stopSpeaking() {
+        speakTask?.cancel()
+        speakTask = nil
+        onNarrationComplete = nil
+        narrationPlayer?.stop()
+        narrationPlayer = nil
+    }
+
+    private func playBell() {
+        activateAudioSession()
+        bellEngine?.stop()
+        bellEngine = nil
+        if let url = Bundle.main.url(forResource: "meditation-bell", withExtension: "aiff") {
+            audioPlayer = try? AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
+        } else {
+            playGeneratedBell()
+        }
+    }
+
+    private func playGeneratedBell() {
+        let sampleRate: Double = 44100
+        let frameCount = AVAudioFrameCount(sampleRate * 2.5)
+        let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else { return }
+        buffer.frameLength = frameCount
+
+        let ptr = buffer.floatChannelData![0]
+        for index in 0..<Int(frameCount) {
+            // swiftlint:disable:next identifier_name
+            let t = Double(index) / sampleRate
+            ptr[index] = Float(sin(2 * .pi * 528 * t) * exp(-t * 1.8) * 0.6)
+        }
+
+        let engine = AVAudioEngine()
+        let player = AVAudioPlayerNode()
+        engine.attach(player)
+        engine.connect(player, to: engine.mainMixerNode, format: format)
+        do {
+            try engine.start()
+        } catch {
+            assertionFailure("AVAudioEngine failed to start: \(error)")
+            return
+        }
+        bellEngine = engine
+        player.scheduleBuffer(buffer, at: nil, completionCallbackType: .dataPlayedBack) { [weak self] _ in
+            Task { @MainActor in
+                self?.bellEngine = nil
+            }
+        }
+        player.play()
+    }
+
+    // MARK: - Private flow
 
     private func startStep() {
         phase = .narrating
         if let instruction = currentStep.instruction {
-            meditationPlayer.speak(instruction) { [weak self] in
+            speak(instruction) { [weak self] in
                 self?.onNarrationFinished()
             }
         } else {
@@ -104,7 +232,7 @@ final class MeditationPlayerViewModel {
 
     private func onNarrationFinished() {
         if let duration = currentStep.silenceDurationSeconds {
-            meditationPlayer.playBell()
+            playBell()
             timerSecondsRemaining = duration
             phase = .timerRunning
             runTimer()
@@ -151,7 +279,7 @@ final class MeditationPlayerViewModel {
     }
 
     private func onTimerFinished() {
-        meditationPlayer.playBell()
+        playBell()
         Task {
             try? await Task.sleep(for: .seconds(2.5))
             guard !Task.isCancelled else { return }
@@ -164,5 +292,16 @@ final class MeditationPlayerViewModel {
         timerTask = nil
         phase = .narrating
         timerSecondsRemaining = 0
+    }
+}
+
+extension MeditationPlayerViewModel: AVAudioPlayerDelegate {
+    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        Task { @MainActor in
+            guard player === self.narrationPlayer else { return }
+            self.narrationPlayer = nil
+            self.onNarrationComplete?()
+            self.onNarrationComplete = nil
+        }
     }
 }

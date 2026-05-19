@@ -1,37 +1,41 @@
-import Factory
 import Foundation
 
 final class SettingsUseCase: SettingsUseCaseProtocol {
-    @Injected(\.userDefaultsService) private var userDefaultsService
+    private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
 
     var showSleepFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showSleepFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showSleepFactor, value: newValue) }
+        get { getLocalBool(.showSleepFactor, defaultingTo: true) }
+        set { defaults.set(newValue, forKey: UserDefaultsKey.showSleepFactor.rawValue) }
     }
 
     var showStressFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showStressFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showStressFactor, value: newValue) }
+        get { getLocalBool(.showStressFactor, defaultingTo: true) }
+        set { defaults.set(newValue, forKey: UserDefaultsKey.showStressFactor.rawValue) }
     }
 
     var showExerciseFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showExerciseFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showExerciseFactor, value: newValue) }
+        get { getLocalBool(.showExerciseFactor, defaultingTo: true) }
+        set { defaults.set(newValue, forKey: UserDefaultsKey.showExerciseFactor.rawValue) }
     }
 
     var showSocialFactor: Bool {
-        get { userDefaultsService.getLocalBool(.showSocialFactor, defaultingTo: true) }
-        set { userDefaultsService.setLocalBool(.showSocialFactor, value: newValue) }
+        get { getLocalBool(.showSocialFactor, defaultingTo: true) }
+        set { defaults.set(newValue, forKey: UserDefaultsKey.showSocialFactor.rawValue) }
     }
 
     func resetFactorToggles() {
-        userDefaultsService.setLocalBool(.showSleepFactor, value: true)
-        userDefaultsService.setLocalBool(.showStressFactor, value: true)
-        userDefaultsService.setLocalBool(.showExerciseFactor, value: true)
-        userDefaultsService.setLocalBool(.showSocialFactor, value: true)
+        defaults.set(true, forKey: UserDefaultsKey.showSleepFactor.rawValue)
+        defaults.set(true, forKey: UserDefaultsKey.showStressFactor.rawValue)
+        defaults.set(true, forKey: UserDefaultsKey.showExerciseFactor.rawValue)
+        defaults.set(true, forKey: UserDefaultsKey.showSocialFactor.rawValue)
     }
 
     func clearPendingWidgetCheckIn() {
-        userDefaultsService.clearLocalData(.pendingWidgetCheckIn)
+        defaults.removeObject(forKey: UserDefaultsKey.pendingWidgetCheckIn.rawValue)
+    }
+
+    private func getLocalBool(_ key: UserDefaultsKey, defaultingTo defaultValue: Bool) -> Bool {
+        guard defaults.object(forKey: key.rawValue) != nil else { return defaultValue }
+        return defaults.bool(forKey: key.rawValue)
     }
 }

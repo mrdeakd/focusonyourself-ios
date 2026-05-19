@@ -1,56 +1,78 @@
-import Factory
 import Foundation
+import Observation
+import WidgetKit
 
+@Observable
+@MainActor
 final class ProfileUseCase: ProfileUseCaseProtocol {
-    @Injected(\.profileService) private var profileService
-    @Injected(\.userDefaultsService) private var userDefaultsService
+    private(set) var profile = UserProfile()
 
-    var name: String { profileService.profile.name }
-    var selectedCategories: [AffirmationCategory] { profileService.profile.selectedCategories }
-    var notificationsEnabled: Bool { profileService.profile.notificationsEnabled }
-    var appearanceOverride: String? { profileService.profile.appearanceOverride }
-    var appleIntelligenceEnabled: Bool { profileService.profile.appleIntelligenceEnabled }
-    var isAppleIntelligenceActive: Bool { profileService.profile.isAppleIntelligenceActive }
-    var onboardingCompleted: Bool { profileService.profile.onboardingCompleted }
+    @ObservationIgnored private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
+
+    init() {
+        profile = defaults.data(forKey: UserDefaultsKey.userProfile.rawValue)
+            .flatMap { try? JSONDecoder().decode(UserProfile.self, from: $0) }
+            ?? UserProfile()
+    }
+
+    // MARK: - Reads
+
+    var name: String { profile.name }
+    var selectedCategories: [AffirmationCategory] { profile.selectedCategories }
+    var notificationsEnabled: Bool { profile.notificationsEnabled }
+    var appearanceOverride: String? { profile.appearanceOverride }
+    var appleIntelligenceEnabled: Bool { profile.appleIntelligenceEnabled }
+    var isAppleIntelligenceActive: Bool { profile.isAppleIntelligenceActive }
+    var onboardingCompleted: Bool { profile.onboardingCompleted }
+
+    // MARK: - Mutations
+
+    func updateProfile(_ profile: UserProfile) {
+        self.profile = profile
+        if let data = try? JSONEncoder().encode(profile) {
+            defaults.set(data, forKey: UserDefaultsKey.userProfile.rawValue)
+        }
+        WidgetCenter.shared.reloadAllTimelines()
+    }
 
     func updateName(_ name: String) {
-        var profile = profileService.profile
-        profile.name = name
-        profileService.updateProfile(profile)
+        var updated = profile
+        updated.name = name
+        updateProfile(updated)
     }
 
     func updateCategories(_ categories: [AffirmationCategory]) {
-        var profile = profileService.profile
-        profile.selectedCategories = categories
-        profileService.updateProfile(profile)
+        var updated = profile
+        updated.selectedCategories = categories
+        updateProfile(updated)
     }
 
     func updateNotificationsEnabled(_ enabled: Bool) {
-        var profile = profileService.profile
-        profile.notificationsEnabled = enabled
-        profileService.updateProfile(profile)
+        var updated = profile
+        updated.notificationsEnabled = enabled
+        updateProfile(updated)
     }
 
     func updateAppearanceOverride(_ override: String?) {
-        var profile = profileService.profile
-        profile.appearanceOverride = override
-        profileService.updateProfile(profile)
+        var updated = profile
+        updated.appearanceOverride = override
+        updateProfile(updated)
     }
 
     func updateAppleIntelligenceEnabled(_ enabled: Bool) {
-        var profile = profileService.profile
-        profile.appleIntelligenceEnabled = enabled
-        profileService.updateProfile(profile)
+        var updated = profile
+        updated.appleIntelligenceEnabled = enabled
+        updateProfile(updated)
     }
 
     func saveCompletedProfile(_ profile: UserProfile) {
-        profileService.updateProfile(profile)
+        updateProfile(profile)
     }
 
     func resetAll() {
-        userDefaultsService.setData(.userProfile, value: nil)
-        userDefaultsService.setData(.affirmationCache, value: nil)
-        userDefaultsService.setData(.affirmationCacheDate, value: nil)
-        profileService.updateProfile(UserProfile())
+        defaults.removeObject(forKey: UserDefaultsKey.userProfile.rawValue)
+        defaults.removeObject(forKey: UserDefaultsKey.affirmationCache.rawValue)
+        defaults.removeObject(forKey: UserDefaultsKey.affirmationCacheDate.rawValue)
+        updateProfile(UserProfile())
     }
 }

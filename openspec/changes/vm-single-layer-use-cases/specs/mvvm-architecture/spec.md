@@ -1,97 +1,113 @@
 ## ADDED Requirements
 
-### Requirement: ViewModels depend only on Use Cases
+### Requirement: Services contain only network calls
 
-A ViewModel SHALL inject only Use Cases via `@ObservationIgnored @Injected(\.<name>UseCase)`. A ViewModel MUST NOT inject services, network clients, repositories, `UserDefaults`, `Keychain`, `URLSession`, `WidgetCenter`, `UNUserNotificationCenter`, `Container.shared.resolve(...)`, or any other infrastructure type.
+A Service SHALL only call `networkClient` (or the underlying HTTP layer). A Service MUST NOT touch `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`, or any other device framework. A Service MUST NOT contain caching logic, branching between alternate paths, business-rule transformations, or held state beyond what's needed for the network call itself.
 
-#### Scenario: New ViewModel injects only use cases
+A Service receives prepared parameters from its caller (Use Case or ViewModel) and returns the raw decoded response.
 
-- **WHEN** a developer adds a new `@Observable @MainActor final class <Name>ViewModel`
-- **THEN** every `@Injected(...)` property in that class SHALL resolve to a `<Something>UseCaseProtocol`
+#### Scenario: New network endpoint
 
-#### Scenario: Existing ViewModel needs new functionality without a use case
+- **WHEN** the app needs a new backend endpoint
+- **THEN** a Service is added at `Services/<Domain>/<Name>Service.swift` + protocol
+- **AND** the Service injects only `networkClient`
+- **AND** the Service has no other `@Injected` dependencies
 
-- **WHEN** a ViewModel needs functionality that has no corresponding Use Case
-- **THEN** the developer SHALL create the Use Case (+ protocol) first under `Domain/UseCases/<Feature>/` and register it in `App/Container+App.swift`
-- **AND** the ViewModel SHALL then inject only that Use Case — not the underlying service
-
-#### Scenario: Reactive state from an Observable service
-
-- **WHEN** a ViewModel needs reactive state currently held by an `@Observable` service such as `ProfileService` or `PurchaseService`
-- **THEN** the ViewModel SHALL read it through a Use Case computed property (e.g. `profileUseCase.name`, `purchaseUseCase.isPro`)
-- **AND** the ViewModel SHALL NOT inject the `@Observable` service directly
-
-#### Scenario: Invariant check
+#### Scenario: Audit invariant
 
 - **WHEN** the layering invariant is audited
-- **THEN** `grep -rn "@Injected" FocusOnYourself/Features --include="*ViewModel.swift" | grep -v "UseCase"` SHALL return empty output
+- **THEN** `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` SHALL return empty output
 
-### Requirement: Use Cases own all business logic and I/O coordination
+#### Scenario: Forbidden patterns in a Service
 
-A Use Case SHALL be a `final class @MainActor` (not `@Observable`) defined in `Domain/UseCases/<Feature>/<Name>UseCase.swift` with a corresponding protocol in `<Name>UseCaseProtocol.swift`. A Use Case MAY inject any number of Services via `@Injected` and MAY hold pure Calculator structs as `private let`. A Use Case MUST NOT inject other Use Cases.
+- **WHEN** a Service file is reviewed
+- **THEN** it MUST NOT contain a date check, a cache lookup, a branch on a feature flag, a mapping rule, a formula, or held state beyond constants
 
-#### Scenario: Use case wraps a service
+### Requirement: Use Cases exist only for SHARED logic
 
-- **WHEN** a feature exposes a service operation (e.g. fetch daily articles)
-- **THEN** a Use Case SHALL be created that injects the service and exposes the operation through its protocol
-- **AND** the operation MAY be a one-line passthrough — thin wrappers are explicitly allowed
+A Use Case SHALL exist when, and only when, two or more ViewModels need the same operation. Single-VM logic SHALL remain in the ViewModel until a second ViewModel needs it — at which point the logic SHALL be extracted to a Use Case.
 
-#### Scenario: Cross-feature orchestration
+A Use Case is `final class @MainActor` (or `@Observable @MainActor` if it holds reactive state). It lives at `Domain/UseCases/<Feature>/<Name>UseCase.swift` with a corresponding protocol.
 
-- **WHEN** a Use Case method must perform work that touches multiple feature domains (e.g. `AuthUseCase.signIn` performs auth then replaces local check-ins with server check-ins)
-- **THEN** the Use Case SHALL inject the underlying *services* it needs (e.g. `networkClient`, `keychainService`, `checkinsService`, `profileService`)
-- **AND** the Use Case MUST NOT inject another Use Case to accomplish the orchestration
+A Use Case may inject Services (network) and may hold Calculators as `private let`. A Use Case may inline non-network device frameworks (Keychain, UserDefaults via App Group, UNUserNotificationCenter, StoreKit) — services are network-only, so any device framework lives in the Use Case (or ViewModel) that uses it.
 
-#### Scenario: Use case exposes reactive state
+A Use Case MUST NOT inject another Use Case EXCEPT the `@Observable` state-store ones (`ProfileUseCase`, `PurchaseUseCase`) which are explicitly shared reactive state.
 
-- **WHEN** a Use Case exposes state held in an `@Observable` service
-- **THEN** the Use Case SHALL expose it as a computed property that reads the service at access time (e.g. `var isPro: Bool { purchaseService.isPro }`)
-- **AND** the Use Case MUST NOT cache the value in a stored property
+#### Scenario: Single-VM operation
 
-#### Scenario: Forbidden imports
+- **WHEN** a ViewModel needs an operation that no other ViewModel uses
+- **THEN** the logic lives in the ViewModel itself (may inline device frameworks)
+- **AND** no Use Case is created for this operation
+
+#### Scenario: Shared logic extraction (second consumer)
+
+- **WHEN** a second ViewModel needs an operation that previously lived in a single ViewModel
+- **THEN** the logic SHALL be extracted to a Use Case under `Domain/UseCases/<Feature>/`
+- **AND** the Use Case SHALL be registered in `App/Container+App.swift` under `// MARK: - Use Cases`
+- **AND** both ViewModels SHALL inject the new Use Case
+
+#### Scenario: State-store Use Case (cross-use-case dependency)
+
+- **WHEN** a Use Case needs to read or mutate shared reactive state held by another Use Case
+- **THEN** it MAY inject `ProfileUseCase` or `PurchaseUseCase` (the only `@Observable` state-store Use Cases)
+- **AND** it MUST NOT inject any other Use Case
+
+#### Scenario: Forbidden patterns in a Use Case
 
 - **WHEN** a Use Case file is reviewed
-- **THEN** it MUST NOT contain `import SwiftUI`, `import Charts`, or any reference to View, Color, or other UI types
+- **THEN** it MUST NOT `import SwiftUI` or reference View / Color types
+- **AND** it MUST NOT inject a non-state-store Use Case
 
-### Requirement: Services are thin I/O wrappers
+### Requirement: ViewModels can inject Services and Use Cases
 
-A Service SHALL wrap exactly one external system (network endpoint family, `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `UNUserNotificationCenter`, `AVAudioPlayer`, `FoundationModels`, etc.). A Service SHALL live under `Services/<Domain>/<Name>Service.swift` with a corresponding `<Name>ServiceProtocol.swift`. A Service MUST NOT contain business logic, orchestrate other services for a domain purpose, or expose ViewModel-facing convenience methods.
+A ViewModel SHALL be `@Observable @MainActor final class`. It MAY inject Use Cases for shared logic and Services directly for single-VM operations. It MAY inline device-framework code (HealthKit, AVAudio, FoundationModels) when only this VM uses that framework — that framework SHALL be extracted to a Use Case as soon as a second VM needs it.
 
-#### Scenario: Service wraps one external system
+A ViewModel MUST NOT use `Container.shared.resolve(...)`.
 
-- **WHEN** a new external system is introduced (e.g. a new SDK or API)
-- **THEN** a Service is created that wraps only that system
-- **AND** any business rules or cross-system coordination SHALL live in a Use Case, not the Service
+#### Scenario: VM uses a Service directly
 
-#### Scenario: ViewModel never injects a service
+- **WHEN** a single ViewModel needs to call a network endpoint that no other VM uses
+- **THEN** the ViewModel MAY inject the Service via `@ObservationIgnored @Injected(\.<service>)`
+- **AND** the ViewModel MAY hold Calculators as `private let` and inline device frameworks
 
-- **WHEN** a ViewModel needs functionality provided by a service
-- **THEN** the ViewModel SHALL inject the appropriate Use Case which itself injects the service
+#### Scenario: VM uses a Use Case
+
+- **WHEN** a ViewModel needs an operation that's already in a Use Case
+- **THEN** the ViewModel SHALL inject the Use Case rather than the underlying Service
 
 ### Requirement: Calculators are pure value types
 
-A Calculator SHALL be a `struct` defined under `Domain/Calculators/<Name>Calculator.swift`, with no `@Injected` properties, no `@Observable` annotation, no `@MainActor`, no `import SwiftUI`. A Calculator SHALL take all inputs as method arguments and return values — never read mutable state from a service.
+A Calculator SHALL be a `struct` defined under `Domain/Calculators/<Name>Calculator.swift`, with no `@Injected` properties, no `@Observable` annotation, no `@MainActor`, no `import SwiftUI`. Other framework imports (e.g. `HealthKit` for type mapping) are allowed. A Calculator SHALL take all inputs as method arguments and return values — never read mutable state from a service.
 
-#### Scenario: Pure computation extracted to calculator
+#### Scenario: Pure computation extracted to a Calculator
 
-- **WHEN** a feature needs non-trivial computation (date math, statistics, scoring, validation)
+- **WHEN** a feature has pure logic of ~10+ lines (math, transformations, validation, scoring, mapping rules)
 - **THEN** the logic SHALL live in a Calculator struct
-- **AND** the Use Case that orchestrates the operation SHALL hold the Calculator as `private let calculator = <Name>Calculator()` and pass the relevant data in as arguments
+- **AND** the consumer (ViewModel or Use Case) SHALL hold the Calculator as `private let calculator = <Name>Calculator()` and pass data in as arguments
 
 ### Requirement: Dependency Injection follows the protocol-typed Factory pattern
 
-All Services, Use Cases, and any other injected dependency SHALL be registered in `App/Container+App.swift` using their **protocol type**, never the concrete class. Registrations SHALL be `.singleton`. Registrations are organised into `// MARK: -` sections: Services, Use Cases.
+All Services and Use Cases SHALL be registered in `App/Container+App.swift` using their **protocol type**, never the concrete class. Registrations SHALL be `.singleton`. Registrations are organised into `// MARK: -` sections: Services, Use Cases.
 
-#### Scenario: New use case registration
+#### Scenario: New Service registration
 
-- **WHEN** a new Use Case `FooUseCase` is added
-- **THEN** `App/Container+App.swift` gains an entry under the `// MARK: - Use Cases` section in the form:
+- **WHEN** a new Service `<Name>Service` is added
+- **THEN** `App/Container+App.swift` gains an entry under the `// MARK: - Services` section:
   ```swift
-  var fooUseCase: Factory<FooUseCaseProtocol> {
-      self { @MainActor in FooUseCase() }.singleton
+  var <name>Service: Factory<<Name>ServiceProtocol> {
+      self { @MainActor in <Name>Service() }.singleton
   }
   ```
-- **AND** ViewModels inject it via `@ObservationIgnored @Injected(\.fooUseCase) private var fooUseCase`
+
+#### Scenario: New Use Case registration
+
+- **WHEN** a new Use Case `<Name>UseCase` is added
+- **THEN** `App/Container+App.swift` gains an entry under the `// MARK: - Use Cases` section:
+  ```swift
+  var <name>UseCase: Factory<<Name>UseCaseProtocol> {
+      self { @MainActor in <Name>UseCase() }.singleton
+  }
+  ```
 
 #### Scenario: Repository layer is absent
 

@@ -1,7 +1,6 @@
 protocol AffirmationServiceProtocol {
-    func generateBatch(
+    func fetchAffirmations(
         count: Int,
-        for categories: [AffirmationCategory],
-        useAppleIntelligence: Bool
+        for categories: [AffirmationCategory]
     ) async throws -> [(quote: String, category: AffirmationCategory)]
 }

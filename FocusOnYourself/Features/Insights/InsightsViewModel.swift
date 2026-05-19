@@ -6,31 +6,38 @@ import SwiftUI
 @Observable
 @MainActor
 final class InsightsViewModel {
-    @ObservationIgnored @Injected(\.insightsUseCase) private var insightsUseCase
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
     @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+    private let calculator = InsightsCalculator()
 
     var isPro: Bool { purchaseUseCase.isPro }
     var showingPaywall = false
     var selectedFactor: FactorCorrelation?
 
-    func recentCheckIns(days: Int) -> [CheckIn] { insightsUseCase.recentCheckIns(days: days) }
-    func checkInCount(days: Int) -> Int { insightsUseCase.checkInCount(days: days) }
-    func averageMood(days: Int) -> Mood? { insightsUseCase.averageMood(days: days) }
-    func averageMoodText(days: Int) -> String { insightsUseCase.averageMoodText(days: days) }
-    func dailyMoodData(days: Int) -> [(label: String, checkIn: CheckIn?)] { insightsUseCase.dailyMoodData(days: days) }
-    func weeklyAverages() -> [(week: String, avg: Double)] { insightsUseCase.weeklyAverages() }
-    func monthlyAverages() -> [(month: String, avg: Double)] { insightsUseCase.monthlyAverages() }
-    func moodDistribution(days: Int) -> [(mood: Mood, count: Int)] { insightsUseCase.moodDistribution(days: days) }
-    func factorCorrelations() -> [FactorCorrelation] { insightsUseCase.factorCorrelations() }
-    func topMoodBooster() -> FactorCorrelation? { insightsUseCase.topMoodBooster() }
+    private var checkIns: [CheckIn] { profileUseCase.profile.checkIns }
+
+    func recentCheckIns(days: Int) -> [CheckIn] { calculator.recentCheckIns(from: checkIns, days: days) }
+    func checkInCount(days: Int) -> Int { calculator.checkInCount(from: checkIns, days: days) }
+    func averageMood(days: Int) -> Mood? { calculator.averageMood(from: checkIns, days: days) }
+    func averageMoodText(days: Int) -> String { calculator.averageMoodText(from: checkIns, days: days) }
+    func dailyMoodData(days: Int) -> [(label: String, checkIn: CheckIn?)] {
+        calculator.dailyMoodData(from: checkIns, days: days)
+    }
+    func weeklyAverages() -> [(week: String, avg: Double)] { calculator.weeklyAverages(from: checkIns) }
+    func monthlyAverages() -> [(month: String, avg: Double)] { calculator.monthlyAverages(from: checkIns) }
+    func moodDistribution(days: Int) -> [(mood: Mood, count: Int)] {
+        calculator.moodDistribution(from: checkIns, days: days)
+    }
+    func factorCorrelations() -> [FactorCorrelation] { calculator.factorCorrelations(from: checkIns) }
+    func topMoodBooster() -> FactorCorrelation? { calculator.topMoodBooster(from: checkIns) }
     func averageMood(forBinaryFactor keyPath: KeyPath<CheckInFactors, Bool>) -> (with: Double?, without: Double?) {
-        insightsUseCase.averageMood(forBinaryFactor: keyPath)
+        calculator.averageMood(from: checkIns, forBinaryFactor: keyPath)
     }
     // swiftlint:disable:next line_length
     func averageMoodByRange(forFactor keyPath: KeyPath<CheckInFactors, Int>) -> (low: FactorRangeGroup, mid: FactorRangeGroup, high: FactorRangeGroup) {
-        insightsUseCase.averageMoodByRange(forFactor: keyPath)
+        calculator.averageMoodByRange(from: checkIns, forFactor: keyPath)
     }
-    func bestDayOfWeek(days: Int) -> String? { insightsUseCase.bestDayOfWeek(days: days) }
+    func bestDayOfWeek(days: Int) -> String? { calculator.bestDayOfWeek(from: checkIns, days: days) }
 
     // MARK: - UI Helpers
 

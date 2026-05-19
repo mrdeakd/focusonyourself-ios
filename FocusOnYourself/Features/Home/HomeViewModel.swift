@@ -1,5 +1,7 @@
 import Factory
 import Foundation
+import FoundationModels
+import HealthKit
 import Observation
 
 @Observable @MainActor
@@ -18,11 +20,16 @@ final class HomeViewModel {
 
     @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
     @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
-    @ObservationIgnored @Injected(\.affirmationUseCase) private var affirmationUseCase
     @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
-    @ObservationIgnored @Injected(\.articlesUseCase) private var articlesUseCase
     @ObservationIgnored @Injected(\.settingsUseCase) private var settingsUseCase
-    @ObservationIgnored @Injected(\.healthKitUseCase) private var healthKitUseCase
+    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
+    @ObservationIgnored @Injected(\.articlesService) private var articlesService
+
+    private let affirmationCalculator = AffirmationCalculator()
+    private let moodHealthKitCalculator = MoodHealthKitCalculator()
+    private let dailyCacheChecker = DailyCacheChecker()
+    private let healthStore = HKHealthStore()
+    private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
 
     var articles: [Article] = []
     var isLoadingArticles = false
@@ -31,6 +38,8 @@ final class HomeViewModel {
     init() {
         isGeneratingAffirmation = true
     }
+
+    // MARK: - Reactive reads
 
     var hasCheckedIn: Bool { checkInUseCase.hasCheckedInToday }
     var todaysMood: Mood? { checkInUseCase.todaysMood }
@@ -49,7 +58,6 @@ final class HomeViewModel {
     }
 
     var formattedDate: String { Date.now.homeScreenFormatted }
-
     var streakCount: Int { checkInUseCase.streakStats().current }
 
     var showSleepFactor: Bool { settingsUseCase.showSleepFactor }
@@ -57,23 +65,22 @@ final class HomeViewModel {
     var showExerciseFactor: Bool { settingsUseCase.showExerciseFactor }
     var showSocialFactor: Bool { settingsUseCase.showSocialFactor }
 
+    // MARK: - Articles
+
     func loadArticles() async {
         isLoadingArticles = true
         defer { isLoadingArticles = false }
         do {
-            articles = try await articlesUseCase.dailyArticles()
+            articles = try await articlesService.dailyArticles()
         } catch {
             self.error = ErrorInfo(title: "Couldn't Load Articles")
         }
     }
 
-    func selectMood(_ mood: Mood) {
-        selectedMood = mood
-    }
+    func selectMood(_ mood: Mood) { selectedMood = mood }
+    func selectArticle(_ article: Article) { selectedArticle = article }
 
-    func selectArticle(_ article: Article) {
-        selectedArticle = article
-    }
+    // MARK: - Check-in
 
     func completeCheckIn() {
         guard let mood = selectedMood else { return }
@@ -118,25 +125,93 @@ final class HomeViewModel {
         if #available(iOS 18, *) {
             Task { [weak self] in
                 guard let self else { return }
-                await healthKitUseCase.save(mood: mood, factors: factors)
+                await writeMoodToHealthKit(mood: mood, factors: factors)
             }
         }
         showingContextSheet = false
     }
 
+    // MARK: - Affirmation generation (inlined logic)
+
     func generateAffirmationIfNeeded() async {
         guard generatedQuotes.isEmpty else { return }
         isGeneratingAffirmation = true
         defer { isGeneratingAffirmation = false }
+
+        if let cached = cachedAffirmations() {
+            generatedQuotes = cached
+            return
+        }
+
+        let categories = profileUseCase.selectedCategories
+        guard !categories.isEmpty else { return }
+        let useAppleIntelligence = profileUseCase.isAppleIntelligenceActive && purchaseUseCase.isPro
+
         do {
-            let pairs = try await affirmationUseCase.generateBatch(
-                count: 10,
-                for: profileUseCase.selectedCategories,
-                useAppleIntelligence: profileUseCase.isAppleIntelligenceActive && purchaseUseCase.isPro
-            )
+            let pairs: [(quote: String, category: AffirmationCategory)]
+            if useAppleIntelligence {
+                pairs = try await generateUsingAppleIntelligence(count: 10, for: categories)
+            } else {
+                pairs = try await affirmationService.fetchAffirmations(count: 10, for: categories)
+            }
+            cacheAffirmations(pairs)
             generatedQuotes = pairs
         } catch {
             self.error = ErrorInfo(title: "Couldn't Load Affirmations")
         }
+    }
+
+    private func generateUsingAppleIntelligence(
+        count: Int,
+        for categories: [AffirmationCategory]
+    ) async throws -> [(quote: String, category: AffirmationCategory)] {
+        let counts = affirmationCalculator.distribute(total: count, across: categories.count)
+        var results: [(quote: String, category: AffirmationCategory)] = []
+        for (category, affirmationCount) in zip(categories, counts) {
+            let prompt = affirmationCalculator.promptFor(category: category, count: affirmationCount)
+            let session = LanguageModelSession()
+            let response = try await session.respond(to: prompt)
+            let quotes = affirmationCalculator.parseNumberedList(response.content, expected: affirmationCount)
+            results += quotes.map { (quote: $0, category: category) }
+        }
+        return results
+    }
+
+    // MARK: - Affirmation cache (inlined UserDefaults)
+
+    private func cachedAffirmations() -> [(quote: String, category: AffirmationCategory)]? {
+        let cachedDate = defaults.string(forKey: UserDefaultsKey.affirmationCacheDate.rawValue)
+        guard dailyCacheChecker.isFreshForToday(cachedDateString: cachedDate) else { return nil }
+        guard let data = defaults.data(forKey: UserDefaultsKey.affirmationCache.rawValue) else { return nil }
+        guard let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data) else { return nil }
+        return cached.map { (quote: $0.quote, category: $0.category) }
+    }
+
+    private func cacheAffirmations(_ pairs: [(quote: String, category: AffirmationCategory)]) {
+        let cached = pairs.map { CachedAffirmation(quote: $0.quote, category: $0.category) }
+        if let data = try? JSONEncoder().encode(cached) {
+            defaults.set(data, forKey: UserDefaultsKey.affirmationCache.rawValue)
+        }
+        defaults.set(dailyCacheChecker.todayString(), forKey: UserDefaultsKey.affirmationCacheDate.rawValue)
+    }
+
+    // MARK: - HealthKit (inlined)
+
+    @available(iOS 18, *)
+    private func writeMoodToHealthKit(mood: Mood, factors: CheckInFactors?) async {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        do {
+            try await healthStore.requestAuthorization(toShare: [HKObjectType.stateOfMindType()], read: [])
+        } catch {
+            return
+        }
+        let sample = HKStateOfMind(
+            date: Date.now,
+            kind: .dailyMood,
+            valence: moodHealthKitCalculator.valence(for: mood),
+            labels: moodHealthKitCalculator.labels(for: mood, factors: factors),
+            associations: moodHealthKitCalculator.associations(for: factors)
+        )
+        try? await healthStore.save(sample)
     }
 }

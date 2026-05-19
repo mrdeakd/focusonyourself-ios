@@ -37,61 +37,71 @@ Key limits: line length 130 (error), file length 400/500, function body 75 lines
 
 ## Architecture
 
-**MVVM + Use Cases + Factory DI, iOS 17+, SwiftUI only.**
+**MVVM + Use Cases + Calculators + Factory DI, iOS 17+, SwiftUI only.**
 
-### Layers (strict)
+### Layers
 
 | Layer | Location | Rule | May depend on |
 |-------|----------|------|---------------|
 | Screen | `Features/<Feature>/<Name>Screen.swift` | Only `@State private var viewModel = …ViewModel()` — no state, no logic | ViewModel |
-| ViewModel | `Features/<Feature>/<Name>ViewModel.swift` | `@Observable @MainActor final class` — all state, all logic, calls Use Cases via Task | **Use Cases ONLY** |
-| Use Case | `Domain/UseCases/<Feature>/<Name>UseCase.swift` + `<Name>UseCaseProtocol.swift` | `final class @MainActor` (NOT `@Observable`). Business logic + I/O coordination. One per feature domain, group related ops together. | Services + Calculators |
+| ViewModel | `Features/<Feature>/<Name>ViewModel.swift` | `@Observable @MainActor final class` — all VM state + logic. Single-VM logic lives here. Inlines device-framework code when only this VM uses that framework. | Use Cases + Services + Calculators |
+| Use Case | `Domain/UseCases/<Feature>/<Name>UseCase.swift` + protocol | **SHARED business logic** across 2+ ViewModels. May be `@Observable` if it holds reactive state (`ProfileUseCase`, `PurchaseUseCase`). Inlines device frameworks (Keychain, UserDefaults, UNUserNotificationCenter, StoreKit) that aren't network. | Services + Calculators + other state-store Use Cases (`ProfileUseCase`) |
 | Calculator | `Domain/Calculators/<Name>Calculator.swift` | Pure `struct`. No DI, no `@Observable`, no `@MainActor`, no `import SwiftUI`. All inputs are method args. | Nothing |
-| Service | `Services/<Domain>/<Name>Service.swift` + protocol | Thin I/O wrapper for ONE external system (network endpoint family, UserDefaults, Keychain, HealthKit, StoreKit, etc.). No business logic. | NetworkClient / device frameworks |
+| Service | `Services/<Domain>/<Name>Service.swift` + protocol | **NETWORK IO ONLY.** Thin: takes prepared parameters from caller, returns raw decoded data. No caching, no branching, no business logic. No device frameworks (Keychain/UserDefaults/HealthKit/etc.). | `NetworkClient` |
 | Model | `Models/` | Plain `Codable` structs/enums, no logic | Nothing |
 | Design System | `DesignSystem/` | Tokens — `DS+Colors.swift`, `DS+Spacing.swift`, etc. | Nothing |
 | Components | `Features/<Feature>/Components/` or `DesignSystem/Components/` | Reusable views in their own files | DesignSystem tokens, parent ViewModel |
 
-### The one-layer rule for ViewModels
+### Services — network only
 
-A ViewModel injects ONLY Use Cases via `@ObservationIgnored @Injected(\.<name>UseCase)`. Nothing else.
+- A Service file may contain ONLY network calls via `networkClient`. No `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`.
+- A Service does not branch between paths, cache anything, decide when to call, transform data beyond decoding, or hold state.
+- The Service receives prepared parameters from its caller (Use Case or ViewModel) and returns raw decoded values.
+- Services are registered as `Factory<<Name>ServiceProtocol>` in `Container+App.swift` under `// MARK: - Services`.
 
-**Invariant** (run to verify): `grep -rn "@Injected" FocusOnYourself/Features --include="*ViewModel.swift" | grep -v "UseCase"` — must return empty.
+**Invariant** (run to verify): `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` — must return empty.
 
-**Forbidden in ViewModels:**
-- `@Injected(\.<anyService>)` — any service injection
-- `@Injected(\.networkClient)` / `@Injected(\.profileService)` / `@Injected(\.userDefaultsService)` / etc.
-- `Container.shared.resolve(...)` or `Container.shared.<service>()`
-- Direct calls to `UserDefaults`, `Keychain`, `URLSession`, `WidgetCenter`, `UNUserNotificationCenter`, `AVAudioPlayer`, `HKHealthStore`, `Product`, etc.
-- Anything that touches an external system without going through a Use Case
+### Use Cases — only when SHARED across 2+ ViewModels
 
-**Reading reactive state**: `ProfileService` and `PurchaseService` are `@Observable` state stores. ViewModels read their reactive properties through a Use Case (e.g. `profileUseCase.name`, `purchaseUseCase.isPro`). SwiftUI's observation system tracks the underlying `@Observable` access transitively — no manual subscription needed.
+- Create a Use Case when (and only when) two or more ViewModels need the same operation. Single-VM logic stays in the ViewModel.
+- One Use Case per feature domain; group related operations together (`CheckInUseCase` covers `record`, `streakStats`, `mergeWidgetCheckIn`, query properties).
+- A Use Case may be `@Observable` when it holds reactive state (`ProfileUseCase` holds `UserProfile`, `PurchaseUseCase` holds `isPro`). Otherwise it's plain `final class @MainActor`.
+- A Use Case may inject Services (network), may hold Calculators as `private let`, and may inline non-network device frameworks (Keychain, UserDefaults via AppGroup, UNUserNotificationCenter, StoreKit) — services are network-only, so any device framework lives here or in a VM.
+- A Use Case does NOT inject other Use Cases EXCEPT the `@Observable` state-store ones (`ProfileUseCase`, `PurchaseUseCase`) which are explicitly shared state.
 
-### The Use Case layer
+**When to extract from VM → Use Case**:
+- ViewModel A has logic X. ViewModel B now also needs X.
+- Create `XUseCase` (or fold into an existing relevant Use Case). Move the logic. Both VMs inject the Use Case.
+- This is the only trigger — don't extract preemptively.
 
-- Every feature with state or actions gets a Use Case. **Thin wrappers are fine** — consistency beats minimal LOC.
-- One Use Case per feature domain, not per action. Group related operations: `CheckInUseCase` has `record`, `streakStats`, `mergeWidgetCheckIn`, `todaysMood`, etc. together.
-- A Use Case is `final class @MainActor` (not `@Observable`). Reactivity comes from the underlying `@Observable` services transitively.
-- A Use Case exposes reactive state as computed properties: `var isPro: Bool { purchaseService.isPro }`. Never cache the value.
-- A Use Case is registered in `App/Container+App.swift` under `// MARK: - Use Cases` using its protocol type, as `.singleton`.
+### Calculators — pure, > ~10 LOC
 
-**Allowed in Use Cases:**
-- `@Injected(\.<anyService>)` — services are the building blocks
-- `private let calculator = <Name>Calculator()` — Calculators are value types, no DI needed
-- Reading from `@Observable` services to expose reactive computed properties
+- Pure `struct`. All inputs are method arguments, all outputs are return values.
+- No DI, no `@Observable`, no `@MainActor`, no `import SwiftUI` (other framework imports like `HealthKit` are allowed for type mapping).
+- Use Calculators when a chunk of pure logic gets large enough to benefit from isolation (distribution algorithms, statistical math, mapping rules, date math).
 
-**Forbidden in Use Cases:**
-- `@Injected(\.<otherUseCase>)` — Use Cases never depend on other Use Cases. Cross-feature workflows (e.g. `AuthUseCase.signIn` needing post-login check-in sync) inject the underlying *services* directly.
-- `import SwiftUI`, `import Charts`, View / Color references — Use Cases are pure logic, no UI concerns
+### ViewModels — inject Use Cases and/or Services
+
+- `@Observable @MainActor final class`.
+- May inject Use Cases for shared logic, and Services directly for single-VM operations.
+- May inline device-framework code (HealthKit, AVAudio, FoundationModels) when only this VM uses that framework. Pull it into a Use Case as soon as a 2nd VM needs the framework.
+- `Container.shared.resolve(...)` is forbidden.
 
 ### When adding a new feature
 
-1. If it touches a new external system → add a Service + protocol under `Services/<Domain>/`
-2. If it has pure logic (math, transforms, validation, scoring) → add a Calculator under `Domain/Calculators/`
-3. Add a Use Case + protocol under `Domain/UseCases/<Feature>/`
-4. Register the Use Case (and any new Service) in `App/Container+App.swift`
-5. Inject the Use Case into your ViewModel via `@ObservationIgnored @Injected(\.<name>UseCase)`
-6. Never reach around the Use Case to a service directly — if you're tempted, the Use Case is missing a method
+1. If it touches a new network endpoint → add a Service (and protocol) under `Services/<Domain>/`. Network only.
+2. If it has pure logic ≥ ~10 lines (math, transforms, validation) → add a Calculator under `Domain/Calculators/`.
+3. Implement the feature in the ViewModel using the Service / Calculator directly. Inline device frameworks inside the VM if needed.
+4. If/when a second ViewModel needs the same logic, extract it to a Use Case under `Domain/UseCases/<Feature>/` and register it in `App/Container+App.swift`.
+5. Never put business logic in a Service. Never duplicate logic across VMs — extract on second use.
+
+### Forbidden patterns
+
+- Business logic in a Service (caching dates, branching on flags, transformation rules).
+- Device-framework code in `Services/` (Keychain, UserDefaults, HealthKit, StoreKit, AVAudio, UNUserNotificationCenter, FoundationModels). These live in Use Cases or ViewModels.
+- A Use Case used by only one ViewModel (dissolve into that VM until a 2nd consumer appears).
+- `Container.shared.resolve(...)` in any layer.
+- A Use Case injecting another non-state-store Use Case.
 
 ### There is NO Repository layer
 
@@ -99,12 +109,12 @@ The Repository pattern was removed (see OpenSpec change `vm-single-layer-use-cas
 
 ### Dependency Injection (Factory)
 
-All Use Cases and Services are registered as singletons in `App/Container+App.swift` using their **protocol type** — never the concrete class. Registrations are organised into `// MARK: -` sections: Services, Use Cases.
+All Services and Use Cases are registered as singletons in `App/Container+App.swift` using their **protocol type** — never the concrete class. Registrations are organised into `// MARK: -` sections: Services (network), Use Cases.
 
 ```swift
-// MARK: - Services
-var profileService: Factory<ProfileServiceProtocol> {
-    self { @MainActor in ProfileService() }.singleton
+// MARK: - Services (network only)
+var affirmationService: Factory<AffirmationServiceProtocol> {
+    self { @MainActor in AffirmationService() }.singleton
 }
 
 // MARK: - Use Cases
@@ -113,25 +123,28 @@ var profileUseCase: Factory<ProfileUseCaseProtocol> {
 }
 ```
 
-ViewModels inject ONLY Use Cases:
+ViewModels inject Use Cases AND, when appropriate, Services directly:
 
 ```swift
 @Observable @MainActor final class HomeViewModel {
-    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
-    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase     // shared
+    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase     // shared
+    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService // single-VM
+    private let healthStore = HKHealthStore()                                        // inlined framework
 }
 ```
 
-Use Cases inject Services (and hold Calculators as `private let`):
+Use Cases inject Services and hold Calculators as `private let`. State-store Use Cases (`ProfileUseCase`, `PurchaseUseCase`) are `@Observable`:
 
 ```swift
+@Observable @MainActor
 final class ProfileUseCase: ProfileUseCaseProtocol {
-    @Injected(\.profileService) private var profileService
-    @Injected(\.userDefaultsService) private var userDefaultsService
+    private(set) var profile = UserProfile()
+    private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
 }
 ```
 
-Views never call `Container.shared.resolve()`. ViewModels never inject services directly.
+Views never call `Container.shared.resolve()`.
 
 ### Data Persistence
 
@@ -139,17 +152,17 @@ Views never call `Container.shared.resolve()`. ViewModels never inject services 
 - `NSUbiquitousKeyValueStore` (iCloud KVS) — syncs across devices
 - App Group UserDefaults (`group.app.ddworks.FocusOnYourself`) — shared with widgets
 
-`UserDefaultsService` is the single abstraction over both stores. Keys are defined in a `UserDefaultsKey` enum inside that file. ViewModels never touch `UserDefaultsService` directly — they go through a Use Case (typically `SettingsUseCase` or `ProfileUseCase`).
+Keys are defined in the `UserDefaultsKey` enum at `Models/UserDefaultsKey.swift`. There is no `UserDefaultsService` — each Use Case (or ViewModel, for single-VM data) instantiates `UserDefaults(suiteName: AppGroup.suiteName)` inline.
 
-The root model is `UserProfile` (contains `[CheckIn]`). `ProfileService` is its `@Observable` state store and is accessed exclusively through `ProfileUseCase` (or `CheckInUseCase` for check-in operations).
+The root model is `UserProfile` (contains `[CheckIn]`). `ProfileUseCase` is the `@Observable` state store: it loads `UserProfile` on init, persists on every `updateProfile`, and triggers `WidgetCenter.shared.reloadAllTimelines()`. All profile reads / writes go through `ProfileUseCase`.
 
 ### State Propagation
 
-`ProfileService` and `PurchaseService` are `@Observable` state stores. Reactive reads flow: View body → ViewModel computed property → Use Case computed property → `@Observable` service property. SwiftUI's observation system tracks the underlying `@Observable` access transitively, so the View re-renders automatically when the service state changes. Use Cases must expose reactive state as **computed properties** (`var isPro: Bool { purchaseService.isPro }`) — never cache the value, or the reactivity breaks.
+`ProfileUseCase` and `PurchaseUseCase` are the `@Observable` state stores. Reactive reads flow: View body → ViewModel computed property → Use Case property. SwiftUI's observation system tracks the underlying `@Observable` access transitively, so the View re-renders automatically when the state changes. Use Cases that expose reactive state from another `@Observable` Use Case must expose it as a **computed property** (e.g. `var isPro: Bool { purchaseUseCase.isPro }`) — never cache the value, or the reactivity breaks.
 
 ### Navigation
 
-- Root (`ContentView`) switches between `OnboardingFlow` and `MainTabView` based on `AppRootViewModel.onboardingCompleted` (computed from `ProfileService.profile`).
+- Root (`ContentView`) switches between `OnboardingFlow` and `MainTabView` based on `AppRootViewModel.onboardingCompleted` (computed from `ProfileUseCase.profile`).
 - `MainTabView` has 4 tabs driven by `AppTab` enum: Check-In, Meditate, History/Insights, Settings. (enum cases: `.checkin`, `.meditate`, `.historyInsights`, `.settings`)
 - Use `NavigationStack` with typed route enums per feature. Never use `NavigationView`.
 
@@ -175,8 +188,11 @@ Always add `.scrollIndicators(.hidden)` to every `ScrollView`.
 ## Key Files
 
 - `App/Container+App.swift` — all service registrations; add new services here
-- `Services/ProfileService.swift` — source of truth for user data, streaks, check-ins
-- `Services/UserDefaultsService.swift` — all persistence reads/writes
+- `Domain/UseCases/Profile/ProfileUseCase.swift` — `@Observable` state store for `UserProfile`; owns load/persist + widget reload
+- `Domain/UseCases/CheckIn/CheckInUseCase.swift` — check-in CRUD + streak via `StreakCalculator`
+- `Domain/UseCases/Auth/AuthUseCase.swift` — login/register/refresh + post-auth sync; inlines Keychain
+- `Domain/UseCases/Purchase/PurchaseUseCase.swift` — `@Observable` `isPro` + StoreKit
+- `Models/UserDefaultsKey.swift` — App Group UserDefaults key enum
 - `Models/UserProfile.swift` + `Models/CheckIn.swift` — core Codable models (domain/persistence)
 - `Networking/Models/Article.swift` + `Networking/Models/MeditationSession.swift` — API response models
 - `DesignSystem/DS+Colors.swift` — full color token list
@@ -309,46 +325,46 @@ final class MyViewModel {
 ### Dependency Injection
 
 ```swift
-@ObservationIgnored @Injected(\.profileService) private var profileService
+@ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
 ```
 
-- Always pair `@ObservationIgnored` with `@Injected`
+- Always pair `@ObservationIgnored` with `@Injected` inside `@Observable` classes
 - Views never call `Container.shared.resolve()`
-- All registrations in `App/Container+App.swift`
+- All registrations in `App/Container+App.swift` under `// MARK: - Services` and `// MARK: - Use Cases`
 
-### Services
+### Services (network only)
 
-Every service has two files: `XxxServiceProtocol.swift` (the interface) and `XxxService.swift` (the implementation). Services are plain `final class` — no `@Observable`, no `@MainActor`, no `@ObservationIgnored`. All dependencies are injected via `@Injected`:
+Every Service has two files: `<Name>ServiceProtocol.swift` and `<Name>Service.swift`. Services are plain `final class` — no `@Observable`, no `@MainActor` necessary (added when required for callers). The Service injects `networkClient` ONLY and does nothing else:
 
 ```swift
-// XxxServiceProtocol.swift
-protocol XxxServiceProtocol {
-    func methodName() async throws -> ReturnType
+// ArticlesServiceProtocol.swift
+protocol ArticlesServiceProtocol {
+    func dailyArticles() async throws -> [Article]
 }
 
-// XxxService.swift
+// ArticlesService.swift
 import Factory
+import Foundation
 
-final class XxxService: XxxServiceProtocol {
+final class ArticlesService: ArticlesServiceProtocol {
     @Injected(\.networkClient) private var networkClient
-    @Injected(\.userDefaultsService) private var userDefaultsService
 
-    func methodName() async throws -> ReturnType {
-        try await networkClient.get("/api/path")
+    func dailyArticles() async throws -> [Article] {
+        try await networkClient.get("/api/articles/today")
     }
 }
 ```
 
 **Container registration** (always via protocol type, no init parameters):
 ```swift
-var myService: Factory<MyServiceProtocol> {
-    self { MyService() }.singleton
+var articlesService: Factory<ArticlesServiceProtocol> {
+    self { @MainActor in ArticlesService() }.singleton
 }
 ```
 
-**Exception — `ProfileService` and `PurchaseService`**: Both are `@Observable final class` registered with their concrete type (`Factory<ProfileService>` / `Factory<PurchaseService>`). `ProfileService` is passed into the SwiftUI view tree via `.environment()`; `PurchaseService` is injected via `@Injected` but observed transitively through ViewModels. Their `@Injected` dependencies must use `@ObservationIgnored` to prevent a backing-storage name collision with the `@Observable` macro. When mutating `@Observable`-tracked properties from inside the class, always assign to `self.property` — never to the synthesized `_property` backing store, which bypasses the observation system.
+**State-store Use Cases — `ProfileUseCase`, `PurchaseUseCase`**: Both are `@Observable @MainActor final class` registered with their protocol type. They hold reactive state (`UserProfile`, `isPro`) and inline framework code (UserDefaults for persistence, StoreKit for transactions). Their `@Injected` dependencies must use `@ObservationIgnored` to prevent a backing-storage name collision with the `@Observable` macro. When mutating `@Observable`-tracked properties from inside the class, always assign to `self.property` — never to the synthesized `_property` backing store, which bypasses the observation system.
 
-**Never use `NotificationCenter`** for propagating state changes between services and views — use `@Observable` or async sequences instead.
+**Never use `NotificationCenter`** for propagating state changes between layers — use `@Observable` or async sequences instead.
 
 **Model placement:**
 - API request/response models → `Networking/Models/`

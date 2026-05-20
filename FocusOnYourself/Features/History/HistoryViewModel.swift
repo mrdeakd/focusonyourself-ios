@@ -6,22 +6,14 @@ import Observation
 final class HistoryViewModel {
     @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
 
+    var selectedCheckIn: CheckIn?
+
     var streakStats: (current: Int, longest: Int) {
         !checkInUseCase.allCheckIns.isEmpty ? checkInUseCase.streakStats() : (0, 0)
     }
 
     var checkInDateStrings: Set<String> {
         Set(checkInUseCase.allCheckIns.map { $0.dateString })
-    }
-
-    var selectedCheckIn: CheckIn?
-
-    func checkIn(for dateString: String) -> CheckIn? {
-        checkInUseCase.checkIn(for: dateString)
-    }
-
-    func selectDay(_ dateString: String) {
-        selectedCheckIn = checkIn(for: dateString)
     }
 
     var calendarMonths: [Date] {
@@ -42,5 +34,13 @@ final class HistoryViewModel {
             current = next
         }
         return months.reversed()
+    }
+
+    func checkIn(for dateString: String) -> CheckIn? {
+        checkInUseCase.checkIn(for: dateString)
+    }
+
+    func selectDay(_ dateString: String) {
+        selectedCheckIn = checkIn(for: dateString)
     }
 }

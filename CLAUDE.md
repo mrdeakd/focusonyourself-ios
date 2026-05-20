@@ -668,6 +668,49 @@ Never write comments that describe what the code does, reference design tools (P
 - For date-only ISO8601 strings (e.g. API query params), use `.formatted(.iso8601.year().month().day())` — never `ISO8601DateFormatter().string(from:).prefix(10)`.
 - Omit `return` in single-expression functions and computed properties. `if`/`switch` can be used as expressions.
 
+### Member ordering inside a class or struct
+
+Members SHALL appear in this fixed order. Use `// MARK: -` dividers between sections when the file is long enough that grouping aids navigation.
+
+1. **Stored properties** (`@Injected`, `@ObservationIgnored`, `let`, `var` with a stored value)
+2. **Static constants** (`private static let foo = ...`)
+3. **Computed properties** (`var foo: T { ... }`, including get-only and get/set)
+4. **`init`**
+5. **Public methods**
+6. **Private methods**
+7. **Nested types** at the bottom (`private struct JWTPayload`, etc.)
+
+A function NEVER appears between two properties of the same kind. If you find yourself adding a computed property in the middle of the file, move it up with the other computed properties.
+
+**Why**: scanning a class for "what does it expose" should hit all properties first, then all behavior. Computed properties hidden between methods make the API surface invisible.
+
+**Worked example** — `AuthUseCase`:
+```swift
+final class AuthUseCase: AuthUseCaseProtocol {
+    @Injected(\.authService) private var authService           // 1. stored
+    @Injected(\.keychainStore) private var keychainStore
+
+    private static let accessTokenKey = "foy.accessToken"      // 2. static constants
+
+    var email: String? { keychainStore.load(Self.userEmailKey) }      // 3. computed
+    var isAuthenticated: Bool { keychainStore.load(Self.accessTokenKey) != nil }
+
+    // 4. init — none for this class
+
+    // MARK: - Public methods                                  // 5. public methods
+    func register(...) async throws { ... }
+    func signIn(...) async throws { ... }
+    func signOut() async { ... }
+
+    // MARK: - Private                                         // 6. private methods
+    private func saveAuthTokens(...) { ... }
+
+    private struct JWTPayload: Decodable { ... }               // 7. nested types
+}
+```
+
+ViewModels follow the same order, with stored `var`s (UI state) grouped together under their own `// MARK: - State` divider when there are many.
+
 ### Widget Model Sync
 
 When modifying `CheckIn`, `Mood`, `UserProfile`, or `PendingWidgetCheckIn`, manually update `FocusOnYourselfWidgets/WidgetDataProvider.swift`. The widget target cannot import the main app, so `WidgetDataProvider.swift` contains mirror copies (`WidgetPendingCheckIn`, etc.) that must be kept field-for-field identical — same property names, same types, same order — because both sides encode/decode the same `UserDefaults` data.

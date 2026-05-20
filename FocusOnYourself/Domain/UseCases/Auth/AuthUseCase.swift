@@ -11,6 +11,11 @@ final class AuthUseCase: AuthUseCaseProtocol {
     private static let refreshTokenKey = "foy.refreshToken"
     private static let userEmailKey    = "foy.userEmail"
 
+    var email: String? { keychainStore.load(Self.userEmailKey) }
+    var isAuthenticated: Bool { keychainStore.load(Self.accessTokenKey) != nil }
+
+    // MARK: - Public methods
+
     func register(email: String, password: String) async throws {
         let response = try await authService.register(email: email, password: password)
         saveAuthTokens(from: response)
@@ -45,9 +50,6 @@ final class AuthUseCase: AuthUseCaseProtocol {
             clearAuthTokens()
         }
     }
-
-    var email: String? { keychainStore.load(Self.userEmailKey) }
-    var isAuthenticated: Bool { keychainStore.load(Self.accessTokenKey) != nil }
 
     // MARK: - Token persistence
 

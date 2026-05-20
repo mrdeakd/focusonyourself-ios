@@ -11,32 +11,22 @@ final class AccountViewModel {
     @ObservationIgnored @Injected(\.settingsUseCase) private var settingsUseCase
     @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
 
+    // MARK: - State
+
     var isAuthenticated: Bool
     var isRefreshing = false
     var accountEmail: String?
     var showAuthFlow = false
     var showSettingsSheet = false
+    var showChangeNameSheet = false
+    var showChangeCategoriesSheet = false
+    var showDailyContextSheet = false
+    var showPaywall = false
+    var showResetConfirmation = false
+
+    // MARK: - Computed
+
     var isPro: Bool { purchaseUseCase.isPro }
-
-    init() {
-        isAuthenticated = _authUseCase.wrappedValue.isAuthenticated
-        accountEmail = _authUseCase.wrappedValue.email
-    }
-
-    func signOut() async {
-        await authUseCase.signOut()
-        isAuthenticated = false
-        accountEmail = nil
-    }
-
-    func refreshAuthState() async {
-        guard authUseCase.isAuthenticated, !isAuthenticated else { return }
-        isRefreshing = true
-        try? await Task.sleep(for: .milliseconds(350))
-        isAuthenticated = true
-        accountEmail = authUseCase.email
-        isRefreshing = false
-    }
 
     var currentName: String {
         profileUseCase.name
@@ -72,37 +62,12 @@ final class AccountViewModel {
         SystemLanguageModel.default.isAvailable
     }
 
-    func updateName(_ name: String) {
-        profileUseCase.updateName(name)
-    }
-
-    func updateCategories(_ categories: Set<AffirmationCategory>) {
-        profileUseCase.updateCategories(Array(categories))
-    }
-
-    var showChangeNameSheet = false
-    var showChangeCategoriesSheet = false
-    var showDailyContextSheet = false
-    var showPaywall = false
-    var showResetConfirmation = false
-
     var sortedCategories: [AffirmationCategory] {
         AffirmationCategory.allCases.sorted { $0.isFree && !$1.isFree }
     }
 
     var currentCategoriesSummary: String {
         currentCategories.map(\.displayName).sorted().joined(separator: ", ")
-    }
-
-    func resetAllData() async {
-        profileUseCase.resetAll()
-        notificationsUseCase.cancel()
-        settingsUseCase.resetFactorToggles()
-        settingsUseCase.clearPendingWidgetCheckIn()
-        await authUseCase.signOut()
-        await purchaseUseCase.refreshEntitlements()
-        isAuthenticated = false
-        accountEmail = nil
     }
 
     var showSleepFactor: Bool {
@@ -133,5 +98,48 @@ final class AccountViewModel {
             showSocialFactor   ? "Social" : nil
         ].compactMap { $0 }
         return labels.isEmpty ? "None" : labels.joined(separator: ", ")
+    }
+
+    // MARK: - Init
+
+    init() {
+        isAuthenticated = _authUseCase.wrappedValue.isAuthenticated
+        accountEmail = _authUseCase.wrappedValue.email
+    }
+
+    // MARK: - Public methods
+
+    func signOut() async {
+        await authUseCase.signOut()
+        isAuthenticated = false
+        accountEmail = nil
+    }
+
+    func refreshAuthState() async {
+        guard authUseCase.isAuthenticated, !isAuthenticated else { return }
+        isRefreshing = true
+        try? await Task.sleep(for: .milliseconds(350))
+        isAuthenticated = true
+        accountEmail = authUseCase.email
+        isRefreshing = false
+    }
+
+    func updateName(_ name: String) {
+        profileUseCase.updateName(name)
+    }
+
+    func updateCategories(_ categories: Set<AffirmationCategory>) {
+        profileUseCase.updateCategories(Array(categories))
+    }
+
+    func resetAllData() async {
+        profileUseCase.resetAll()
+        notificationsUseCase.cancel()
+        settingsUseCase.resetFactorToggles()
+        settingsUseCase.clearPendingWidgetCheckIn()
+        await authUseCase.signOut()
+        await purchaseUseCase.refreshEntitlements()
+        isAuthenticated = false
+        accountEmail = nil
     }
 }

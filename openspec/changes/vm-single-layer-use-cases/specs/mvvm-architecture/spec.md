@@ -23,6 +23,20 @@ A Service MAY encode typed inputs into URL/query/body and decode the response (i
 - **WHEN** a Service file is reviewed
 - **THEN** it MUST NOT contain a guard validating inputs (e.g. empty-check), a cache lookup, a branch on a feature flag, a fallback to alternate paths, or held state beyond constants
 
+### Requirement: Members ordered by kind inside a type
+
+Inside a `class` or `struct`, members SHALL appear in this fixed order: stored properties → static constants → computed properties → `init` → public methods → private methods → nested types. A function MUST NOT appear between two properties of the same kind.
+
+#### Scenario: Computed property hidden between methods
+
+- **WHEN** a computed property `var x: T { ... }` appears AFTER a function `func y(...)` in the same type
+- **THEN** the computed property SHALL be moved up to sit with other computed properties
+
+#### Scenario: Long file uses MARK dividers
+
+- **WHEN** a type has many members across multiple sections
+- **THEN** `// MARK: - <Section>` dividers SHALL be used between sections (e.g. `// MARK: - State`, `// MARK: - Computed`, `// MARK: - Public methods`, `// MARK: - Private`)
+
 ### Requirement: Calculators have one responsibility
 
 A Calculator SHALL have a single responsibility, definable as a noun phrase without "and". Methods within a Calculator SHALL share either an input domain or contribute to the same kind of output (cohesion test). When a Calculator accumulates methods across disjoint input domains, it SHALL be split — single-purpose Calculators for reusable algorithms, inline the rest as `private func` in the single consumer.

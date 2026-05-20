@@ -7,6 +7,30 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     @Injected(\.userDefaultsStore) private var userDefaultsStore
     private let streakCalculator = StreakCalculator()
 
+    var hasCheckedInToday: Bool {
+        profileUseCase.profile.checkIns.contains { $0.dateString == CheckIn.dateString(for: .now) }
+    }
+
+    var todaysMood: Mood? {
+        profileUseCase.profile.checkIns.first { $0.dateString == CheckIn.dateString(for: .now) }?.mood
+    }
+
+    var todaysFeelingsDescription: String? {
+        profileUseCase.profile.checkIns.first { $0.dateString == CheckIn.dateString(for: .now) }?.feelingsDescription
+    }
+
+    var todaysFactors: CheckInFactors? {
+        profileUseCase.profile.checkIns.first { $0.dateString == CheckIn.dateString(for: .now) }?.factors
+    }
+
+    var earliestCheckInDate: Date? {
+        profileUseCase.profile.checkIns.map { $0.date }.min()
+    }
+
+    var allCheckIns: [CheckIn] { profileUseCase.profile.checkIns }
+
+    // MARK: - Public methods
+
     func record(mood: Mood, feelingsDescription: String?, factors: CheckInFactors?) async throws {
         let checkIn = CheckIn(
             dateString: CheckIn.dateString(for: .now),
@@ -44,26 +68,6 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
         profileUseCase.updateProfile(profile)
     }
 
-    var hasCheckedInToday: Bool {
-        profileUseCase.profile.checkIns.contains { $0.dateString == CheckIn.dateString(for: .now) }
-    }
-
-    var todaysMood: Mood? {
-        profileUseCase.profile.checkIns.first { $0.dateString == CheckIn.dateString(for: .now) }?.mood
-    }
-
-    var todaysFeelingsDescription: String? {
-        profileUseCase.profile.checkIns.first { $0.dateString == CheckIn.dateString(for: .now) }?.feelingsDescription
-    }
-
-    var todaysFactors: CheckInFactors? {
-        profileUseCase.profile.checkIns.first { $0.dateString == CheckIn.dateString(for: .now) }?.factors
-    }
-
-    var earliestCheckInDate: Date? {
-        profileUseCase.profile.checkIns.map { $0.date }.min()
-    }
-
     func streakStats() -> (current: Int, longest: Int) {
         streakCalculator.compute(checkIns: profileUseCase.profile.checkIns)
     }
@@ -71,8 +75,6 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     func streakStartDate() -> Date? {
         streakCalculator.startDate(checkIns: profileUseCase.profile.checkIns)
     }
-
-    var allCheckIns: [CheckIn] { profileUseCase.profile.checkIns }
 
     func checkIn(for dateString: String) -> CheckIn? {
         profileUseCase.profile.checkIns.first { $0.dateString == dateString }

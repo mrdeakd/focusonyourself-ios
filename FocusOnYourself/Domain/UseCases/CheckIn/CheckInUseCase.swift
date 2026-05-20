@@ -42,9 +42,7 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     }
 
     func replaceAll(_ checkIns: [CheckIn]) async throws {
-        var profile = profileUseCase.profile
-        profile.checkIns = checkIns
-        profileUseCase.updateProfile(profile)
+        profileUseCase.updateCheckIns(checkIns)
     }
 
     func mergeWidgetCheckIn() {
@@ -63,9 +61,7 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     }
 
     func reset() {
-        var profile = profileUseCase.profile
-        profile.checkIns = []
-        profileUseCase.updateProfile(profile)
+        profileUseCase.updateCheckIns([])
     }
 
     func uploadAllToServer() async throws {
@@ -94,14 +90,13 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     // MARK: - Private
 
     private func save(_ checkIn: CheckIn) async throws {
-        var profile = profileUseCase.profile
-        let dateString = checkIn.dateString
-        if let idx = profile.checkIns.firstIndex(where: { $0.dateString == dateString }) {
-            profile.checkIns[idx] = checkIn
+        var checkIns = profileUseCase.profile.checkIns
+        if let idx = checkIns.firstIndex(where: { $0.dateString == checkIn.dateString }) {
+            checkIns[idx] = checkIn
         } else {
-            profile.checkIns.append(checkIn)
+            checkIns.append(checkIn)
         }
-        profileUseCase.updateProfile(profile)
+        profileUseCase.updateCheckIns(checkIns)
         // Local state is already persisted above — network sync is advisory only
         Task { try? await checkinsService.post(checkIn) }
     }

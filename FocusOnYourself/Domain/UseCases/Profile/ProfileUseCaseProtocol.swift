@@ -17,6 +17,7 @@ protocol ProfileUseCaseProtocol: AnyObject {
     func updateNotificationsEnabled(_ enabled: Bool)
     func updateAppearanceOverride(_ override: String?)
     func updateAppleIntelligenceEnabled(_ enabled: Bool)
+    func updateCheckIns(_ checkIns: [CheckIn])
     func saveCompletedProfile(_ profile: UserProfile)
     func resetAll()
 }

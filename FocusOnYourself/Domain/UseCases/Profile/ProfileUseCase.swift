@@ -66,6 +66,12 @@ final class ProfileUseCase: ProfileUseCaseProtocol {
         updateProfile(updated)
     }
 
+    func updateCheckIns(_ checkIns: [CheckIn]) {
+        var updated = profile
+        updated.checkIns = checkIns
+        updateProfile(updated)
+    }
+
     func saveCompletedProfile(_ profile: UserProfile) {
         updateProfile(profile)
     }

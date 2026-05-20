@@ -13,13 +13,13 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
     func register(email: String, password: String) async throws {
         let response = try await authService.register(email: email, password: password)
-        saveAuthTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
+        saveAuthTokens(from: response)
         await uploadLocalCheckIns()
     }
 
     func signIn(email: String, password: String) async throws {
         let response = try await authService.login(email: email, password: password)
-        saveAuthTokens(access: response.accessToken, refresh: response.refreshToken, email: response.user.email)
+        saveAuthTokens(from: response)
         await downloadAndReplaceCheckIns()
     }
 
@@ -51,10 +51,10 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
     // MARK: - Token persistence
 
-    private func saveAuthTokens(access: String, refresh: String, email: String) {
-        try? keychainStore.save(access, for: Self.accessTokenKey)
-        try? keychainStore.save(refresh, for: Self.refreshTokenKey)
-        try? keychainStore.save(email, for: Self.userEmailKey)
+    private func saveAuthTokens(from response: AuthResponse) {
+        try? keychainStore.save(response.accessToken, for: Self.accessTokenKey)
+        try? keychainStore.save(response.refreshToken, for: Self.refreshTokenKey)
+        try? keychainStore.save(response.user.email, for: Self.userEmailKey)
     }
 
     private func clearAuthTokens() {

@@ -1,8 +1,11 @@
+import Factory
 import Foundation
 import UserNotifications
 
 final class NotificationsUseCase: NotificationsUseCaseProtocol {
     static let notificationID = "daily-affirmation"
+
+    @Injected(\.profileUseCase) private var profileUseCase
 
     func requestPermission() async -> Bool {
         (try? await UNUserNotificationCenter.current()
@@ -28,5 +31,14 @@ final class NotificationsUseCase: NotificationsUseCaseProtocol {
 
     func cancel() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [Self.notificationID])
+    }
+
+    func setEnabled(_ enabled: Bool) {
+        profileUseCase.updateNotificationsEnabled(enabled)
+        if enabled {
+            schedule(name: profileUseCase.name)
+        } else {
+            cancel()
+        }
     }
 }

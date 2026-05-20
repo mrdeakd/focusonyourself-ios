@@ -4,4 +4,5 @@ protocol NotificationsUseCaseProtocol: AnyObject {
     func requestPermission() async -> Bool
     func schedule(name: String)
     func cancel()
+    func setEnabled(_ enabled: Bool)
 }

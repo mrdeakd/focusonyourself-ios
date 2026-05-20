@@ -38,14 +38,7 @@ final class AccountViewModel {
 
     var currentNotifications: Bool {
         get { profileUseCase.notificationsEnabled }
-        set {
-            profileUseCase.updateNotificationsEnabled(newValue)
-            if newValue {
-                notificationsUseCase.schedule(name: profileUseCase.name)
-            } else {
-                notificationsUseCase.cancel()
-            }
-        }
+        set { notificationsUseCase.setEnabled(newValue) }
     }
 
     var appearanceOverride: String? {

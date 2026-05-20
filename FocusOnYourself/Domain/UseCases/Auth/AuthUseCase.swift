@@ -5,7 +5,7 @@ final class AuthUseCase: AuthUseCaseProtocol {
     @Injected(\.authService) private var authService
     @Injected(\.checkInUseCase) private var checkInUseCase
     @Injected(\.keychainStore) private var keychainStore
-    private let jwtExpiryChecker = JWTExpiryChecker()
+    private let jwtExpiryCalculator = JWTExpiryCalculator()
 
     private static let accessTokenKey  = "foy.accessToken"
     private static let refreshTokenKey = "foy.refreshToken"
@@ -37,7 +37,7 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
     func refreshTokenIfNeeded() async {
         guard let accessToken = keychainStore.load(Self.accessTokenKey) else { return }
-        guard jwtExpiryChecker.isNearExpiry(accessToken) else { return }
+        guard jwtExpiryCalculator.isNearExpiry(accessToken) else { return }
         guard let refresh = keychainStore.load(Self.refreshTokenKey) else {
             clearAuthTokens()
             return

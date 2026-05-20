@@ -289,6 +289,8 @@ Extract when ALL three are true:
 
 Otherwise inline as `private func` in the consumer. Don't pre-extract.
 
+**Naming**: every file in `Domain/Calculators/` SHALL end with the `Calculator` suffix — `StreakCalculator`, `InsightsCalculator`, `MoodHealthKitCalculator`, `DistributionCalculator`, `DailyCacheCalculator`, `JWTExpiryCalculator`. No `…Checker`, `…Helper`, `…Validator`, `…Parser`. The folder is "Calculators" — every member is one.
+
 #### Rule 2 — Calculator vs Use Case vs ViewModel — the decision tree
 
 ```

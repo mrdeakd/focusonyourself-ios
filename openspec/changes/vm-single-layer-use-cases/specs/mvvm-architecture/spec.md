@@ -43,6 +43,8 @@ A Calculator SHALL have a single responsibility, definable as a noun phrase with
 
 A Calculator SHALL be a `struct` with no `@Injected` properties, no `@Observable`, no `@MainActor`, no `import SwiftUI`. All inputs are method arguments; all outputs are return values. No held state beyond constants. No side effects (no `print`, no IO, no logging).
 
+Every file in `FocusOnYourself/Domain/Calculators/` SHALL be named `<Name>Calculator.swift` and contain a struct named `<Name>Calculator`. Alternate suffixes (`Checker`, `Helper`, `Validator`, `Parser`) are forbidden — the folder is "Calculators" and the suffix matches.
+
 #### Scenario: Cohesion preserved despite many methods
 
 - **WHEN** all methods on a Calculator take the same input type and return values in the same conceptual family (e.g. `InsightsCalculator` — all take `[CheckIn]`, return insight values)

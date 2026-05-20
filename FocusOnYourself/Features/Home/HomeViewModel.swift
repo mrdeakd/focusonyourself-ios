@@ -28,7 +28,7 @@ final class HomeViewModel {
 
     private let distributionCalculator = DistributionCalculator()
     private let moodHealthKitCalculator = MoodHealthKitCalculator()
-    private let dailyCacheChecker = DailyCacheChecker()
+    private let dailyCacheCalculator = DailyCacheCalculator()
     private let healthStore = HKHealthStore()
 
     var articles: [Article] = []
@@ -205,7 +205,7 @@ final class HomeViewModel {
 
     private func cachedAffirmations() -> [(quote: String, category: AffirmationCategory)]? {
         let cachedDate = userDefaultsStore.string(for: .affirmationCacheDate)
-        guard dailyCacheChecker.isFreshForToday(cachedDateString: cachedDate) else { return nil }
+        guard dailyCacheCalculator.isFreshForToday(cachedDateString: cachedDate) else { return nil }
         guard let data = userDefaultsStore.data(for: .affirmationCache) else { return nil }
         guard let cached = try? JSONDecoder().decode([CachedAffirmation].self, from: data) else { return nil }
         return cached.map { (quote: $0.quote, category: $0.category) }
@@ -216,7 +216,7 @@ final class HomeViewModel {
         if let data = try? JSONEncoder().encode(cached) {
             userDefaultsStore.setData(data, for: .affirmationCache)
         }
-        userDefaultsStore.setString(dailyCacheChecker.todayString(), for: .affirmationCacheDate)
+        userDefaultsStore.setString(dailyCacheCalculator.todayString(), for: .affirmationCacheDate)
     }
 
     // MARK: - HealthKit (inlined)

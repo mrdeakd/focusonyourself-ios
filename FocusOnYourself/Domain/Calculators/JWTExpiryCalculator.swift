@@ -1,6 +1,6 @@
 import Foundation
 
-struct JWTExpiryChecker {
+struct JWTExpiryCalculator {
     private static let nearExpirySeconds: TimeInterval = 60
 
     func isNearExpiry(_ token: String) -> Bool {

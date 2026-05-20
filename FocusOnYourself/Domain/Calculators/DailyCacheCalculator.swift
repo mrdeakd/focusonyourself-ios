@@ -1,6 +1,6 @@
 import Foundation
 
-struct DailyCacheChecker {
+struct DailyCacheCalculator {
     func isFreshForToday(cachedDateString: String?) -> Bool {
         cachedDateString == CheckIn.dateString(for: Date.now)
     }

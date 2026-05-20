@@ -253,7 +253,7 @@ A Use Case is `final class @MainActor` (or `@Observable @MainActor` if it holds 
 
 A Use Case may inject Services (network) and may hold Calculators as `private let`. A Use Case may inline non-network device frameworks (Keychain, UserDefaults via App Group, UNUserNotificationCenter, StoreKit) — services are network-only, so any device framework lives in the Use Case (or ViewModel) that uses it.
 
-A Use Case MUST NOT inject another Use Case EXCEPT the `@Observable` state-store ones (`ProfileUseCase`, `PurchaseUseCase`) which are explicitly shared reactive state.
+A Use Case MAY inject other Use Cases when delegating ownership of another feature's data or operations (Tell, Don't Ask). The dependency graph MUST remain acyclic.
 
 #### Scenario: Single-VM operation
 
@@ -268,17 +268,18 @@ A Use Case MUST NOT inject another Use Case EXCEPT the `@Observable` state-store
 - **AND** the Use Case SHALL be registered in `App/Container+App.swift` under `// MARK: - Use Cases`
 - **AND** both ViewModels SHALL inject the new Use Case
 
-#### Scenario: State-store Use Case (cross-use-case dependency)
+#### Scenario: Tell, Don't Ask (delegate to the owner)
 
-- **WHEN** a Use Case needs to read or mutate shared reactive state held by another Use Case
-- **THEN** it MAY inject `ProfileUseCase` or `PurchaseUseCase` (the only `@Observable` state-store Use Cases)
-- **AND** it MUST NOT inject any other Use Case
+- **WHEN** a Use Case needs work that operates on another feature's data using that feature's services (e.g. AuthUseCase needs to upload local check-ins to the server after register)
+- **THEN** the work SHALL be exposed as a method on the OWNING feature's Use Case (e.g. `CheckInUseCase.uploadAllToServer()`)
+- **AND** the caller SHALL inject the owning Use Case and call that method — NOT read the data out and operate on it locally
+- **AND** the dependency graph MUST remain acyclic
 
 #### Scenario: Forbidden patterns in a Use Case
 
 - **WHEN** a Use Case file is reviewed
 - **THEN** it MUST NOT `import SwiftUI` or reference View / Color types
-- **AND** it MUST NOT inject a non-state-store Use Case
+- **AND** it MUST NOT read another Use Case's data and then call a service that belongs to that other feature — delegate to a method on the owning Use Case instead
 
 ### Requirement: ViewModels can inject Services and Use Cases
 

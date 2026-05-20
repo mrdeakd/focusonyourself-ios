@@ -3,8 +3,7 @@ import Foundation
 
 final class AuthUseCase: AuthUseCaseProtocol {
     @Injected(\.authService) private var authService
-    @Injected(\.checkinsService) private var checkinsService
-    @Injected(\.profileUseCase) private var profileUseCase
+    @Injected(\.checkInUseCase) private var checkInUseCase
     @Injected(\.keychainStore) private var keychainStore
 
     private static let accessTokenKey  = "foy.accessToken"
@@ -19,13 +18,13 @@ final class AuthUseCase: AuthUseCaseProtocol {
     func register(email: String, password: String) async throws {
         let response = try await authService.register(email: email, password: password)
         saveAuthTokens(from: response)
-        await uploadLocalCheckIns()
+        try? await checkInUseCase.uploadAllToServer()
     }
 
     func signIn(email: String, password: String) async throws {
         let response = try await authService.login(email: email, password: password)
         saveAuthTokens(from: response)
-        await downloadAndReplaceCheckIns()
+        try? await checkInUseCase.downloadAndReplaceFromServer()
     }
 
     func signOut() async {
@@ -63,21 +62,6 @@ final class AuthUseCase: AuthUseCaseProtocol {
         keychainStore.delete(Self.accessTokenKey)
         keychainStore.delete(Self.refreshTokenKey)
         keychainStore.delete(Self.userEmailKey)
-    }
-
-    // MARK: - Check-in sync
-
-    private func uploadLocalCheckIns() async {
-        let checkIns = profileUseCase.profile.checkIns
-        guard !checkIns.isEmpty else { return }
-        try? await checkinsService.importAll(checkIns)
-    }
-
-    private func downloadAndReplaceCheckIns() async {
-        guard let checkIns = try? await checkinsService.fetch() else { return }
-        var profile = profileUseCase.profile
-        profile.checkIns = checkIns
-        profileUseCase.updateProfile(profile)
     }
 
     // MARK: - JWT

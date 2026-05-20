@@ -236,7 +236,40 @@ extension BackendCheckIn {
 - One Use Case per feature domain; group related operations together (`CheckInUseCase` covers `record`, `streakStats`, `mergeWidgetCheckIn`, query properties).
 - A Use Case may be `@Observable` when it holds reactive state (`ProfileUseCase` holds `UserProfile`, `PurchaseUseCase` holds `isPro`). Otherwise it's plain `final class @MainActor`.
 - A Use Case may inject Services (network) + Stores (Keychain, UserDefaults), may hold Calculators as `private let`, and may inline single-consumer device frameworks (UNUserNotificationCenter in NotificationsUseCase, StoreKit in PurchaseUseCase, etc.). Multi-consumer device frameworks always go through a Store (see "Stores" section above).
-- A Use Case does NOT inject other Use Cases EXCEPT the `@Observable` state-store ones (`ProfileUseCase`, `PurchaseUseCase`) which are explicitly shared state.
+- A Use Case MAY inject other Use Cases when delegating ownership of another feature's data or operations (see "Tell, Don't Ask" below). The dependency graph must remain acyclic.
+
+#### Tell, Don't Ask — delegate to the owner
+
+**Rule**: when a Use Case needs work that involves data or services owned by another feature, it SHALL inject that feature's Use Case and call a method on it — NOT read the data out and operate on it locally.
+
+**Why**: reading `otherUseCase.someProperty` and then calling a third service is feature envy. It leaks the other feature's storage shape and service choice into the calling Use Case, making both harder to change.
+
+**Bad** — `AuthUseCase` reaches into check-in state AND uses the check-in network service:
+```swift
+@Injected(\.checkinsService) private var checkinsService
+@Injected(\.profileUseCase) private var profileUseCase
+
+private func uploadLocalCheckIns() async {
+    let checkIns = profileUseCase.profile.checkIns       // ← reads another feature's data
+    guard !checkIns.isEmpty else { return }
+    try? await checkinsService.importAll(checkIns)       // ← calls another feature's service
+}
+```
+
+**Good** — `AuthUseCase` tells `CheckInUseCase` to sync:
+```swift
+@Injected(\.checkInUseCase) private var checkInUseCase
+
+// in register():
+try? await checkInUseCase.uploadAllToServer()
+
+// in signIn():
+try? await checkInUseCase.downloadAndReplaceFromServer()
+```
+
+`CheckInUseCase` owns its data + service choice. `AuthUseCase` knows only "tell check-ins to sync" — nothing about how.
+
+**How to spot the smell**: if a Use Case method reads `otherUseCase.someData` and then calls `someService.someMethod`, that work belongs on the other Use Case. Add a method to it (`uploadAllToServer`, `replaceFromServer`, etc.) and delegate.
 
 **When to extract from VM → Use Case**:
 - ViewModel A has logic X. ViewModel B now also needs X.

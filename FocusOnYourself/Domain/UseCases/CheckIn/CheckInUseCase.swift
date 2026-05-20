@@ -68,6 +68,17 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
         profileUseCase.updateProfile(profile)
     }
 
+    func uploadAllToServer() async throws {
+        let checkIns = profileUseCase.profile.checkIns
+        guard !checkIns.isEmpty else { return }
+        try await checkinsService.importAll(checkIns)
+    }
+
+    func downloadAndReplaceFromServer() async throws {
+        let checkIns = try await checkinsService.fetch()
+        try await replaceAll(checkIns)
+    }
+
     func streakStats() -> (current: Int, longest: Int) {
         streakCalculator.compute(checkIns: profileUseCase.profile.checkIns)
     }

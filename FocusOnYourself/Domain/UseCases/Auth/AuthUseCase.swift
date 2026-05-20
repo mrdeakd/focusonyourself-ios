@@ -5,6 +5,7 @@ final class AuthUseCase: AuthUseCaseProtocol {
     @Injected(\.authService) private var authService
     @Injected(\.checkInUseCase) private var checkInUseCase
     @Injected(\.keychainStore) private var keychainStore
+    private let jwtExpiryChecker = JWTExpiryChecker()
 
     private static let accessTokenKey  = "foy.accessToken"
     private static let refreshTokenKey = "foy.refreshToken"
@@ -36,7 +37,7 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
     func refreshTokenIfNeeded() async {
         guard let accessToken = keychainStore.load(Self.accessTokenKey) else { return }
-        guard jwtIsNearExpiry(accessToken) else { return }
+        guard jwtExpiryChecker.isNearExpiry(accessToken) else { return }
         guard let refresh = keychainStore.load(Self.refreshTokenKey) else {
             clearAuthTokens()
             return
@@ -62,22 +63,5 @@ final class AuthUseCase: AuthUseCaseProtocol {
         keychainStore.delete(Self.accessTokenKey)
         keychainStore.delete(Self.refreshTokenKey)
         keychainStore.delete(Self.userEmailKey)
-    }
-
-    // MARK: - JWT
-
-    private func jwtIsNearExpiry(_ token: String) -> Bool {
-        let parts = token.split(separator: ".").map(String.init)
-        guard parts.count == 3 else { return true }
-        var payload = parts[1]
-        let remainder = payload.count % 4
-        if remainder != 0 { payload += String(repeating: "=", count: 4 - remainder) }
-        guard let data = Data(base64Encoded: payload) else { return true }
-        guard let jwt = try? JSONDecoder().decode(JWTPayload.self, from: data) else { return true }
-        return jwt.exp - Date().timeIntervalSince1970 < 60
-    }
-
-    private struct JWTPayload: Decodable {
-        let exp: Double
     }
 }

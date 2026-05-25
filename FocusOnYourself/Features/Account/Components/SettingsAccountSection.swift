@@ -7,10 +7,7 @@ struct SettingsAccountSection: View {
 
     var body: some View {
         Group {
-            if viewModel.isRefreshing {
-                SkeletonAccountCard()
-                    .transition(.opacity)
-            } else if viewModel.isAuthenticated {
+            if viewModel.isAuthenticated {
                 signedInCard
                     .transition(.opacity)
             } else {
@@ -18,11 +15,9 @@ struct SettingsAccountSection: View {
                     .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: viewModel.isRefreshing)
         .animation(.easeInOut(duration: 0.25), value: viewModel.isAuthenticated)
         .fullScreenCover(
             isPresented: Bindable(viewModel).showAuthFlow,
-            onDismiss: { Task { await viewModel.refreshAuthState() } },
             content: { AuthFlow() }
         )
     }

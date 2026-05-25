@@ -6,18 +6,6 @@ import Observation
 
 @Observable @MainActor
 final class HomeViewModel {
-    var selectedMood: Mood?
-    var feelingsDescription: String = ""
-    var showingContextSheet = false
-    var isGeneratingAffirmation = false
-    var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
-    var error: ErrorInfo?
-
-    var sleepQuality: Int = 3
-    var stressLevel: Int = 3
-    var exercised = false
-    var socialQuality: Int = 3
-
     @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
     @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
     @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
@@ -31,6 +19,20 @@ final class HomeViewModel {
     private let dailyCacheCalculator = DailyCacheCalculator()
     private let healthStore = HKHealthStore()
 
+    // MARK: - State
+
+    var selectedMood: Mood?
+    var feelingsDescription: String = ""
+    var showingContextSheet = false
+    var isGeneratingAffirmation = false
+    var generatedQuotes: [(quote: String, category: AffirmationCategory)] = []
+    var error: ErrorInfo?
+
+    var sleepQuality: Int = 3
+    var stressLevel: Int = 3
+    var exercised = false
+    var socialQuality: Int = 3
+
     var articles: [Article] = []
     var isLoadingArticles = false
     var selectedArticle: Article?
@@ -39,7 +41,7 @@ final class HomeViewModel {
         isGeneratingAffirmation = true
     }
 
-    // MARK: - Reactive reads
+    // MARK: - Computed
 
     var hasCheckedIn: Bool { checkInUseCase.hasCheckedInToday }
     var todaysMood: Mood? { checkInUseCase.todaysMood }
@@ -65,22 +67,22 @@ final class HomeViewModel {
     var showExerciseFactor: Bool { settingsUseCase.showExerciseFactor }
     var showSocialFactor: Bool { settingsUseCase.showSocialFactor }
 
-    // MARK: - Articles
+    // MARK: - Public methods
 
     func loadArticles() async {
         isLoadingArticles = true
         defer { isLoadingArticles = false }
         do {
             articles = try await articlesService.dailyArticles()
+        } catch let error as ArticlesError {
+            self.error = ErrorInfo(error)
         } catch {
-            self.error = ErrorInfo(title: "Couldn't Load Articles")
+            self.error = ErrorInfo(title: "Couldn't load articles")
         }
     }
 
     func selectMood(_ mood: Mood) { selectedMood = mood }
     func selectArticle(_ article: Article) { selectedArticle = article }
-
-    // MARK: - Check-in
 
     func completeCheckIn() {
         guard let mood = selectedMood else { return }
@@ -131,8 +133,6 @@ final class HomeViewModel {
         showingContextSheet = false
     }
 
-    // MARK: - Affirmation generation (inlined logic)
-
     func generateAffirmationIfNeeded() async {
         guard generatedQuotes.isEmpty else { return }
         isGeneratingAffirmation = true
@@ -157,10 +157,14 @@ final class HomeViewModel {
             }
             cacheAffirmations(pairs)
             generatedQuotes = pairs
+        } catch let error as AffirmationError {
+            self.error = ErrorInfo(error)
         } catch {
-            self.error = ErrorInfo(title: "Couldn't Load Affirmations")
+            self.error = ErrorInfo(title: "Couldn't load affirmations")
         }
     }
+
+    // MARK: - Private methods
 
     private func generateUsingAppleIntelligence(
         count: Int,
@@ -201,8 +205,6 @@ final class HomeViewModel {
         return Array(results.prefix(expected))
     }
 
-    // MARK: - Affirmation cache (inlined UserDefaults)
-
     private func cachedAffirmations() -> [(quote: String, category: AffirmationCategory)]? {
         let cachedDate = userDefaultsStore.string(for: .affirmationCacheDate)
         guard dailyCacheCalculator.isFreshForToday(cachedDateString: cachedDate) else { return nil }
@@ -218,8 +220,6 @@ final class HomeViewModel {
         }
         userDefaultsStore.setString(dailyCacheCalculator.todayString(), for: .affirmationCacheDate)
     }
-
-    // MARK: - HealthKit (inlined)
 
     @available(iOS 18, *)
     private func writeMoodToHealthKit(mood: Mood, factors: CheckInFactors?) async {

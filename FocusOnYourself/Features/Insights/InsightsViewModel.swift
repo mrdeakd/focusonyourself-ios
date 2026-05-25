@@ -3,18 +3,25 @@ import Foundation
 import Observation
 import SwiftUI
 
-@Observable
-@MainActor
+@Observable @MainActor
 final class InsightsViewModel {
-    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
     @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+
     private let calculator = InsightsCalculator()
 
-    var isPro: Bool { purchaseUseCase.isPro }
+    // MARK: - State
+
     var showingPaywall = false
     var selectedFactor: FactorCorrelation?
 
-    private var checkIns: [CheckIn] { profileUseCase.profile.checkIns }
+    // MARK: - Computed
+
+    var isPro: Bool { purchaseUseCase.isPro }
+
+    private var checkIns: [CheckIn] { checkInUseCase.allCheckIns }
+
+    // MARK: - Public methods
 
     func recentCheckIns(days: Int) -> [CheckIn] { calculator.recentCheckIns(from: checkIns, days: days) }
     func checkInCount(days: Int) -> Int { calculator.checkInCount(from: checkIns, days: days) }
@@ -38,8 +45,6 @@ final class InsightsViewModel {
         calculator.averageMoodByRange(from: checkIns, forFactor: keyPath)
     }
     func bestDayOfWeek(days: Int) -> String? { calculator.bestDayOfWeek(from: checkIns, days: days) }
-
-    // MARK: - UI Helpers
 
     func barColor(for mood: Mood?) -> Color {
         guard let mood else { return Color.foyBorder }

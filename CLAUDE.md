@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working in this repository.
 
 ## Git
 
@@ -8,529 +8,293 @@ Never add `Co-Authored-By: Claude` or any Claude authorship trailer to commit me
 
 ## Build & Lint
 
-**Build (iOS Simulator):**
 ```bash
 xcodebuild -project FocusOnYourself.xcodeproj -scheme FocusOnYourself \
   -destination 'generic/platform=iOS Simulator' build 2>&1 | tail -20
+swiftlint --fix && swiftlint   # also runs as an Xcode build phase
 ```
 
-**SwiftLint** runs automatically as an Xcode build phase (`swiftlint --fix` then `swiftlint`). To run manually:
-```bash
-swiftlint --fix && swiftlint
-```
+No unit tests. No Makefile/Fastfile — Xcode directly, or the `ios-app-release` skill.
 
-There are no unit tests in this project. There is no Makefile or Fastfile — all build automation uses Xcode directly or the `ios-app-release` skill.
+**SwiftLint limits:** line 130 · file 400/500 · function 75 · closure 100/150.
 
-**SwiftLint gotcha — `empty_count`**: The opt-in rule auto-converts `x.count > 0` → `!x.isEmpty`. For named tuples or types without `.isEmpty`, suppress with:
-```swift
-// swiftlint:disable:next empty_count
-.someModifier(x.count > 0 ? a : b)
-```
-
-**SwiftLint gotcha — `identifier_name`**: The spacing tokens `xs`, `sm`, `md`, `lg`, `xl`, `ys` are excluded in `.swiftlint.yml` (intentional token and math-variable names). For short local variables like `ds` or `ci`, use the full name (`dateString`, `checkIn`).
-
-**SwiftLint gotcha — `closure_body_length`**: SwiftUI `var body` closures can legitimately grow long when views are deeply composed. Suppress individual overruns with `// swiftlint:disable:next closure_body_length` only after confirming sub-view extraction would harm readability. The configured threshold is 100 lines warning / 150 lines error.
-
-**SwiftLint gotcha — Charts `BarMark.cornerRadius()`**: This is the Swift Charts modifier, not the deprecated `View.cornerRadius()`. Do not replace it with `.clipShape`; suppress with `// swiftlint:disable:next legacy_constructor` only if SwiftLint flags it.
-
-Key limits: line length 130 (error), file length 400/500, function body 75 lines, closure body 100/150 lines.
+**SwiftLint gotchas:**
+- `empty_count` auto-rewrites `x.count > 0` → `!x.isEmpty`; for tuples/types without `.isEmpty`, suppress with `// swiftlint:disable:next empty_count`.
+- `identifier_name` — `xs/sm/md/lg/xl/ys` are excluded as token names. Use full names (`dateString`, `checkIn`) for other shorts.
+- `closure_body_length` — suppress `var body` overruns with `// swiftlint:disable:next closure_body_length` only after confirming sub-view extraction would harm readability.
+- Swift Charts `BarMark.cornerRadius()` is NOT the deprecated `View.cornerRadius()` — suppress `legacy_constructor` only if flagged.
 
 ## Architecture
 
-**MVVM + Use Cases + Calculators + Factory DI, iOS 17+, SwiftUI only.**
+**MVVM + Use Cases + Calculators + Stores + Factory DI. iOS 17+, SwiftUI only.**
 
 ### Layers
 
 | Layer | Location | Rule | May depend on |
 |-------|----------|------|---------------|
-| Screen | `Features/<Feature>/<Name>Screen.swift` | Only `@State private var viewModel = …ViewModel()` — no state, no logic | ViewModel |
-| ViewModel | `Features/<Feature>/<Name>ViewModel.swift` | `@Observable @MainActor final class` — all VM state + logic. Single-VM logic lives here. Inlines device-framework code when only this VM uses that framework. | Use Cases + Services + Calculators |
-| Use Case | `Domain/UseCases/<Feature>/<Name>UseCase.swift` + protocol | **SHARED business logic** across 2+ ViewModels. May be `@Observable` if it holds reactive state (`ProfileUseCase`, `PurchaseUseCase`). Inlines device frameworks (Keychain, UserDefaults, UNUserNotificationCenter, StoreKit) that aren't network. | Services + Calculators + other state-store Use Cases (`ProfileUseCase`) |
+| Screen | `Features/<F>/<Name>Screen.swift` | `@State private var viewModel = …ViewModel()` only — no state, no logic | ViewModel |
+| ViewModel | `Features/<F>/<Name>ViewModel.swift` | `@Observable @MainActor final class`. All single-VM state + logic. Inlines device frameworks used only here. | Use Cases, Services, Calculators |
+| Use Case | `Domain/UseCases/<F>/<Name>UseCase.swift` + protocol | **Shared** business logic (2+ VMs). `@Observable` if it holds reactive state. Inlines single-consumer device frameworks. | Services, Stores, Calculators, state-store Use Cases |
 | Calculator | `Domain/Calculators/<Name>Calculator.swift` | Pure `struct`. No DI, no `@Observable`, no `@MainActor`, no `import SwiftUI`. All inputs are method args. | Nothing |
-| Service | `Services/<Domain>/<Name>Service.swift` + protocol | **NETWORK IO ONLY.** Thin: takes prepared parameters from caller, returns raw decoded data. No caching, no branching, no business logic. No device frameworks (Keychain/UserDefaults/HealthKit/etc.). | `NetworkClient` |
-| Store | `Stores/<Domain>/<Name>Store.swift` + protocol | Thin wrapper for a device-framework primitive (Keychain, UserDefaults, future DB, etc.). Same rules as Service: no business logic, no validation, no branching. | The wrapped framework |
-| Domain Model | `Domain/Models/<Name>.swift` | Plain `Codable` struct/enum — one type per file, no logic | Nothing |
-| Wire Model | `Networking/Models/<Name>.swift` | Wire-format `Codable` types (request bodies, responses, backend variants) — one type per file. Mapper extensions co-locate with the backend type. | Domain models |
-| Design System | `DesignSystem/` | Tokens — `DS+Colors.swift`, `DS+Spacing.swift`, etc. | Nothing |
-| Components | `Features/<Feature>/Components/` or `DesignSystem/Components/` | Reusable views in their own files | DesignSystem tokens, parent ViewModel |
+| Service | `Services/<D>/<Name>Service.swift` + protocol | **Network IO only.** Thin: encode → call → decode. No caching, branching, validation, state, or device frameworks. | `NetworkClient` |
+| Store | `Stores/<D>/<Name>Store.swift` + protocol | Thin wrapper for one device-framework primitive. Same rules as Service. | The wrapped framework |
+| Domain Model | `Domain/Models/<Name>.swift` | Plain `Codable` struct/enum, one type per file, no logic | Nothing |
+| Wire Model | `Networking/Models/<Name>.swift` | Wire-format `Codable`, one type per file. Mapper extensions co-locate with the backend type. | Domain models |
+| Design System | `DesignSystem/` | Tokens (`DS+Colors.swift`, `DS+Spacing.swift`, ...) | Nothing |
+| Components | `Features/<F>/Components/` or `DesignSystem/Components/` | Reusable views in their own files | DS tokens, parent VM |
 
 ### Services — network only
 
-- A Service file may contain ONLY network calls via `networkClient`. No `UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`.
-- A Service does not branch between paths, cache anything, decide when to call, validate inputs, or hold state.
-- A Service may encode typed inputs into URL/query/body (transformation for the wire) and decode the response, INCLUDING `.toBackendModel()` / `.toDomainModel()` mappings on Codable models.
-- The Service receives prepared parameters from its caller (Use Case or ViewModel) and returns the mapped models (domain types where applicable, or raw decoded backend types where translation isn't needed).
-- Services are registered as `Factory<<Name>ServiceProtocol>` in `Container+App.swift` under `// MARK: - Services`.
-
-#### Mandatory method template (ENFORCE on every Service method)
-
-Every Service method **must** follow this exact 4-line structure:
-
-```
-1. let path = "..."                                         // endpoint path (base, without query)
-2. let <param> = ... / let body = ...                       // params: encode inputs to wire format (zero or more lines)
-3. let response: <T> = try await networkClient.get/post(...)  // the call (may interpolate path + params)
-4. return response  /  return response.map { ... }          // return, with optional mapping
-```
-
-Rules:
-- Line 1 is ALWAYS `let path = "..."` — a string literal for the endpoint base, no query string here.
-- Lines 2…N are ALWAYS `let <name> = <encoded value>` — one `let` per param transformation (`categories.map(\.rawValue).joined(...)`, `Date.now.formatted(...)`, `.toBackendModel()`, etc.). Skip if there are no params.
-- The call line ALWAYS captures into `let response: T = try await networkClient.<verb>(...)`. The query string is built inline at the call site by interpolating the `path` and param `let`s (e.g. `"\(path)?date=\(date)"`).
-- The return line is either `return response` or `return response.compactMap { ... }` / `return response.map { ... }` when a domain translation is needed (typically `.toDomainModel()`).
-- For void-returning calls (POST with empty response), replace lines 3–4 with `let _: EmptyResponse = try await networkClient.post(path, body: body)` (no return statement). The discard goes on the same call line.
-- One method = one network call. If a feature needs multiple round-trips, expose multiple methods on the Service (the caller composes them).
-
-**Conforming examples:**
+Every Service method wraps the call in `do/catch` and rethrows a typed feature error via a `private static func map<Method>Error(_:)`:
 
 ```swift
-// GET with query params
-func fetchAffirmations(count: Int, for categories: [AffirmationCategory]) async throws -> [CachedAffirmation] {
-    let path = "/api/affirmations/batch"
-    let categoryParams = categories.map(\.rawValue).joined(separator: ",")
-    let response: [CachedAffirmation] = try await networkClient.get(
-        "\(path)?categories=\(categoryParams)&count=\(count)"
-    )
-    return response
-}
-
-// GET with mapping
-func fetch() async throws -> [CheckIn] {
-    let path = "/api/checkins"
-    let response: [BackendCheckIn] = try await networkClient.get(path)
-    return response.compactMap { $0.toDomainModel() }
-}
-
-// POST with body, typed response
 func login(email: String, password: String) async throws -> AuthResponse {
     let path = "/api/auth/login"
     let body = LoginBody(email: email, password: password)
-    let response: AuthResponse = try await networkClient.post(path, body: body)
-    return response
+    do {
+        let response: AuthResponse = try await networkClient.post(path, body: body)
+        return response
+    } catch {
+        throw Self.mapLoginError(error)
+    }
 }
 
-// POST with body, no response
-func post(_ checkIn: CheckIn) async throws {
-    let path = "/api/checkins"
-    let body = checkIn.toBackendModel()
-    let _: EmptyResponse = try await networkClient.post(path, body: body)
-}
-
-// GET no params
-func allSessions() async throws -> [MeditationSession] {
-    let path = "/api/meditations"
-    let response: [MeditationSession] = try await networkClient.get(path)
-    return response
+private static func mapLoginError(_ error: Error) -> AuthError {
+    switch (error as? NetworkError)?.statusCode {
+    case 401: .invalidCredentials
+    default:  .signInFailed
+    }
 }
 ```
 
-**Forbidden in Service methods (violations of the template):**
-- `guard !x.isEmpty else { return [] }` — validation belongs to the caller
-- `if/else` branching between alternate paths — split into two methods instead (`allSessions()` + `sessions(in:)`)
-- Inline `Date.now` or other runtime decisions that aren't pure encoding — the caller provides the value when it's a business decision
-- Caching, retry loops, fallback logic — those belong in the Use Case or ViewModel
+Shape inside the `do`: (1) `let path = "…"`, (2) zero-or-more `let` lines encoding params, (3) `let response: T = try await networkClient.<verb>(…)`, (4) `return response` (or `.compactMap { $0.toDomainModel() }` when wire ≠ domain). The trailing `catch { throw Self.map<Method>Error(error) }` is mandatory — one mapper per method, even when trivial (`{ .fetchFailed }`).
 
-**Invariant** (run to verify): `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` — must return empty.
+- One method = one network call. Multiple round-trips? Multiple methods, caller composes.
+- Void POST: `let _: EmptyResponse = try await networkClient.post(path, body: body)`, no `return`.
 
-### Stores — device-framework IO (Keychain, UserDefaults, future DB)
+**Typed errors.** Each feature has an `enum <Feature>Error: UserFacingError, Equatable` at `Domain/Errors/<Feature>Error.swift`, one type per file. `UserFacingError` exposes `errorTitle: String` and `errorDescription: String?`. Status-code branching lives only inside mappers; `NetworkError` never crosses out of `Services/`. VMs catch the typed error and use `ErrorInfo(error)`:
 
-Stores are the peer of Services for non-network device frameworks. Same rules as Services: thin, one external system per Store, no business logic. Registered in `Container+App.swift` under `// MARK: - Stores`.
+```swift
+} catch let error as AuthError {
+    self.error = ErrorInfo(error)
+} catch {
+    self.error = ErrorInfo(title: "Sign in failed", description: "Please try again.")
+}
+```
 
-**Existing Stores:**
-- `KeychainStore` — SwiftSecurity Keychain access (`save(_:for:)`, `load(_:)`, `delete(_:)` by string key). Account namespace is fixed to `"FocusOnYourself"`.
-- `UserDefaultsStore` — App Group UserDefaults access (`data` / `bool` / `string` getters + setters + `remove`, all typed by `UserDefaultsKey`).
+**Forbidden in a Service:** validation (`guard !x.isEmpty`), branching between paths (split into two methods), inline `Date.now`/runtime decisions (caller passes in), caching, retries, fallbacks, state, OR any device framework (`UserDefaults`, `Keychain`, `HealthKit`, `StoreKit`, `AVAudio`, `UNUserNotificationCenter`, `FoundationModels`).
 
-**Extraction rule** — same as for Use Cases: extract to a Store when 2+ consumers (Use Cases or ViewModels) need the same device-framework primitive. Single-consumer frameworks stay inlined in their sole consumer:
+**Two files per Service:** `<Name>ServiceProtocol.swift` + `<Name>Service.swift`. Plain `final class`, injects `networkClient` only. Registered as `Factory<<Name>ServiceProtocol>` in `Container+App.swift` under `// MARK: - Services`.
+
+**Invariant:** `grep -rln "UserDefaults\|Keychain\|HealthKit\|StoreKit\|AVAudio\|UNUserNotificationCenter\|FoundationModels" FocusOnYourself/Services/ --include="*.swift"` → empty.
+
+### Stores — device-framework IO
+
+Stores are the non-network peer of Services. Same rules: thin, one external system, no business logic, no state beyond constants, no knowledge of key meanings. Registered under `// MARK: - Stores`.
+
+**Existing:** `KeychainStore` (SwiftSecurity, account namespace `"FocusOnYourself"`) · `UserDefaultsStore` (App Group, typed by `UserDefaultsKey`).
+
+**Extraction rule** — same as Use Cases: extract to a Store when a 2nd consumer (Use Case or VM) needs the same primitive. Until then, the framework is inlined in its sole consumer:
 
 | Framework | Status |
 |-----------|--------|
-| Keychain (SwiftSecurity) | ✓ Store (used by AuthUseCase + URLSessionNetworkClient) |
-| UserDefaults | ✓ Store (used by 5 consumers) |
-| HealthKit | inlined in HomeViewModel (single consumer) |
-| AVAudio | inlined in MeditationPlayerViewModel (single consumer) |
-| StoreKit | inlined in PurchaseUseCase (single consumer) |
-| UNUserNotificationCenter | inlined in NotificationsUseCase (single consumer) |
-| FoundationModels | inlined in HomeViewModel (single consumer) |
+| Keychain | Store (AuthUseCase + URLSessionNetworkClient) |
+| UserDefaults | Store (5 consumers) |
+| HealthKit | inlined in HomeViewModel |
+| AVAudio | inlined in MeditationPlayerViewModel |
+| StoreKit | inlined in PurchaseUseCase |
+| UNUserNotificationCenter | inlined in NotificationsUseCase |
+| FoundationModels | inlined in HomeViewModel |
 
-When a second consumer for any inlined framework appears, extract to a Store at the same time as you migrate the new consumer.
+**Callers:** Use Cases (preferred), ViewModels (for single-VM keys, same rule as Services), `NetworkClient` (auth header).
 
-**Forbidden in a Store**:
-- Business logic, validation, branching between alternate paths
-- Holding state beyond constants
-- Knowing the meaning of specific keys (e.g. `UserDefaultsStore` takes a generic `UserDefaultsKey`; consumers know what each key is for)
+**Invariants:** `grep -rn "Keychain.default" FocusOnYourself --include="*.swift" | grep -v "Stores/Keychain/"` and `grep -rn "UserDefaults(suiteName:" FocusOnYourself --include="*.swift" | grep -v "Stores/UserDefaults/"` → empty.
 
-**Allowed callers**:
-- Use Cases (preferred — wraps access in a business operation)
-- ViewModels (for single-VM keys, same rule as Services)
-- The `NetworkClient` (auth header injection — token reading is network plumbing)
-
-**Future Stores**: when we add SwiftData / GRDB / SQLite, it'll live here as `Stores/Database/DatabaseStore.swift` following the same shape.
-
-**Invariants** (run to verify):
-```bash
-# Inline Keychain.default outside Stores/Keychain/ → empty
-grep -rn "Keychain.default" FocusOnYourself --include="*.swift" | grep -v "Stores/Keychain/"
-
-# Inline UserDefaults(suiteName: outside Stores/UserDefaults/ → empty
-grep -rn "UserDefaults(suiteName:" FocusOnYourself --include="*.swift" | grep -v "Stores/UserDefaults/"
-```
-
-### Models — placement, one-per-file, and domain mappers
+### Models — placement, one-per-file, and mappers
 
 **Folder split:**
-- `Domain/Models/` — domain types (the language of the business): `CheckIn`, `CheckInFactors`, `Mood`, `UserProfile`, `AffirmationCategory`, `MeditationCategory`, `ArticleTopic`, `PendingWidgetCheckIn`, `ProductID`, `PurchaseError`, `PurchaseOutcome`, `UserDefaultsKey`, etc.
-- `Networking/Models/` — wire-format ONLY (request bodies, response payloads, backend variants, shared envelopes): `AuthResponse`, `LoginBody`, `RefreshBody`, `BackendCheckIn`, `ImportCheckInsBody`, `Article`, `MeditationSession`, `MeditationStep`, `CachedAffirmation`, `EmptyResponse`, etc.
+- `Domain/Models/` — business language: `CheckIn`, `Mood`, `UserProfile`, `AffirmationCategory`, `ProductID`, `UserDefaultsKey`, etc.
+- `Networking/Models/` — wire-format only: `<Action>Body`, `<Action>Response` / `Backend<Domain>`, shared `EmptyResponse`, etc.
 
-**One struct/enum per file.** Every top-level type lives in its own file named after the type (`<TypeName>.swift`). No grouping multiple types in one file even when they're conceptually related (e.g. `MeditationStep` does NOT live in `MeditationSession.swift`; `ImportCheckInsBody` does NOT live in `BackendCheckIn.swift`).
+**One top-level type per file**, file named after the type. No grouping conceptually-related types (e.g. `MeditationStep` ≠ `MeditationSession.swift`).
 
-**Exception — mapper extensions co-locate with the backend type.** When a backend model needs `toBackendModel()` / `toDomainModel()` mappers, BOTH extensions live in the **backend type's file** (e.g. `Networking/Models/BackendCheckIn.swift` contains the `BackendCheckIn` struct, the `extension CheckIn { toBackendModel() }`, and the `extension BackendCheckIn { toDomainModel() }`). This is the only case where a model file contains more than one top-level declaration.
+**Exception:** when a backend model needs `toBackendModel()` / `toDomainModel()` mappers, BOTH extensions live in the **backend type's file** (the only case where a model file contains > 1 top-level decl).
 
-**Naming conventions in `Networking/Models/`:**
-- Request body: `<Action>Body` (e.g. `LoginBody`, `RefreshBody`, `ImportCheckInsBody`)
-- Response payload: `<Action>Response` (e.g. `AuthResponse`, `RefreshResponse`) OR `Backend<DomainType>` when the response is a backend-shaped variant of a domain type (e.g. `BackendCheckIn`)
-- Empty/discard response: shared `EmptyResponse`
-
-**Domain mappers — REQUIRED both ways when the wire shape differs from the domain shape.** If a backend model has even one field that needs validation, renaming, enum conversion, or restructuring before it becomes a domain model, BOTH mappers must exist in the backend model file:
-
-```swift
-// Networking/Models/BackendCheckIn.swift
-
-struct BackendCheckIn: Codable {
-    let date: String
-    let mood: String
-    let feelingsDescription: String?
-    let factors: BackendCheckInFactors?
-}
-
-extension CheckIn {
-    func toBackendModel() -> BackendCheckIn { … }   // outbound: domain → API
-}
-
-extension BackendCheckIn {
-    func toDomainModel() -> CheckIn? { … }          // inbound: API → domain
-}
-```
-
-**Mapper rules:**
-- Naming: ALWAYS `toBackendModel()` and `toDomainModel()`. No other names.
-- Both extensions live in the **backend model file** (`Networking/Models/<Backend>.swift`), never split across files.
-- `toDomainModel()` returns an **optional** when any field can fail validation (e.g. `guard let mood = Mood(rawValue: rawMood)`). Call sites use `compactMap { $0.toDomainModel() }` to filter invalid entries.
-- `toBackendModel()` returns non-optional — the domain model is already valid by construction.
+**Mapper rules** — required both ways when wire ≠ domain:
+- Names: ALWAYS `toBackendModel()` (non-optional) and `toDomainModel()` (optional when any field can fail validation; call sites use `compactMap`).
+- Both extensions in the backend file (`Networking/Models/<Backend>.swift`).
 - Enum conversion: `.rawValue` outbound; guarded `Enum(rawValue:)` inbound.
-- Optional sub-model groups: collect multiple optional fields into an optional struct using an inline closure:
-  ```swift
-  let factors: CheckInFactors? = {
-      guard let sleepQuality, let stressLevel,
-            let exercised, let socialQuality else { return nil }
-      return CheckInFactors(…)
-  }()
-  ```
+- Optional sub-model groups: collect via inline closure: `let factors: CheckInFactors? = { guard let a, let b else { return nil }; return CheckInFactors(...) }()`.
 
-**When mappers are NOT required**: if a backend model is used directly without translation (the wire shape matches the consumer's needs exactly), no mapper is needed. Examples: `LoginBody`, `RefreshBody`, `AuthResponse`, `EmptyResponse` — they're used as-is. But the moment a domain type needs a different shape from the wire, both mappers MUST exist together.
+Direct-use wire models (`LoginBody`, `RefreshBody`, `AuthResponse`, `EmptyResponse`) need no mapper.
 
-**Invariant** (run to verify): `ls FocusOnYourself/Models/ | xargs -I{} grep -l "Codable" FocusOnYourself/Models/{}` — files listed here that are network request/response shapes belong in `Networking/Models/` instead. Domain models in `Models/` may still be `Codable` (for UserDefaults persistence), but they aren't network wire formats.
+### Use Cases — shared logic only
 
-### Use Cases — only when SHARED across 2+ ViewModels
+- Create one ONLY when 2+ ViewModels need the same operation. Single-VM logic stays in the VM.
+- One Use Case per feature domain; group related operations (`CheckInUseCase` does record/streak/merge/queries).
+- `@Observable @MainActor final class` when holding reactive state (`ProfileUseCase`, `PurchaseUseCase`). Otherwise plain `final class @MainActor`.
+- May inject Services, Stores, hold Calculators (`private let`), inline single-consumer device frameworks, and inject other Use Cases when **delegating** (see below).
 
-- Create a Use Case when (and only when) two or more ViewModels need the same operation. Single-VM logic stays in the ViewModel.
-- One Use Case per feature domain; group related operations together (`CheckInUseCase` covers `record`, `streakStats`, `mergeWidgetCheckIn`, query properties).
-- A Use Case may be `@Observable` when it holds reactive state (`ProfileUseCase` holds `UserProfile`, `PurchaseUseCase` holds `isPro`). Otherwise it's plain `final class @MainActor`.
-- A Use Case may inject Services (network) + Stores (Keychain, UserDefaults), may hold Calculators as `private let`, and may inline single-consumer device frameworks (UNUserNotificationCenter in NotificationsUseCase, StoreKit in PurchaseUseCase, etc.). Multi-consumer device frameworks always go through a Store (see "Stores" section above).
-- A Use Case MAY inject other Use Cases when delegating ownership of another feature's data or operations (see "Tell, Don't Ask" below). The dependency graph must remain acyclic.
+**Tell, Don't Ask** — when a Use Case needs work involving another feature's data or services, inject that feature's Use Case and call a method on it. NEVER read its state out and operate on it locally.
 
-#### Tell, Don't Ask — delegate to the owner
+❌ `AuthUseCase` reads `profileUseCase.profile.checkIns` then calls `checkinsService.importAll(...)` — feature envy.
+✅ `AuthUseCase` calls `checkInUseCase.uploadAllToServer()` / `downloadAndReplaceFromServer()` — owner decides how.
 
-**Rule**: when a Use Case needs work that involves data or services owned by another feature, it SHALL inject that feature's Use Case and call a method on it — NOT read the data out and operate on it locally.
+Smell: `someUseCase.someData` read followed by `otherService.someMethod` call → add a method to `someUseCase` and delegate.
 
-**Why**: reading `otherUseCase.someProperty` and then calling a third service is feature envy. It leaks the other feature's storage shape and service choice into the calling Use Case, making both harder to change.
-
-**Bad** — `AuthUseCase` reaches into check-in state AND uses the check-in network service:
-```swift
-@Injected(\.checkinsService) private var checkinsService
-@Injected(\.profileUseCase) private var profileUseCase
-
-private func uploadLocalCheckIns() async {
-    let checkIns = profileUseCase.profile.checkIns       // ← reads another feature's data
-    guard !checkIns.isEmpty else { return }
-    try? await checkinsService.importAll(checkIns)       // ← calls another feature's service
-}
-```
-
-**Good** — `AuthUseCase` tells `CheckInUseCase` to sync:
-```swift
-@Injected(\.checkInUseCase) private var checkInUseCase
-
-// in register():
-try? await checkInUseCase.uploadAllToServer()
-
-// in signIn():
-try? await checkInUseCase.downloadAndReplaceFromServer()
-```
-
-`CheckInUseCase` owns its data + service choice. `AuthUseCase` knows only "tell check-ins to sync" — nothing about how.
-
-**How to spot the smell**: if a Use Case method reads `otherUseCase.someData` and then calls `someService.someMethod`, that work belongs on the other Use Case. Add a method to it (`uploadAllToServer`, `replaceFromServer`, etc.) and delegate.
-
-**When to extract from VM → Use Case**:
-- ViewModel A has logic X. ViewModel B now also needs X.
-- Create `XUseCase` (or fold into an existing relevant Use Case). Move the logic. Both VMs inject the Use Case.
-- This is the only trigger — don't extract preemptively.
+**VM → Use Case extraction trigger:** ViewModel B now needs logic that exists in ViewModel A. Create the Use Case (or fold into existing). No preemptive extraction.
 
 ### Calculators — pure SOLID logic
 
-Calculators are the SOLID slot of the architecture: pure `struct`s with no dependencies, no state, no side effects. Given inputs, return outputs. They are HELD BY Use Cases / ViewModels (`private let calculator = XCalculator()`) and used to delegate pure math out of the caller.
+Pure `struct`s, held by Use Cases / VMs as `private let calc = XCalculator()`. Given inputs, return outputs.
 
-#### Rule 1 — When to extract a Calculator (vs inline)
+**Extract when ALL true:** pure (no IO/state/side effects), worth a name (≥ 10 LOC OR ≥ 2 test-worthy edges OR shared by 2+ consumers), reusable in concept. Otherwise inline as `private func`.
 
-Extract when ALL three are true:
-1. **Pure** — no IO, no state, no framework side effects
-2. **Worth a name** — ≥ 10 LOC, OR ≥ 2 test-worthy edge cases, OR shared by 2+ consumers
-3. **Reusable in concept** — a future feature might want the same transform
+**Naming:** every file in `Domain/Calculators/` ends with `Calculator` suffix. No `…Checker/Helper/Validator/Parser`.
 
-Otherwise inline as `private func` in the consumer. Don't pre-extract.
+**One responsibility — the "and" test:** if the name needs "X and Y", split it. Methods within a Calculator MUST share an input domain OR contribute to the same output kind.
 
-**Naming**: every file in `Domain/Calculators/` SHALL end with the `Calculator` suffix — `StreakCalculator`, `InsightsCalculator`, `MoodHealthKitCalculator`, `DistributionCalculator`, `DailyCacheCalculator`, `JWTExpiryCalculator`. No `…Checker`, `…Helper`, `…Validator`, `…Parser`. The folder is "Calculators" — every member is one.
+**Splitting a big method (> ~25 LOC):**
+1. Read the body as English sentences → each sentence = one responsibility.
+2. Extract each as a named `private func` (verbs: `entriesWithFactors(_:)`, `correlate(_:factor:moods:)`).
+3. Promote a private helper to its own Calculator only if reused elsewhere.
+4. Hard limit 75 LOC (SwiftLint); soft target ≤ 25 LOC per public method.
 
-#### Rule 2 — Calculator vs Use Case vs ViewModel — the decision tree
+**Forbidden:** `@Injected`, `@Observable`, `@MainActor`, `import SwiftUI`/`Charts`, mutating instance state, `print`/IO, holding refs to Services/Stores/Use Cases/other Calculators.
 
-```
-Has IO / state / side effects?
-├── NO  → Calculator (≥ 10 LOC) OR private func in the consumer
-└── YES → Shared across 2+ ViewModels?
-         ├── YES → Use Case
-         └── NO  → keep in the single ViewModel
-```
+**Allowed:** `Int.random` etc. when randomness is part of the algorithmic contract.
 
-Calculators do the math. Use Cases / ViewModels do the IO around the math.
+### ViewModels
 
-#### Rule 3 — One responsibility per Calculator (the "and" test)
+- `@Observable @MainActor final class`. Never `ObservableObject`/`@Published`.
+- May inject Use Cases AND Services directly (for single-VM ops). May inline device frameworks until a 2nd VM needs them.
+- `Container.shared.resolve(...)` is forbidden in any layer.
 
-A Calculator's name must be a single noun phrase you can defend without "and". If you need "X and Y calculator" to describe it, split it.
+**Canonical member order** — every VM follows this layout. `AccountViewModel` is the reference:
 
-**Cohesion test**: methods within a Calculator MUST share an input domain OR contribute to the same kind of output.
-- ✓ `StreakCalculator` — all methods take `[CheckIn]`, return streak values
-- ✓ `MoodHealthKitCalculator` — all methods translate `Mood` → HealthKit types
-- ✓ `InsightsCalculator` — 14 methods but all take `[CheckIn]`, return insight values (broad but cohesive)
-- ✗ Bad example (the now-split `AffirmationCalculator` was this): method A took `(Int, Int)`, B took `(String, Int)`, C took `(Category, Int)` — three input domains = three responsibilities
-
-#### Rule 4 — How to split a big method
-
-When a method exceeds ~25 LOC or contains multiple distinct sub-tasks:
-
-1. **Read the body as English sentences.** Each sentence = one responsibility.
-2. **Extract each sub-task as a named `private func`** in the same Calculator. The orchestrator becomes a list of named steps that reads like prose.
-3. **Helper names read like verbs**: `entriesWithFactors(_:)`, `correlate(_:factor:moods:)`, `groupByRange(_:keyPath:)`.
-4. **Promote** a private helper to its own Calculator only if reused elsewhere.
-5. **Hard limit**: 75 LOC per function (SwiftLint). **Soft target**: ≤ 25 LOC per public method.
-
-Worked example:
 ```swift
-// Before (one big method doing 4 things):
-func factorCorrelations(from checkIns: [CheckIn]) -> [FactorCorrelation] {
-    let entries = checkIns.filter { $0.factors != nil }
-    guard entries.count >= Self.factorMinimum else { return [] }
-    let moods = entries.map { Double($0.mood.numericValue) }
-    var results: [FactorCorrelation] = []
-    // ... 4× correlate ...
-    return results.sorted { abs($0.pearsonR) > abs($1.pearsonR) }
-}
+@Observable @MainActor
+final class FooViewModel {
+    // 1. @ObservationIgnored dependencies and non-observable storage
+    @ObservationIgnored @Injected(\.barUseCase) private var barUseCase
+    @ObservationIgnored private var loadTask: Task<Void, Never>?
+    private let calculator = FooCalculator()
 
-// After (orchestrator reads as named steps):
-func factorCorrelations(from checkIns: [CheckIn]) -> [FactorCorrelation] {
-    let entries = entriesWithFactors(checkIns)
-    guard meetsMinimumCount(entries) else { return [] }
-    return correlateAllFactors(entries).sorted { abs($0.pearsonR) > abs($1.pearsonR) }
+    // MARK: - State
+    // 2. Observable stored properties (the @Observable surface)
+    var input = ""
+    var error: ErrorInfo?
+
+    // MARK: - Computed
+    // 3. Computed properties (re-exposures, derived values)
+    var isPro: Bool { purchaseUseCase.isPro }
+
+    // 4. init (if any)
+
+    // MARK: - Public methods
+    // 5. Public async/sync methods
+
+    // MARK: - Private methods
+    // 6. Private helpers (only when present)
 }
 ```
 
-#### Rule 5 — Forbidden in Calculators
-
-- `@Injected` — no DI
-- `@Observable` / `@MainActor`
-- `import SwiftUI` / `import Charts` / any UI framework (`import HealthKit` etc. is OK for type-mapping calculators)
-- Mutating instance state — calculators are stateless; use `let` and return values
-- `print`, logging, FileManager, URLSession, anything with side effects
-- Holding a reference to a Service / Store / Use Case / other Calculator
-
-#### Rule 6 — Pragmatic exception for random algorithms
-
-A Calculator may use `Int.random` etc. when randomness is part of its algorithmic contract (e.g. fair distribution). The output is deterministic given the same random seed. Don't extract for seedable testing unless you actually need it.
-
-### ViewModels — inject Use Cases and/or Services
-
-- `@Observable @MainActor final class`.
-- May inject Use Cases for shared logic, and Services directly for single-VM operations.
-- May inline device-framework code (HealthKit, AVAudio, FoundationModels) when only this VM uses that framework. Pull it into a Use Case as soon as a 2nd VM needs the framework.
-- `Container.shared.resolve(...)` is forbidden.
-
-### When adding a new feature
-
-1. If it touches a new network endpoint → add a Service (and protocol) under `Services/<Domain>/`. Network only.
-2. If it has pure logic ≥ ~10 lines (math, transforms, validation) → add a Calculator under `Domain/Calculators/`.
-3. Implement the feature in the ViewModel using the Service / Calculator directly. Inline device frameworks inside the VM if needed.
-4. If/when a second ViewModel needs the same logic, extract it to a Use Case under `Domain/UseCases/<Feature>/` and register it in `App/Container+App.swift`.
-5. Never put business logic in a Service. Never duplicate logic across VMs — extract on second use.
+Function NEVER between properties of the same kind. Use the exact MARK strings above (`// MARK: - State`, `// MARK: - Computed`, `// MARK: - Public methods`, `// MARK: - Private methods`) so all VMs read the same way. Tiny VMs (one stored var, no computed) may omit MARKs. Nested types follow the global rule — declared last (see [Member ordering](#member-ordering-classstruct)) even when used by a stored property at the top.
 
 ### Forbidden patterns
 
-- Business logic in a Service (caching dates, branching on flags, transformation rules).
-- Device-framework code in `Services/` (Keychain, UserDefaults, HealthKit, StoreKit, AVAudio, UNUserNotificationCenter, FoundationModels). These live in Use Cases or ViewModels.
-- A Use Case used by only one ViewModel (dissolve into that VM until a 2nd consumer appears).
-- `Container.shared.resolve(...)` in any layer.
-- A Use Case injecting another non-state-store Use Case.
-
-### There is NO Repository layer
-
-The Repository pattern was removed (see OpenSpec change `vm-single-layer-use-cases`). Operations that previously sat in a `*RepositoryImpl` are inlined into the corresponding Use Case. Do not introduce new files under `Domain/Repositories/` or `Data/`.
+- Business logic in a Service · device frameworks in `Services/` · single-VM Use Case · `Container.shared.resolve(...)` · a non-state-store Use Case injecting another Use Case (besides delegation to a state-store).
+- No Repository layer — removed (see OpenSpec `vm-single-layer-use-cases`). Don't create `Domain/Repositories/` or `Data/`.
+- Never `NotificationCenter` for cross-layer state — use `@Observable` or async sequences.
 
 ### Dependency Injection (Factory)
 
-All Services and Use Cases are registered as singletons in `App/Container+App.swift` using their **protocol type** — never the concrete class. Registrations are organised into `// MARK: -` sections: Services (network), Use Cases.
+All Services / Use Cases / Stores are singletons registered by **protocol type** in `App/Container+App.swift`, grouped by `// MARK: - Services` / `// MARK: - Stores` / `// MARK: - Use Cases`:
 
 ```swift
-// MARK: - Services (network only)
 var affirmationService: Factory<AffirmationServiceProtocol> {
     self { @MainActor in AffirmationService() }.singleton
 }
-
-// MARK: - Use Cases
 var profileUseCase: Factory<ProfileUseCaseProtocol> {
     self { @MainActor in ProfileUseCase() }.singleton
 }
 ```
 
-ViewModels inject Use Cases AND, when appropriate, Services directly:
+Inside `@Observable` classes, ALWAYS pair `@ObservationIgnored` with `@Injected` (avoids backing-storage name collision). When mutating tracked properties from inside the class, assign to `self.property` — never `_property` (bypasses observation).
 
 ```swift
 @Observable @MainActor final class HomeViewModel {
-    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase     // shared
-    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase     // shared
-    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService // single-VM
-    private let healthStore = HKHealthStore()                                        // inlined framework
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.affirmationService) private var affirmationService
+    private let healthStore = HKHealthStore()
 }
 ```
 
-Use Cases inject Services and hold Calculators as `private let`. State-store Use Cases (`ProfileUseCase`, `PurchaseUseCase`) are `@Observable`:
+### Data persistence
 
-```swift
-@Observable @MainActor
-final class ProfileUseCase: ProfileUseCaseProtocol {
-    private(set) var profile = UserProfile()
-    private let defaults = UserDefaults(suiteName: AppGroup.suiteName) ?? .standard
-}
-```
-
-Views never call `Container.shared.resolve()`.
-
-### Data Persistence
-
-**No CoreData, no Firebase.** All data is JSON-serialized `Codable` structs stored in:
-- `NSUbiquitousKeyValueStore` (iCloud KVS) — syncs across devices
+No CoreData, no Firebase. All data is JSON-encoded `Codable` in:
+- `NSUbiquitousKeyValueStore` (iCloud KVS) — cross-device sync
 - App Group UserDefaults (`group.app.ddworks.FocusOnYourself`) — shared with widgets
 
-Keys are defined in the `UserDefaultsKey` enum at `Domain/Models/UserDefaultsKey.swift`. All UserDefaults access goes through `UserDefaultsStore` (`Stores/UserDefaults/`) — Use Cases and ViewModels inject `@Injected(\.userDefaultsStore)` rather than instantiating `UserDefaults` directly.
+Keys in `UserDefaultsKey` enum at `Domain/Models/UserDefaultsKey.swift`; access via `UserDefaultsStore`. Root model is `UserProfile` (contains `[CheckIn]`); `ProfileUseCase` is the `@Observable` state store — loads on init, persists on `updateProfile`, calls `WidgetCenter.shared.reloadAllTimelines()`.
 
-The root model is `UserProfile` (contains `[CheckIn]`). `ProfileUseCase` is the `@Observable` state store: it loads `UserProfile` on init, persists on every `updateProfile`, and triggers `WidgetCenter.shared.reloadAllTimelines()`. All profile reads / writes go through `ProfileUseCase`.
+### State propagation
 
-### State Propagation
-
-`ProfileUseCase` and `PurchaseUseCase` are the `@Observable` state stores. Reactive reads flow: View body → ViewModel computed property → Use Case property. SwiftUI's observation system tracks the underlying `@Observable` access transitively, so the View re-renders automatically when the state changes. Use Cases that expose reactive state from another `@Observable` Use Case must expose it as a **computed property** (e.g. `var isPro: Bool { purchaseUseCase.isPro }`) — never cache the value, or the reactivity breaks.
+`ProfileUseCase` and `PurchaseUseCase` are the `@Observable` state stores. Flow: View → VM computed property → Use Case property. Use Cases re-exposing another Use Case's reactive state must use a **computed property** (`var isPro: Bool { purchaseUseCase.isPro }`) — never cache, or reactivity breaks.
 
 ### Navigation
 
-- Root (`ContentView`) switches between `OnboardingFlow` and `MainTabView` based on `AppRootViewModel.onboardingCompleted` (computed from `ProfileUseCase.profile`).
-- `MainTabView` has 4 tabs driven by `AppTab` enum: Check-In, Meditate, History/Insights, Settings. (enum cases: `.checkin`, `.meditate`, `.historyInsights`, `.settings`)
-- Use `NavigationStack` with typed route enums per feature. Never use `NavigationView`.
+- Root `ContentView` switches `OnboardingFlow` vs `MainTabView` from `AppRootViewModel.onboardingCompleted`.
+- `MainTabView` 4 tabs from `AppTab`: `.checkin`, `.meditate`, `.historyInsights`, `.settings`.
+- Always `NavigationStack` + typed route enums per feature (`FeatureRoute.swift`). Never `NavigationView`.
 
 ### Widgets
 
-Two widgets (`MoodWidget`, `StreakWidget`) in the `FocusOnYourselfWidgets` target read data from the shared App Group. They do **not** import any main-target files — widget-specific model copies live in `WidgetDataProvider.swift`. Keep widget models in sync with main-app models manually when changing `CheckIn`, `Mood`, or `UserProfile`.
+`MoodWidget` + `StreakWidget` in `FocusOnYourselfWidgets` read App Group data. Widgets do NOT import main-target files — `WidgetDataProvider.swift` holds mirror copies (`WidgetPendingCheckIn`, etc.). When modifying `CheckIn`/`Mood`/`UserProfile`/`PendingWidgetCheckIn`, update the mirror field-for-field (same names, types, order) — both sides decode the same UserDefaults bytes.
 
-## Design System Tokens
+## SwiftUI conventions
 
-Always use tokens — never raw numbers or colors inline.
+### Code is the single source of truth
 
-| What | Token source |
-|------|-------------|
-| Colors | `Color.foyNavy`, `Color.foyBackground`, `Color.foyCard`, `Color.foyOrange`, etc. |
-| Spacing | `Spacing.xs/sm/md/lg/xl/xxl` (xxxs=4 → xxl=32) |
-| Corner radius | `CornerRadius.*` |
-| Typography | `.font(.foyBody)`, `.foyBodyStyle()`, etc. |
+Swift code is authoritative. Design files (Pencil, Figma) are generated outputs. Code wins on disagreement; tokens are defined in Swift first; never block a code change on a design file.
 
-For one-off sizes with no matching token, extract to a `private let` at the top of the struct.
+### Apply `swiftui-pro` rules
 
-Always add `.scrollIndicators(.hidden)` to every `ScrollView`.
+- Modern API: `overlay { }` not `overlay(_:)` · `foregroundStyle` not `foregroundColor` · `.clipShape(.rect(cornerRadius:))` not `cornerRadius()`.
+- A11y: VoiceOver labels on icon-only buttons; `accessibilityHidden(true)` on decorative images.
+- Always pass `value:` to `.animation(...)`.
 
-## Key Files
+### Design tokens — always
 
-- `App/Container+App.swift` — all service registrations; add new services here
-- `Domain/UseCases/Profile/ProfileUseCase.swift` — `@Observable` state store for `UserProfile`; owns load/persist + widget reload
-- `Domain/UseCases/CheckIn/CheckInUseCase.swift` — check-in CRUD + streak via `StreakCalculator`
-- `Domain/UseCases/Auth/AuthUseCase.swift` — login/register/refresh + post-auth sync (uses `KeychainStore`)
-- `Domain/UseCases/Purchase/PurchaseUseCase.swift` — `@Observable` `isPro` + StoreKit
-- `Models/UserDefaultsKey.swift` — App Group UserDefaults key enum
-- `Domain/Models/UserProfile.swift` + `Domain/Models/CheckIn.swift` — core domain models
-- `Networking/Models/Article.swift` + `Networking/Models/MeditationSession.swift` — API response models
-- `DesignSystem/DS+Colors.swift` — full color token list
-- `DesignSystem/DS+Spacing.swift` — spacing scale
-- `FocusOnYourselfWidgets/WidgetDataProvider.swift` — widget data layer (keep in sync with main models)
-
-## Swift/SwiftUI Conventions
-
-### Code is the Single Source of Truth
-
-Swift code is always authoritative. Design files (Pencil, Figma) are generated outputs — never the source of requirements.
-- When code and a design file disagree, code wins.
-- Design tokens are defined in Swift first, then synced to design tools.
-- Never hold up a code change because a design file hasn't been updated.
-
-When writing or reviewing any SwiftUI view, also apply **`swiftui-pro`** rules:
-- Deprecated API: `overlay(_:)` → `overlay { }`, `foregroundColor` → `foregroundStyle`, `cornerRadius()` → `clipShape(.rect(cornerRadius:))`
-- Accessibility: VoiceOver labels on icon-only buttons, `accessibilityHidden(true)` on decorative images
-- Always supply a `value:` to `.animation()`
-
-### Design System Tokens
-
-Always use tokens — never raw values:
-
-| What | Use | Never use |
-|------|-----|-----------|
-| Colors | `Color.foyBackground`, `Color.foyNavy`, `Color.foyForeground`, etc. | `.blue`, `Color(hex:)`, `UIColor` literals |
-| Spacing | `Spacing.xs/sm/md/lg/xl/xxl` | `8`, `16`, `24` as magic numbers |
+| What | Token | Never |
+|------|-------|-------|
+| Colors | `Color.foy*` | `.blue`, `Color(hex:)`, `UIColor` literals |
+| Spacing | `Spacing.xs/sm/md/lg/xl/xxl` (xxxs=4 → xxl=32) | raw `8`, `16`, `24` |
 | Corner radius | `CornerRadius.*` | `10`, `12`, `.cornerRadius(8)` |
-| Typography | `.font(.foyNavTitle)`, `.font(.foyBody)`, etc. | `.font(.system(size: 40))` |
+| Typography | `.font(.foy*)`, `.foy*Style()` | `.font(.system(size: 40))` |
 
-`Spacing.*` everywhere padding or spacing appears: `.padding(Spacing.md)`, `VStack(spacing: Spacing.sm)`, `HStack(spacing: Spacing.xs)`, `Spacer(minLength: Spacing.md)`.
+Use everywhere padding/spacing appears: `.padding(Spacing.md)`, `VStack(spacing: Spacing.sm)`, `HStack(spacing: Spacing.xs)`, `Spacer(minLength: Spacing.md)`. Corners: `.clipShape(RoundedRectangle(cornerRadius: CornerRadius.lg))`.
 
-`CornerRadius.*` for all corner radii: `.clipShape(RoundedRectangle(cornerRadius: CornerRadius.lg))`.
+**Exceptions:** `.frame(width:height:)` / `.frame(maxWidth:)` don't use tokens. One-off values → `private let` at top of struct, never inline. Missing token? Add it to `DS+Spacing.swift` / `DS+CornerRadius.swift`.
 
-**Exception:** `.frame(width:height:)` and `.frame(maxWidth:)` do not use tokens.
+Always `.scrollIndicators(.hidden)` on every `ScrollView`. Never the deprecated `showsIndicators: false` initializer parameter.
 
-**One-off values:** extract to `private let` at top of struct — never inline.
+Full token sets live in `DesignSystem/DS+Colors.swift`, `DS+Typography.swift`, `DS+Spacing.swift`, `DS+CornerRadius.swift` — grep there for the canonical names.
 
-Always `.scrollIndicators(.hidden)` on every `ScrollView`. Never use deprecated `showsIndicators: false` initializer parameter.
-
-**Color tokens:** `foyBackground`, `foyCard`, `foyForeground`, `foyForegroundSecondary`, `foyPlaceholder`, `foyBorder`, `foyButtonDisabled`, `foyNavy`, `foyNavyTint`, `foyOrange`, `foyOrangeTint`, `foyOrangeAccent`, `foyMoodBackground`, `foyCalendarSkipped`, `foyDetailPencil`, `foyDetailDotFill`, `foyDetailDotStroke`, `foyGreen`, `foyGreenTint`, `foyOnPrimary`, `foyScrim`, `foyUpgradeCardBg`, `foyUpgradeCardBorder`, `foyUpgradeIconBg`, `foyFreeBadgeBg`
-
-**Typography tokens:** `.foyDisplayTitle`, `.foySectionTitle`, `.foyNavTitle`, `.foyHeadline`, `.foyBody`, `.foyBodyMedium`, `.foyBodySemibold`, `.foyButtonLabel`, `.foyInputText`, `.foyQuote`, `.foyCaption`, `.foyCaptionMedium`, `.foyCaptionSemibold`, `.foyStatValue`, `.foyHint`, `.foyHintMedium`, `.foySkipLabel`, `.foySkipLabelMedium`, `.foySectionLabel`, `.foySectionLabelSemibold`, `.foyMicro`, `.foyMicroMedium`, `foyMeditationTimer(size:)`. Style modifiers: `.foyDisplayTitleStyle()`, `.foySectionTitleStyle()`, `.foyBodyStyle()`, `.foySectionLabelStyle()`.
-
-### Screen Structure (canonical template)
+### Screen structure — canonical
 
 ```swift
 struct ExampleScreen: View {
     @State private var viewModel = ExampleViewModel()
-
     var body: some View {
         ZStack {
             Color.foyBackground.ignoresSafeArea()
             VStack(spacing: 0) {
                 ScreenHeaderView(title: "Title")
                 ScrollView {
-                    VStack(spacing: Spacing.lg) {
-                        // sections here
-                    }
-                    .padding(.horizontal, Spacing.screenHorizontal)
-                    .padding(.bottom, Spacing.screenBottom)
+                    VStack(spacing: Spacing.lg) { /* sections */ }
+                        .padding(.horizontal, Spacing.screenHorizontal)
+                        .padding(.bottom, Spacing.screenBottom)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -539,116 +303,46 @@ struct ExampleScreen: View {
 }
 ```
 
-**8 rules every screen must satisfy:**
-1. Outermost layer: `ZStack { Color.foyBackground.ignoresSafeArea() }`
-2. Always `ScreenHeaderView(title:)`. If header-less: document it with `// Screen has no header: <reason>`
-3. `Spacing.screenHorizontal` applied once on scroll content `VStack`. Never `Spacing.xl`. Never raw numbers.
-4. Always `.padding(.bottom, Spacing.screenBottom)` on scroll content `VStack`
-5. `VStack(spacing: Spacing.lg)` between major sections
-6. Always `.scrollIndicators(.hidden)`
-7. No raw spacing/corner values — use tokens; if missing add to `DS+Spacing.swift` or `DS+CornerRadius.swift`
-8. Components inside a padded scroll context must not add their own `.padding(.horizontal, ...)` — **Exception:** use `.padding(.horizontal, -Spacing.screenHorizontal)` to intentionally break out of scroll padding for edge-to-edge content (e.g. carousels, full-bleed banners).
+**8 rules every screen satisfies:**
+1. Outer: `ZStack { Color.foyBackground.ignoresSafeArea() }`
+2. `ScreenHeaderView(title:)` — if header-less, comment `// Screen has no header: <reason>`
+3. `Spacing.screenHorizontal` applied once on scroll content `VStack` (never `Spacing.xl`, never raw)
+4. `.padding(.bottom, Spacing.screenBottom)` on scroll content `VStack`
+5. `VStack(spacing: Spacing.lg)` between sections
+6. `.scrollIndicators(.hidden)`
+7. No raw spacing/corner values — use tokens; if missing, add to `DS+Spacing.swift`/`DS+CornerRadius.swift`
+8. Components inside padded scroll context don't add their own `.padding(.horizontal, ...)`. **Exception:** `.padding(.horizontal, -Spacing.screenHorizontal)` to break out for edge-to-edge content.
 
-**Component padding hierarchy:** `Spacing.lg` between sections · `Spacing.md` between list items · `Spacing.sm` for icon+text · `Spacing.xs` for chips/badges · `Spacing.md` inside cards
+**Padding hierarchy:** `Spacing.lg` sections · `Spacing.md` list items + inside cards · `Spacing.sm` icon+text · `Spacing.xs` chips/badges.
 
-### Screen Views (MVVM)
+### Screens (MVVM)
 
-Screens are named with `Screen` suffix and contain **only** the ViewModel declaration:
+`Screen` suffix; contains only the VM declaration:
 
 ```swift
 struct BlockSetupScreen: View {
-    @State private var viewModel = BlockSetupViewModel()  // ✅ @State, not @StateObject
+    @State private var viewModel = BlockSetupViewModel()
     var body: some View { ... }
 }
 ```
 
-All state (including navigation booleans, selected-item optionals, sheet triggers) belongs in the ViewModel. Bind with `Bindable(viewModel).property` — no property wrapper change required:
+ALL state (navigation flags, sheet triggers, selected-item optionals) lives in the VM. Bind via `Bindable(viewModel).property` — no property wrapper change needed:
 
 ```swift
-.sheet(item: Bindable(viewModel).selectedArticle) { article in ArticleDetailView(article: article) }
+.sheet(item: Bindable(viewModel).selectedArticle) { ArticleDetailView(article: $0) }
 ```
 
-**View conditions:** one ViewModel property inline is fine. Two or more → computed property on ViewModel:
+**View conditions:** one VM property inline OK; two+ → computed property on the VM.
 
-```swift
-// ✅ ViewModel
-var showRetry: Bool { !isLoading && hasError }
-// ✅ View
-if viewModel.showRetry { RetryButton() }
-```
+### Components
 
-### ViewModels
-
-```swift
-@Observable @MainActor
-final class MyViewModel {
-    var isLoading = false
-    var error: ErrorInfo?
-    @ObservationIgnored @Injected(\.myService) private var myService
-}
-```
-
-- `@Observable @MainActor final class` — always. Never `ObservableObject`/`@Published`.
-- Screens own with `@State`. Child views with bindings use `@Bindable`. Read-only children use plain `var`.
-- Never use `private var foo: some View` computed view properties — extract to named `struct` in `Components/`.
-
-### Reusable Components
-
-- Feature-scoped → `Features/FeatureName/Components/`
+- Feature-scoped → `Features/<F>/Components/`
 - App-wide → `DesignSystem/Components/`
-- Never inline ad-hoc sub-views in screen files. Never copy-paste a view body.
+- Never inline ad-hoc sub-views in screen files. Never `private var foo: some View` — extract to a named `struct` in `Components/`. Never copy-paste a view body.
 
-### Dependency Injection
+### Swift concurrency
 
-```swift
-@ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
-```
-
-- Always pair `@ObservationIgnored` with `@Injected` inside `@Observable` classes
-- Views never call `Container.shared.resolve()`
-- All registrations in `App/Container+App.swift` under `// MARK: - Services` and `// MARK: - Use Cases`
-
-### Services (network only)
-
-Every Service has two files: `<Name>ServiceProtocol.swift` and `<Name>Service.swift`. Services are plain `final class` — no `@Observable`, no `@MainActor` necessary (added when required for callers). The Service injects `networkClient` ONLY and does nothing else:
-
-```swift
-// ArticlesServiceProtocol.swift
-protocol ArticlesServiceProtocol {
-    func dailyArticles() async throws -> [Article]
-}
-
-// ArticlesService.swift
-import Factory
-import Foundation
-
-final class ArticlesService: ArticlesServiceProtocol {
-    @Injected(\.networkClient) private var networkClient
-
-    func dailyArticles() async throws -> [Article] {
-        try await networkClient.get("/api/articles/today")
-    }
-}
-```
-
-**Container registration** (always via protocol type, no init parameters):
-```swift
-var articlesService: Factory<ArticlesServiceProtocol> {
-    self { @MainActor in ArticlesService() }.singleton
-}
-```
-
-**State-store Use Cases — `ProfileUseCase`, `PurchaseUseCase`**: Both are `@Observable @MainActor final class` registered with their protocol type. They hold reactive state (`UserProfile`, `isPro`); persistence goes through `UserDefaultsStore`, and `PurchaseUseCase` inlines StoreKit (single consumer). Their `@Injected` dependencies must use `@ObservationIgnored` to prevent a backing-storage name collision with the `@Observable` macro. When mutating `@Observable`-tracked properties from inside the class, always assign to `self.property` — never to the synthesized `_property` backing store, which bypasses the observation system.
-
-**Never use `NotificationCenter`** for propagating state changes between layers — use `@Observable` or async sequences instead.
-
-**Model placement is governed by the "Networking models" section earlier in this file** — backend models go in `Networking/Models/` with both `toBackendModel()` / `toDomainModel()` mappers when the wire shape differs from the domain; domain models go in `Models/`. No `import SwiftUI` in model files.
-
-**Views must never access services, use cases, or `Container.shared` directly.** All interaction goes through a ViewModel. **ViewModels must never access services directly** — all service interaction goes through a Use Case (see "The one-layer rule for ViewModels" earlier in this file).
-
-### Swift Concurrency
-
-Services and Use Cases are `async throws`. ViewModels call Use Cases in `Task {}`:
+Use Cases / Services are `async throws`. VMs call them in `Task {}`:
 
 ```swift
 func load() {
@@ -659,93 +353,39 @@ func load() {
 }
 ```
 
-- Never completion handlers in new code — use `async throws`
-- Never `try?` to suppress errors — always catch and surface
-- Cancel superseded tasks: store as `private var loadTask: Task<Void, Never>?`, cancel before re-launching
+- Never completion handlers in new code · never `try?` to suppress (catch + surface) · cancel superseded tasks (`private var loadTask: Task<Void, Never>?`, cancel before re-launch).
+- **Loading flags wrap network IO only.** Set `isLoading = true` immediately before `await <service/useCase call>`, `false` immediately after (use `defer { isLoading = false }` when there's a throw path). Never introduce `Task.sleep` to gate UI transitions — rely on `@Observable` propagation and `.animation(_:value:)` for visual smoothing.
+- **Fire-and-forget exception** — silent `Task { _ = try? await ... }` only when ALL three hold: (1) data already persisted locally, (2) failure has no user-visible consequence, (3) a comment explains why.
 
-**Best-effort fire-and-forget pattern** (use sparingly): For non-critical background sync where local state is already saved and a network failure has no user-visible consequence, a silent Task is permitted:
-```swift
-// Local state is already persisted above — network sync is advisory only
-Task { [weak self] in
-    guard let self else { return }
-    _ = try? await networkClient.post(path, body: body) as EmptyResponse
-}
-```
-Only allowed when all three conditions hold: (1) data is already persisted locally, (2) failure has no user-visible consequence, (3) a comment explains why silent failure is acceptable.
-
-### Error Handling
+### Error handling
 
 ```swift
 enum MyError: Error {
-    case caseA
-    case caseB(Error)
+    case caseA, caseB(Error)
     var defaultDescription: String { switch self { ... } }
 }
 ```
 
-ViewModels expose `var error: ErrorInfo?`. Views display with `InlineErrorView(error: error)` — never raw `Text` with `Color.foyOrange`.
-
-### Navigation
-
-Always `NavigationStack` — never `NavigationView`. Route enums per feature (`FeatureRoute.swift`). Navigation state owned by root screen `@State` or parent ViewModel.
+VMs expose `var error: ErrorInfo?`. Display via `InlineErrorView(error: error)` — never raw `Text` in `Color.foyOrange`.
 
 ### Comments
 
-Never write comments. The only exceptions are:
-- `// MARK: -` section dividers
-- A comment that explains a non-obvious *why* — a hidden constraint, a workaround for a specific bug, or behavior that would surprise a reader
+Never write comments. Exceptions: `// MARK: -` dividers; a non-obvious *why* (hidden constraint, workaround for a specific bug, surprising behavior). Never describe what the code does, reference design tools (Pencil/Figma IDs), name callers, or document the current task.
 
-Never write comments that describe what the code does, reference design tools (Pencil, Figma node IDs), name callers, or document current tasks.
+### Swift idioms
 
-### Swift Idioms
+- `Date.now` over `Date()`.
+- Date-only ISO8601 strings: `.formatted(.iso8601.year().month().day())`, never `ISO8601DateFormatter().string(from:).prefix(10)`.
+- Omit `return` in single-expression functions/computed properties. `if`/`switch` as expressions.
 
-- Prefer `Date.now` over `Date()` for clarity.
-- For date-only ISO8601 strings (e.g. API query params), use `.formatted(.iso8601.year().month().day())` — never `ISO8601DateFormatter().string(from:).prefix(10)`.
-- Omit `return` in single-expression functions and computed properties. `if`/`switch` can be used as expressions.
+### Member ordering (class/struct)
 
-### Member ordering inside a class or struct
+Fixed order — function NEVER between properties of the same kind. Use `// MARK: -` dividers when grouping helps navigation:
 
-Members SHALL appear in this fixed order. Use `// MARK: -` dividers between sections when the file is long enough that grouping aids navigation.
-
-1. **Stored properties** (`@Injected`, `@ObservationIgnored`, `let`, `var` with a stored value)
-2. **Static constants** (`private static let foo = ...`)
-3. **Computed properties** (`var foo: T { ... }`, including get-only and get/set)
-4. **`init`**
-5. **Public methods**
-6. **Private methods**
-7. **Nested types** at the bottom (`private struct JWTPayload`, etc.)
-
-A function NEVER appears between two properties of the same kind. If you find yourself adding a computed property in the middle of the file, move it up with the other computed properties.
-
-**Why**: scanning a class for "what does it expose" should hit all properties first, then all behavior. Computed properties hidden between methods make the API surface invisible.
-
-**Worked example** — `AuthUseCase`:
-```swift
-final class AuthUseCase: AuthUseCaseProtocol {
-    @Injected(\.authService) private var authService           // 1. stored
-    @Injected(\.keychainStore) private var keychainStore
-
-    private static let accessTokenKey = "foy.accessToken"      // 2. static constants
-
-    var email: String? { keychainStore.load(Self.userEmailKey) }      // 3. computed
-    var isAuthenticated: Bool { keychainStore.load(Self.accessTokenKey) != nil }
-
-    // 4. init — none for this class
-
-    // MARK: - Public methods                                  // 5. public methods
-    func register(...) async throws { ... }
-    func signIn(...) async throws { ... }
-    func signOut() async { ... }
-
-    // MARK: - Private                                         // 6. private methods
-    private func saveAuthTokens(...) { ... }
-
-    private struct JWTPayload: Decodable { ... }               // 7. nested types
-}
-```
-
-ViewModels follow the same order, with stored `var`s (UI state) grouped together under their own `// MARK: - State` divider when there are many.
-
-### Widget Model Sync
-
-When modifying `CheckIn`, `Mood`, `UserProfile`, or `PendingWidgetCheckIn`, manually update `FocusOnYourselfWidgets/WidgetDataProvider.swift`. The widget target cannot import the main app, so `WidgetDataProvider.swift` contains mirror copies (`WidgetPendingCheckIn`, etc.) that must be kept field-for-field identical — same property names, same types, same order — because both sides encode/decode the same `UserDefaults` data.
+1. Stored properties (`@Injected`, `let`, `var` with stored value)
+2. Static constants
+3. Computed properties
+4. `init`
+5. Public methods
+6. Private methods
+7. Nested types

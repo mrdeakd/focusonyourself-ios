@@ -2,9 +2,14 @@ import Factory
 import Foundation
 import Observation
 
-@MainActor
-@Observable
+@Observable @MainActor
 final class OnboardingViewModel {
+    @ObservationIgnored @Injected(\.notificationsUseCase) private var notificationsUseCase
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+
+    // MARK: - State
+
     var currentStep: OnboardingStep = .welcome
     var nameInput: String = ""
     var selectedCategories: [AffirmationCategory] = []
@@ -12,9 +17,7 @@ final class OnboardingViewModel {
     private(set) var notificationsEnabled = false
     private(set) var isCompleted = false
 
-    @ObservationIgnored @Injected(\.notificationsUseCase) private var notificationsUseCase
-    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
-    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+    // MARK: - Computed
 
     var isPro: Bool { purchaseUseCase.isPro }
 
@@ -25,6 +28,8 @@ final class OnboardingViewModel {
     var isNameValid: Bool {
         !nameInput.trimmingCharacters(in: .whitespaces).isEmpty
     }
+
+    // MARK: - Public methods
 
     func requestUnlock() { showPaywall = true }
 
@@ -65,6 +70,8 @@ final class OnboardingViewModel {
             onboardingCompleted: true
         )
     }
+
+    // MARK: - Private methods
 
     private func complete() {
         profileUseCase.saveCompletedProfile(buildProfile())

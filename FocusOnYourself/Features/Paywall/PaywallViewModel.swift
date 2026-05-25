@@ -3,20 +3,22 @@ import Foundation
 import Observation
 import StoreKit
 
-@Observable
-@MainActor
+@Observable @MainActor
 final class PaywallViewModel {
-    enum Plan { case monthly, annual }
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+
+    // MARK: - State
 
     var selectedPlan: Plan = .annual
     var isLoading = false
     var error: ErrorInfo?
     var shouldDismiss = false
     var showSuccess = false
-    var isPro: Bool { purchaseUseCase.isPro }
     var products: [Product]
 
-    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+    // MARK: - Computed
+
+    var isPro: Bool { purchaseUseCase.isPro }
 
     var monthlyProduct: Product? {
         products.first { $0.id == ProductID.monthly }
@@ -49,6 +51,8 @@ final class PaywallViewModel {
     init() {
         products = []
     }
+
+    // MARK: - Public methods
 
     func onAppear() async {
         async let loadedProducts = purchaseUseCase.loadProducts()
@@ -84,12 +88,9 @@ final class PaywallViewModel {
                     break
                 }
             } catch let purchaseError as PurchaseError {
-                error = ErrorInfo(
-                    title: "Purchase Failed",
-                    description: purchaseError.defaultDescription
-                )
+                error = ErrorInfo(purchaseError)
             } catch {
-                self.error = ErrorInfo(title: "Purchase Failed", description: "Something went wrong. Please try again.")
+                self.error = ErrorInfo(title: "Purchase failed", description: "Something went wrong. Please try again.")
             }
             isLoading = false
         }
@@ -108,12 +109,14 @@ final class PaywallViewModel {
                 try await purchaseUseCase.restorePurchases()
             } catch let purchaseError as PurchaseError {
                 if purchaseError != .userCancelled {
-                    error = ErrorInfo(title: "Restore Failed", description: purchaseError.defaultDescription)
+                    error = ErrorInfo(purchaseError)
                 }
             } catch {
-                self.error = ErrorInfo(title: "Restore Failed", description: "Something went wrong. Please try again.")
+                self.error = ErrorInfo(title: "Restore failed", description: "Something went wrong. Please try again.")
             }
             isLoading = false
         }
     }
+
+    enum Plan { case monthly, annual }
 }

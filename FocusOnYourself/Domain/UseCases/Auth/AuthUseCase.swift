@@ -1,18 +1,27 @@
 import Factory
 import Foundation
+import Observation
 
+@Observable
+@MainActor
 final class AuthUseCase: AuthUseCaseProtocol {
-    @Injected(\.authService) private var authService
-    @Injected(\.checkInUseCase) private var checkInUseCase
-    @Injected(\.keychainStore) private var keychainStore
-    private let jwtExpiryCalculator = JWTExpiryCalculator()
+    private(set) var isAuthenticated: Bool
+    private(set) var email: String?
+
+    @ObservationIgnored @Injected(\.authService) private var authService
+    @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
+    @ObservationIgnored @Injected(\.keychainStore) private var keychainStore
+    @ObservationIgnored private let jwtExpiryCalculator = JWTExpiryCalculator()
 
     private static let accessTokenKey  = "foy.accessToken"
     private static let refreshTokenKey = "foy.refreshToken"
     private static let userEmailKey    = "foy.userEmail"
 
-    var email: String? { keychainStore.load(Self.userEmailKey) }
-    var isAuthenticated: Bool { keychainStore.load(Self.accessTokenKey) != nil }
+    init() {
+        let keychain = _keychainStore.wrappedValue
+        isAuthenticated = keychain.load(Self.accessTokenKey) != nil
+        email = keychain.load(Self.userEmailKey)
+    }
 
     // MARK: - Public methods
 
@@ -57,11 +66,15 @@ final class AuthUseCase: AuthUseCaseProtocol {
         try? keychainStore.save(response.accessToken, for: Self.accessTokenKey)
         try? keychainStore.save(response.refreshToken, for: Self.refreshTokenKey)
         try? keychainStore.save(response.user.email, for: Self.userEmailKey)
+        isAuthenticated = true
+        email = response.user.email
     }
 
     private func clearAuthTokens() {
         keychainStore.delete(Self.accessTokenKey)
         keychainStore.delete(Self.refreshTokenKey)
         keychainStore.delete(Self.userEmailKey)
+        isAuthenticated = false
+        email = nil
     }
 }

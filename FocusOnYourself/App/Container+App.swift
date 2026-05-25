@@ -31,6 +31,9 @@ extension Container {
     var authService: Factory<AuthServiceProtocol> {
         self { @MainActor in AuthService() }.singleton
     }
+    var subscriptionService: Factory<SubscriptionServiceProtocol> {
+        self { @MainActor in SubscriptionService() }.singleton
+    }
 
     // MARK: - Use Cases
 

@@ -6,7 +6,11 @@ import Observation
 final class HistoryViewModel {
     @ObservationIgnored @Injected(\.checkInUseCase) private var checkInUseCase
 
+    // MARK: - State
+
     var selectedCheckIn: CheckIn?
+
+    // MARK: - Computed
 
     var streakStats: (current: Int, longest: Int) {
         !checkInUseCase.allCheckIns.isEmpty ? checkInUseCase.streakStats() : (0, 0)
@@ -35,6 +39,8 @@ final class HistoryViewModel {
         }
         return months.reversed()
     }
+
+    // MARK: - Public methods
 
     func checkIn(for dateString: String) -> CheckIn? {
         checkInUseCase.checkIn(for: dateString)

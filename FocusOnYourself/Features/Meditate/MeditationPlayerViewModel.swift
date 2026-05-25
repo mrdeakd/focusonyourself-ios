@@ -5,13 +5,9 @@ import Observation
 
 @Observable @MainActor
 final class MeditationPlayerViewModel: NSObject {
-    let session: MeditationSession
-    @ObservationIgnored @Injected(\.networkClient) private var networkClient
+    @ObservationIgnored @Injected(\.meditationService) private var meditationService
 
-    var currentStepIndex: Int = 0
-    var isComplete = false
-    var phase: MeditationPhase = .narrating
-    var timerSecondsRemaining: Int = 0
+    let session: MeditationSession
 
     @ObservationIgnored private var timerTask: Task<Void, Never>?
     @ObservationIgnored private var narrationMap: [String: String] = [:]
@@ -22,6 +18,13 @@ final class MeditationPlayerViewModel: NSObject {
     @ObservationIgnored private var audioPlayer: AVAudioPlayer?
 
     private let processingBreakDuration = 15
+
+    // MARK: - State
+
+    var currentStepIndex: Int = 0
+    var isComplete = false
+    var phase: MeditationPhase = .narrating
+    var timerSecondsRemaining: Int = 0
 
     init(session: MeditationSession) {
         self.session = session
@@ -43,7 +46,7 @@ final class MeditationPlayerViewModel: NSObject {
             .formatted(.time(pattern: .minuteSecond(padMinuteToLength: 1)))
     }
 
-    // MARK: - Lifecycle
+    // MARK: - Public methods
 
     func onAppear() {
         startStep()
@@ -53,8 +56,6 @@ final class MeditationPlayerViewModel: NSObject {
         stopSpeaking()
         timerTask?.cancel()
     }
-
-    // MARK: - Navigation
 
     func nextStep() {
         cancelTimer()
@@ -75,8 +76,6 @@ final class MeditationPlayerViewModel: NSObject {
         startStep()
     }
 
-    // MARK: - Timer Controls
-
     func pauseTimer() {
         guard phase == .timerRunning else { return }
         timerTask?.cancel()
@@ -89,7 +88,7 @@ final class MeditationPlayerViewModel: NSObject {
         runTimer()
     }
 
-    // MARK: - Audio (inlined AVAudio)
+    // MARK: - Private methods
 
     private func configureAudioSession() {
         #if os(iOS)
@@ -105,11 +104,9 @@ final class MeditationPlayerViewModel: NSObject {
     }
 
     private func fetchNarrationMap() async {
-        do {
-            narrationMap = try await networkClient.get("/api/narration-map")
-        } catch {
-            // Map unavailable — speak() will silently do nothing until map loads
-        }
+        // Narration is a non-fatal enhancement: if the map fails to load, speak() silently no-ops
+        // and the player still progresses through steps.
+        narrationMap = (try? await meditationService.narrationMap()) ?? [:]
     }
 
     private func speak(_ text: String, onComplete: @escaping () -> Void) {
@@ -206,8 +203,6 @@ final class MeditationPlayerViewModel: NSObject {
         }
         player.play()
     }
-
-    // MARK: - Private flow
 
     private func startStep() {
         phase = .narrating

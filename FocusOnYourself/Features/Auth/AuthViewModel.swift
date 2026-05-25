@@ -3,6 +3,10 @@ import Observation
 
 @Observable @MainActor
 final class AuthViewModel {
+    @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
+
+    // MARK: - State
+
     var email = ""
     var password = ""
     var confirmPassword = ""
@@ -10,7 +14,7 @@ final class AuthViewModel {
     var isAuthenticated = false
     var error: ErrorInfo?
 
-    @ObservationIgnored @Injected(\.authUseCase) private var authUseCase
+    // MARK: - Public methods
 
     func signIn() async {
         isLoading = true
@@ -19,12 +23,8 @@ final class AuthViewModel {
         do {
             try await authUseCase.signIn(email: email, password: password)
             isAuthenticated = true
-        } catch let networkError as NetworkError {
-            if case .badResponse(let code) = networkError, code == 401 {
-                error = ErrorInfo(title: "Incorrect email or password")
-            } else {
-                error = ErrorInfo(title: "Sign in failed", description: "Please try again.")
-            }
+        } catch let error as AuthError {
+            self.error = ErrorInfo(error)
         } catch {
             self.error = ErrorInfo(title: "Sign in failed", description: "Please try again.")
         }
@@ -41,12 +41,8 @@ final class AuthViewModel {
         do {
             try await authUseCase.register(email: email, password: password)
             isAuthenticated = true
-        } catch let networkError as NetworkError {
-            if case .badResponse(let code) = networkError, code == 409 {
-                error = ErrorInfo(title: "Email already in use")
-            } else {
-                error = ErrorInfo(title: "Registration failed", description: "Please try again.")
-            }
+        } catch let error as AuthError {
+            self.error = ErrorInfo(error)
         } catch {
             self.error = ErrorInfo(title: "Registration failed", description: "Please try again.")
         }

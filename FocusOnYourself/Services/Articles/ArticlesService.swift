@@ -7,7 +7,13 @@ final class ArticlesService: ArticlesServiceProtocol {
     func dailyArticles() async throws -> [Article] {
         let path = "/api/articles/daily"
         let date = Date.now.formatted(.iso8601.year().month().day())
-        let response: [Article] = try await networkClient.get("\(path)?date=\(date)")
-        return response
+        do {
+            let response: [Article] = try await networkClient.get("\(path)?date=\(date)")
+            return response
+        } catch {
+            throw Self.mapDailyArticlesError(error)
+        }
     }
+
+    private static func mapDailyArticlesError(_ error: Error) -> ArticlesError { .fetchFailed }
 }

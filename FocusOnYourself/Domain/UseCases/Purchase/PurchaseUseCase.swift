@@ -8,6 +8,7 @@ final class PurchaseUseCase: PurchaseUseCaseProtocol {
     private(set) var isPro = false
 
     @ObservationIgnored @Injected(\.userDefaultsStore) private var userDefaultsStore
+    @ObservationIgnored @Injected(\.subscriptionService) private var subscriptionService
     @ObservationIgnored private var updatesTask: Task<Void, Never>?
 
     init() {
@@ -44,7 +45,18 @@ final class PurchaseUseCase: PurchaseUseCaseProtocol {
                 throw PurchaseError.verificationFailed
             }
             await transaction.finish()
-            await refreshEntitlements()
+            // Use the just-verified JWS directly. Transaction.currentEntitlements is
+            // eventually-consistent after transaction.finish(); waiting for it would
+            // leave isPro=false until Transaction.updates ticks asynchronously.
+            do {
+                let response = try await subscriptionService.verify(
+                    signedTransaction: verification.jwsRepresentation
+                )
+                isPro = response.isPro
+                userDefaultsStore.setBool(response.isPro, for: .isPro)
+            } catch {
+                // Backend unreachable — Transaction.updates listener will retry via refreshEntitlements
+            }
             return .success
         case .userCancelled:
             return .cancelled
@@ -61,16 +73,18 @@ final class PurchaseUseCase: PurchaseUseCaseProtocol {
     }
 
     func refreshEntitlements() async {
-        var hasEntitlement = false
+        var serverIsPro = false
         for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result,
-                transaction.productID == ProductID.monthly || transaction.productID == ProductID.annual,
-                transaction.revocationDate == nil {
-                hasEntitlement = true
-                break
+            guard case .verified = result else { continue }
+            do {
+                let response = try await subscriptionService.verify(signedTransaction: result.jwsRepresentation)
+                if response.isPro { serverIsPro = true }
+            } catch {
+                // Network failure mid-loop — preserve the previously cached isPro value
+                return
             }
         }
-        isPro = hasEntitlement
-        userDefaultsStore.setBool(hasEntitlement, for: .isPro)
+        isPro = serverIsPro
+        userDefaultsStore.setBool(serverIsPro, for: .isPro)
     }
 }

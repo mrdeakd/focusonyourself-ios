@@ -10,9 +10,15 @@ final class AffirmationService: AffirmationServiceProtocol {
     ) async throws -> [CachedAffirmation] {
         let path = "/api/affirmations/batch"
         let categoryParams = categories.map(\.rawValue).joined(separator: ",")
-        let response: [CachedAffirmation] = try await networkClient.get(
-            "\(path)?categories=\(categoryParams)&count=\(count)"
-        )
-        return response
+        do {
+            let response: [CachedAffirmation] = try await networkClient.get(
+                "\(path)?categories=\(categoryParams)&count=\(count)"
+            )
+            return response
+        } catch {
+            throw Self.mapFetchAffirmationsError(error)
+        }
     }
+
+    private static func mapFetchAffirmationsError(_ error: Error) -> AffirmationError { .fetchFailed }
 }

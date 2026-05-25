@@ -13,9 +13,6 @@ final class AccountViewModel {
 
     // MARK: - State
 
-    var isAuthenticated: Bool
-    var isRefreshing = false
-    var accountEmail: String?
     var showAuthFlow = false
     var showSettingsSheet = false
     var showChangeNameSheet = false
@@ -26,6 +23,8 @@ final class AccountViewModel {
 
     // MARK: - Computed
 
+    var isAuthenticated: Bool { authUseCase.isAuthenticated }
+    var accountEmail: String? { authUseCase.email }
     var isPro: Bool { purchaseUseCase.isPro }
 
     var currentName: String {
@@ -93,28 +92,10 @@ final class AccountViewModel {
         return labels.isEmpty ? "None" : labels.joined(separator: ", ")
     }
 
-    // MARK: - Init
-
-    init() {
-        isAuthenticated = _authUseCase.wrappedValue.isAuthenticated
-        accountEmail = _authUseCase.wrappedValue.email
-    }
-
     // MARK: - Public methods
 
     func signOut() async {
         await authUseCase.signOut()
-        isAuthenticated = false
-        accountEmail = nil
-    }
-
-    func refreshAuthState() async {
-        guard authUseCase.isAuthenticated, !isAuthenticated else { return }
-        isRefreshing = true
-        try? await Task.sleep(for: .milliseconds(350))
-        isAuthenticated = true
-        accountEmail = authUseCase.email
-        isRefreshing = false
     }
 
     func updateName(_ name: String) {
@@ -132,7 +113,5 @@ final class AccountViewModel {
         settingsUseCase.clearPendingWidgetCheckIn()
         await authUseCase.signOut()
         await purchaseUseCase.refreshEntitlements()
-        isAuthenticated = false
-        accountEmail = nil
     }
 }

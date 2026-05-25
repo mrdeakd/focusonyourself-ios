@@ -27,6 +27,14 @@ struct SignInScreen: View {
                 .background(Color.foyBackground)
         }
         .ignoresSafeArea(.keyboard)
+        .simultaneousGesture(TapGesture().onEnded {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder),
+                to: nil,
+                from: nil,
+                for: nil
+            )
+        })
     }
 
     private var titleBlock: some View {

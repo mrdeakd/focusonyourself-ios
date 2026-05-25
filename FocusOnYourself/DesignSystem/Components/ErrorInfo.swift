@@ -8,4 +8,8 @@ struct ErrorInfo {
         self.title = title
         self.description = description
     }
+
+    init(_ error: UserFacingError) {
+        self.init(title: error.errorTitle, description: error.errorDescription)
+    }
 }

@@ -50,9 +50,6 @@
             ReferencedContainer = "container:FocusOnYourself.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <StoreKitConfigurationFileReference
-         identifier = "../../FocusOnYourself/FocusOnYourselfStoreKit.storekit">
-      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

@@ -4,6 +4,11 @@ import Observation
 
 @Observable @MainActor
 final class MeditateViewModel {
+    @ObservationIgnored @Injected(\.meditationService) private var meditationService
+    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+
+    // MARK: - State
+
     var selectedCategory: MeditationCategory?
     var sessions: [MeditationSession] = []
     var isLoading = false
@@ -11,10 +16,11 @@ final class MeditateViewModel {
     var showingPaywall = false
     var error: ErrorInfo?
 
-    @ObservationIgnored @Injected(\.meditationService) private var meditationService
-    @ObservationIgnored @Injected(\.purchaseUseCase) private var purchaseUseCase
+    // MARK: - Computed
 
     var isPro: Bool { purchaseUseCase.isPro }
+
+    // MARK: - Public methods
 
     func handleSessionTap(_ session: MeditationSession) {
         if session.isPro && !isPro {
@@ -43,8 +49,10 @@ final class MeditateViewModel {
                 }
                 return !lhs.isPro && rhs.isPro
             }
+        } catch let error as MeditationError {
+            self.error = ErrorInfo(error)
         } catch {
-            self.error = ErrorInfo(title: "Couldn't Load Meditations", description: error.localizedDescription)
+            self.error = ErrorInfo(title: "Couldn't load meditations", description: "Please try again.")
         }
     }
 }

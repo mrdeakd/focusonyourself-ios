@@ -34,6 +34,9 @@ extension Container {
     var subscriptionService: Factory<SubscriptionServiceProtocol> {
         self { @MainActor in SubscriptionService() }.singleton
     }
+    var streaksService: Factory<StreaksServiceProtocol> {
+        self { @MainActor in StreaksService() }.singleton
+    }
 
     // MARK: - Use Cases
 

@@ -70,6 +70,7 @@ struct HomeScreen: View {
             DailyFactorsSheet(viewModel: viewModel)
         }
         .task {
+            await viewModel.refreshStreaks()
             await viewModel.loadArticles()
             await viewModel.generateAffirmationIfNeeded()
         }

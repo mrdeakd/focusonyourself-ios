@@ -42,6 +42,10 @@ final class HistoryViewModel {
 
     // MARK: - Public methods
 
+    func refreshStreaks() async {
+        try? await checkInUseCase.refreshStreaksFromServer()
+    }
+
     func checkIn(for dateString: String) -> CheckIn? {
         checkInUseCase.checkIn(for: dateString)
     }

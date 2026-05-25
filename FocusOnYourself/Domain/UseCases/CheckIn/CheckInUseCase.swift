@@ -1,11 +1,21 @@
 import Factory
 import Foundation
+import Observation
+import WidgetKit
 
+@Observable @MainActor
 final class CheckInUseCase: CheckInUseCaseProtocol {
-    @Injected(\.profileUseCase) private var profileUseCase
-    @Injected(\.checkinsService) private var checkinsService
-    @Injected(\.userDefaultsStore) private var userDefaultsStore
-    private let streakCalculator = StreakCalculator()
+    @ObservationIgnored @Injected(\.profileUseCase) private var profileUseCase
+    @ObservationIgnored @Injected(\.checkinsService) private var checkinsService
+    @ObservationIgnored @Injected(\.streaksService) private var streaksService
+    @ObservationIgnored @Injected(\.userDefaultsStore) private var userDefaultsStore
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
+
+    // MARK: - State
+
+    private(set) var serverStreaks: ServerStreakStats?
+
+    // MARK: - Computed
 
     var hasCheckedInToday: Bool {
         profileUseCase.profile.checkIns.contains { $0.dateString == CheckIn.dateString(for: .now) }
@@ -28,6 +38,11 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     }
 
     var allCheckIns: [CheckIn] { profileUseCase.profile.checkIns }
+
+    init() {
+        guard let data = _userDefaultsStore.wrappedValue.data(for: .serverStreakStats) else { return }
+        serverStreaks = try? JSONDecoder().decode(ServerStreakStats.self, from: data)
+    }
 
     // MARK: - Public methods
 
@@ -73,21 +88,34 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
     func downloadAndReplaceFromServer() async throws {
         let checkIns = try await checkinsService.fetch()
         try await replaceAll(checkIns)
+        try? await refreshStreaksFromServer()
+    }
+
+    func refreshStreaksFromServer() async throws {
+        let timezone = TimeZone.current.identifier
+        let response = try await streaksService.fetchMyStreaks(timezone: timezone)
+        let stats = ServerStreakStats(
+            currentStreak: response.currentStreak,
+            longestStreak: response.longestStreak,
+            streakStartDate: response.streakStartDate,
+            lastCheckInDate: response.lastCheckInDate
+        )
+        serverStreaks = stats
+        if let data = try? JSONEncoder().encode(stats) {
+            userDefaultsStore.setData(data, for: .serverStreakStats)
+        }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func streakStats() -> (current: Int, longest: Int) {
-        streakCalculator.compute(checkIns: profileUseCase.profile.checkIns)
-    }
-
-    func streakStartDate() -> Date? {
-        streakCalculator.startDate(checkIns: profileUseCase.profile.checkIns)
+        (current: serverStreaks?.currentStreak ?? 0, longest: serverStreaks?.longestStreak ?? 0)
     }
 
     func checkIn(for dateString: String) -> CheckIn? {
         profileUseCase.profile.checkIns.first { $0.dateString == dateString }
     }
 
-    // MARK: - Private
+    // MARK: - Private methods
 
     private func save(_ checkIn: CheckIn) async throws {
         var checkIns = profileUseCase.profile.checkIns
@@ -97,7 +125,8 @@ final class CheckInUseCase: CheckInUseCaseProtocol {
             checkIns.append(checkIn)
         }
         profileUseCase.updateCheckIns(checkIns)
-        // Local state is already persisted above — network sync is advisory only
         Task { try? await checkinsService.post(checkIn) }
+        refreshTask?.cancel()
+        refreshTask = Task { [weak self] in try? await self?.refreshStreaksFromServer() }
     }
 }

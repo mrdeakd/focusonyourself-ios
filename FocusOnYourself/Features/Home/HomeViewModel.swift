@@ -69,6 +69,10 @@ final class HomeViewModel {
 
     // MARK: - Public methods
 
+    func refreshStreaks() async {
+        try? await checkInUseCase.refreshStreaksFromServer()
+    }
+
     func loadArticles() async {
         isLoadingArticles = true
         defer { isLoadingArticles = false }

@@ -50,5 +50,8 @@ struct HistoryScreen: View {
         .sheet(item: Bindable(viewModel).selectedCheckIn) { checkIn in
             DayDetailSheet(checkIn: checkIn)
         }
+        .task {
+            await viewModel.refreshStreaks()
+        }
     }
 }

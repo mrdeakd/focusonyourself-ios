@@ -7,6 +7,7 @@ protocol CheckInUseCaseProtocol: AnyObject {
     var todaysFactors: CheckInFactors? { get }
     var earliestCheckInDate: Date? { get }
     var allCheckIns: [CheckIn] { get }
+    var serverStreaks: ServerStreakStats? { get }
 
     func record(mood: Mood, feelingsDescription: String?, factors: CheckInFactors?) async throws
     func replaceAll(_ checkIns: [CheckIn]) async throws
@@ -15,8 +16,8 @@ protocol CheckInUseCaseProtocol: AnyObject {
 
     func uploadAllToServer() async throws
     func downloadAndReplaceFromServer() async throws
+    func refreshStreaksFromServer() async throws
 
     func streakStats() -> (current: Int, longest: Int)
-    func streakStartDate() -> Date?
     func checkIn(for dateString: String) -> CheckIn?
 }

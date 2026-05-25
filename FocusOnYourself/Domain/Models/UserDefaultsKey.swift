@@ -10,4 +10,5 @@ enum UserDefaultsKey: String {
     case showExerciseFactor   = "factor.show.exercise"
     case showSocialFactor     = "factor.show.social"
     case pendingWidgetCheckIn = "pendingWidgetCheckIn"
+    case serverStreakStats    = "server-streak-stats"
 }

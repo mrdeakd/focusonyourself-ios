@@ -64,9 +64,17 @@ private struct WidgetPendingCheckIn: Codable {
     let timestamp: Date
 }
 
+private struct WidgetServerStreakStats: Codable {
+    let currentStreak: Int
+    let longestStreak: Int
+    let streakStartDate: String?
+    let lastCheckInDate: String?
+}
+
 enum WidgetDataProvider {
     private static let profileKey = "userProfile"
     private static let pendingCheckInKey = "pendingWidgetCheckIn"
+    private static let serverStreakStatsKey = "server-streak-stats"
     private static let suiteName = "group.app.ddworks.FocusOnYourself"
 
     private static func loadProfile() -> WidgetUserProfile {
@@ -79,37 +87,12 @@ enum WidgetDataProvider {
     }
 
     static func streakStats() -> (current: Int, longest: Int) {
-        let profile = loadProfile()
-        let cal = Calendar.current
-        let checkInDates = Set(profile.checkIns.map { cal.startOfDay(for: $0.date) })
-
-        var current = 0
-        var day = cal.startOfDay(for: Date())
-        if !checkInDates.contains(day) {
-            day = cal.date(byAdding: .day, value: -1, to: day) ?? day
-        }
-        while checkInDates.contains(day) {
-            current += 1
-            day = cal.date(byAdding: .day, value: -1, to: day) ?? day
-        }
-
-        let sorted = checkInDates.sorted()
-        var longest = 0
-        var run = 0
-        var prev: Date?
-        for checkInDate in sorted {
-            if let prevDate = prev,
-                let expected = cal.date(byAdding: .day, value: 1, to: prevDate),
-                expected == checkInDate {
-                run += 1
-            } else {
-                run = 1
-            }
-            if run > longest { longest = run }
-            prev = checkInDate
-        }
-
-        return (current: current, longest: longest)
+        guard
+            let defaults = UserDefaults(suiteName: suiteName),
+            let data = defaults.data(forKey: serverStreakStatsKey),
+            let stats = try? JSONDecoder().decode(WidgetServerStreakStats.self, from: data)
+        else { return (current: 0, longest: 0) }
+        return (current: stats.currentStreak, longest: stats.longestStreak)
     }
 
     static var todaysMood: WidgetMood? {
